@@ -2145,7 +2145,7 @@ func main() {
 	//Repost channel post to chat
 	Bot.Handle(tb.OnChannelPost, func(m *tb.Message) {
 		if m.Chat.Username == Config.Telegram.Channel {
-			chat, err := Bot.ChatByID("@"+Config.Telegram.Channel)
+			chat, err := Bot.ChatByID("@"+Config.Telegram.Chat)
 			if err != nil {
 				ErrorReporting(err, m)
 				return
@@ -2394,7 +2394,7 @@ func main() {
 				delay = 30
 			}
 			time.Sleep(time.Duration(delay) * time.Second)
-			err := ZavtraStreamCheck("youtubes")
+			err := ZavtraStreamCheck("youtube")
 			if err != nil {
 				log.Println(err.Error())
 				chat, _ := Bot.ChatByID("@"+Config.Telegram.SysAdmin)
