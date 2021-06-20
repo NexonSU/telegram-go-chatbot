@@ -23,10 +23,17 @@ type PidorStats struct {
 }
 
 type PidorList tb.User
+
 type Duelist struct {
 	UserID int `gorm:"primaryKey"`
 	Deaths int
 	Kills  int
+}
+
+type Warn struct {
+	UserID   int `gorm:"primaryKey"`
+	Amount   int
+	LastWarn time.Time
 }
 
 var DB, _ = gorm.Open(sqlite.Open("../../bot.db"), &gorm.Config{Logger: logger.Default.LogMode(logger.Info)})
