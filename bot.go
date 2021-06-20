@@ -1556,6 +1556,9 @@ func main() {
 	})
 	//Launch pidorday game
 	Bot.Handle("/pidor", func(m *tb.Message) {
+		if m.Private() {
+			return
+		}
 		if busy["pidor"] {
 			_, err := Bot.Reply(m, "Команда занята. Попробуйте позже.")
 			if err != nil {
@@ -1599,7 +1602,9 @@ func main() {
 				DB.Delete(pidorToday)
 				return
 			}
-			DB.Create(pidorToday)
+			pidor.UserID = pidorToday.ID
+			pidor.Date = time.Now()
+			DB.Create(pidor)
 			messages := [][]string{
 				{"Инициирую поиск пидора дня...", "Опять в эти ваши игрульки играете? Ну ладно...", "Woop-woop! That's the sound of da pidor-police!", "Система взломана. Нанесён урон. Запущено планирование контрмер.", "Сейчас поколдуем...", "Инициирую поиск пидора дня...", "Зачем вы меня разбудили...", "Кто сегодня счастливчик?"},
 				{"Хм...", "Сканирую...", "Ведётся поиск в базе данных", "Сонно смотрит на бумаги", "(Ворчит) А могли бы на работе делом заниматься", "Военный спутник запущен, коды доступа внутри...", "Ну давай, посмотрим кто тут классный..."},
@@ -2257,6 +2262,7 @@ func main() {
 			}
 		}
 		go func() {
+			message := welcomeMessage
 			time.Sleep(time.Second * 120)
 			ChatMember, err := Bot.ChatMemberOf(m.Chat, m.Sender)
 			if err != nil {
@@ -2269,7 +2275,7 @@ func main() {
 					return
 				}
 			}
-			err = Bot.Delete(m)
+			err = Bot.Delete(message)
 			if err != nil {
 				return
 			}
