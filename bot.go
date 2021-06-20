@@ -33,6 +33,7 @@ import (
 	"strings"
 	"time"
 )
+
 type Configuration struct {
 	Telegram struct {
 		Token         string   `json:"token,omitempty"`
@@ -58,31 +59,32 @@ type Configuration struct {
 	ReleasesUrl string `json:"releases_url,omitempty"`
 }
 type Get struct {
-	Name     string `gorm:"primaryKey"`
-	Type     string
-	Data     string
-	Caption  string
+	Name    string `gorm:"primaryKey"`
+	Type    string
+	Data    string
+	Caption string
 }
 type Warn struct {
-	UserID     int `gorm:"primaryKey"`
-	Amount     int
-	LastWarn   time.Time
+	UserID   int `gorm:"primaryKey"`
+	Amount   int
+	LastWarn time.Time
 }
 type PidorStats struct {
-	Date       time.Time `gorm:"primaryKey"`
-	UserID     int
+	Date   time.Time `gorm:"primaryKey"`
+	UserID int
 }
 type PidorList tb.User
 type ZavtraStream struct {
-	Service     string     `gorm:"primaryKey"`
-	LastCheck   time.Time
-	VideoID		string
+	Service   string `gorm:"primaryKey"`
+	LastCheck time.Time
+	VideoID   string
 }
 type Duelist struct {
-	UserID      int     `gorm:"primaryKey"`
-	Deaths		int
-	Kills		int
+	UserID int `gorm:"primaryKey"`
+	Deaths int
+	Kills  int
 }
+
 var ConfigFile, _ = os.Open("config.json")
 var Config = new(Configuration)
 var _ = json.NewDecoder(ConfigFile).Decode(&Config)
@@ -97,7 +99,8 @@ var Bot, _ = tb.NewBot(tb.Settings{
 })
 var DB, _ = gorm.Open(sqlite.Open("bot.db"), &gorm.Config{Logger: logger.Default.LogMode(logger.Info)})
 var busy = make(map[string]bool)
-func ErrorReporting(err error, message *tb.Message)  {
+
+func ErrorReporting(err error, message *tb.Message) {
 	_, fn, line, _ := runtime.Caller(1)
 	log.Printf("[%s:%d] %v at MessageID \"%v\" in Chat \"%v\"", fn, line, err, message.ID, message.Chat.Username)
 	MarshalledMessage, _ := json.MarshalIndent(message, "", "    ")
@@ -167,7 +170,7 @@ func FindUserInMessage(m tb.Message) (tb.User, int64, error) {
 	if m.ReplyTo != nil {
 		user = *m.ReplyTo.Sender
 		if len(text) == 2 {
-			addtime, err := strconv.ParseInt(text[1], 10,64)
+			addtime, err := strconv.ParseInt(text[1], 10, 64)
 			if err != nil {
 				return user, untildate, err
 			}
@@ -183,7 +186,7 @@ func FindUserInMessage(m tb.Message) (tb.User, int64, error) {
 			return user, untildate, err
 		}
 		if len(text) == 3 {
-			addtime, err := strconv.ParseInt(text[2], 10,64)
+			addtime, err := strconv.ParseInt(text[2], 10, 64)
 			if err != nil {
 				return user, untildate, err
 			}
@@ -219,7 +222,7 @@ func ZavtraStreamCheck(service string) error {
 			if stream.VideoID != videoId {
 				thumbnail := fmt.Sprintf("https://i.ytimg.com/vi/%v/maxresdefault_live.jpg", videoId)
 				caption := fmt.Sprintf("Стрим \"%v\" начался.\nhttps://youtube.com/%v/live", title, Config.Youtube.ChannelName)
-				chat, err := Bot.ChatByID("@"+Config.Telegram.StreamChannel)
+				chat, err := Bot.ChatByID("@" + Config.Telegram.StreamChannel)
 				if err != nil {
 					return err
 				}
@@ -275,8 +278,8 @@ func main() {
 			switch {
 			case get.Type == "Animation":
 				_, err := Bot.Reply(m, &tb.Animation{
-					File:      tb.File{FileID: get.Data},
-					Caption:   get.Caption,
+					File:    tb.File{FileID: get.Data},
+					Caption: get.Caption,
 				})
 				if err != nil {
 					ErrorReporting(err, m)
@@ -284,8 +287,8 @@ func main() {
 				}
 			case get.Type == "Audio":
 				_, err := Bot.Reply(m, &tb.Audio{
-					File:      tb.File{FileID: get.Data},
-					Caption:   get.Caption,
+					File:    tb.File{FileID: get.Data},
+					Caption: get.Caption,
 				})
 				if err != nil {
 					ErrorReporting(err, m)
@@ -293,8 +296,8 @@ func main() {
 				}
 			case get.Type == "Photo":
 				_, err := Bot.Reply(m, &tb.Photo{
-					File:      tb.File{FileID: get.Data},
-					Caption:   get.Caption,
+					File:    tb.File{FileID: get.Data},
+					Caption: get.Caption,
 				})
 				if err != nil {
 					ErrorReporting(err, m)
@@ -302,8 +305,8 @@ func main() {
 				}
 			case get.Type == "Video":
 				_, err := Bot.Reply(m, &tb.Video{
-					File:      tb.File{FileID: get.Data},
-					Caption:   get.Caption,
+					File:    tb.File{FileID: get.Data},
+					Caption: get.Caption,
 				})
 				if err != nil {
 					ErrorReporting(err, m)
@@ -311,7 +314,7 @@ func main() {
 				}
 			case get.Type == "Voice":
 				_, err := Bot.Reply(m, &tb.Voice{
-					File:      tb.File{FileID: get.Data},
+					File: tb.File{FileID: get.Data},
 				})
 				if err != nil {
 					ErrorReporting(err, m)
@@ -319,8 +322,8 @@ func main() {
 				}
 			case get.Type == "Document":
 				_, err := Bot.Reply(m, &tb.Document{
-					File:      tb.File{FileID: get.Data},
-					Caption:   get.Caption,
+					File:    tb.File{FileID: get.Data},
+					Caption: get.Caption,
 				})
 				if err != nil {
 					ErrorReporting(err, m)
@@ -385,8 +388,8 @@ func main() {
 			switch {
 			case get.Type == "Animation":
 				_, err := Bot.Reply(m, &tb.Animation{
-					File:      tb.File{FileID: get.Data},
-					Caption:   get.Caption,
+					File:    tb.File{FileID: get.Data},
+					Caption: get.Caption,
 				})
 				if err != nil {
 					ErrorReporting(err, m)
@@ -394,8 +397,8 @@ func main() {
 				}
 			case get.Type == "Audio":
 				_, err := Bot.Reply(m, &tb.Audio{
-					File:      tb.File{FileID: get.Data},
-					Caption:   get.Caption,
+					File:    tb.File{FileID: get.Data},
+					Caption: get.Caption,
 				})
 				if err != nil {
 					ErrorReporting(err, m)
@@ -403,8 +406,8 @@ func main() {
 				}
 			case get.Type == "Photo":
 				_, err := Bot.Reply(m, &tb.Photo{
-					File:      tb.File{FileID: get.Data},
-					Caption:   get.Caption,
+					File:    tb.File{FileID: get.Data},
+					Caption: get.Caption,
 				})
 				if err != nil {
 					ErrorReporting(err, m)
@@ -412,8 +415,8 @@ func main() {
 				}
 			case get.Type == "Video":
 				_, err := Bot.Reply(m, &tb.Video{
-					File:      tb.File{FileID: get.Data},
-					Caption:   get.Caption,
+					File:    tb.File{FileID: get.Data},
+					Caption: get.Caption,
 				})
 				if err != nil {
 					ErrorReporting(err, m)
@@ -421,7 +424,7 @@ func main() {
 				}
 			case get.Type == "Voice":
 				_, err := Bot.Reply(m, &tb.Voice{
-					File:      tb.File{FileID: get.Data},
+					File: tb.File{FileID: get.Data},
 				})
 				if err != nil {
 					ErrorReporting(err, m)
@@ -429,8 +432,8 @@ func main() {
 				}
 			case get.Type == "Document":
 				_, err := Bot.Reply(m, &tb.Document{
-					File:      tb.File{FileID: get.Data},
-					Caption:   get.Caption,
+					File:    tb.File{FileID: get.Data},
+					Caption: get.Caption,
 				})
 				if err != nil {
 					ErrorReporting(err, m)
@@ -613,7 +616,7 @@ func main() {
 		var text = strings.Split(m.Text, " ")
 		if m.ReplyTo != nil {
 			cmd := fmt.Sprintf("echo \"%v\" | sed \"%v\"", strings.ReplaceAll(m.ReplyTo.Text, "\"", "\\\""), strings.ReplaceAll(text[1], "\"", "\\\""))
-			out, err := exec.Command("bash","-c", cmd).Output()
+			out, err := exec.Command("bash", "-c", cmd).Output()
 			if err != nil {
 				ErrorReporting(err, m)
 				return
@@ -720,7 +723,7 @@ func main() {
 			return
 		}
 		client := cmc.NewClient(&cmc.Config{ProAPIKey: Config.CurrencyKey})
-		conversion, err := client.Tools.PriceConversion(&cmc.ConvertOptions{Amount:  amount, Symbol:  symbol, Convert: convert})
+		conversion, err := client.Tools.PriceConversion(&cmc.ConvertOptions{Amount: amount, Symbol: symbol, Convert: convert})
 		if err != nil {
 			_, err := Bot.Reply(m, "Ошибка при запросе. Возможно, одна из валют не найдена.\nОнлайн-версия: https://coinmarketcap.com/ru/converter/", &tb.SendOptions{DisableWebPagePreview: true})
 			if err != nil {
@@ -1099,7 +1102,7 @@ func main() {
 		}
 		dc := gg.NewContextForImage(im)
 		dc.DrawImage(im, 0, 0)
-		dc.SetRGB(0,0,0)
+		dc.SetRGB(0, 0, 0)
 		err = dc.LoadFontFace("files/impact.ttf", 20)
 		if err != nil {
 			ErrorReporting(err, m)
@@ -1152,7 +1155,7 @@ func main() {
 		dc := gg.NewContextForImage(im)
 		dc.DrawImage(im, 0, 0)
 		dc.Rotate(gg.Radians(15))
-		dc.SetRGB(0,0,0)
+		dc.SetRGB(0, 0, 0)
 		err = dc.LoadFontFace("files/impact.ttf", 20)
 		if err != nil {
 			ErrorReporting(err, m)
@@ -1272,7 +1275,7 @@ func main() {
 		}
 		result := DB.First(&warn, target.ID)
 		if result.RowsAffected != 0 {
-			warn.Amount = warn.Amount - int(time.Now().Sub(warn.LastWarn).Hours() / 24 / 7)
+			warn.Amount = warn.Amount - int(time.Now().Sub(warn.LastWarn).Hours()/24/7)
 			if warn.Amount < 0 {
 				warn.Amount = 0
 			}
@@ -1341,7 +1344,7 @@ func main() {
 		var warn Warn
 		result := DB.First(&warn, m.Sender.ID)
 		if result.RowsAffected != 0 {
-			warn.Amount = warn.Amount - int(time.Now().Sub(warn.LastWarn).Hours() / 24 / 7)
+			warn.Amount = warn.Amount - int(time.Now().Sub(warn.LastWarn).Hours()/24/7)
 			if warn.Amount < 0 {
 				warn.Amount = 0
 			}
@@ -1402,7 +1405,7 @@ func main() {
 		var countYear int64
 		var countAlltime int64
 		pidor.UserID = m.Sender.ID
-		DB.Model(&PidorStats{}).Where(pidor).Where("date BETWEEN ? AND ?", time.Date(time.Now().Year(),1,1,0,0,0,0,time.Local), time.Now()).Count(&countYear)
+		DB.Model(&PidorStats{}).Where(pidor).Where("date BETWEEN ? AND ?", time.Date(time.Now().Year(), 1, 1, 0, 0, 0, 0, time.Local), time.Now()).Count(&countYear)
 		DB.Model(&PidorStats{}).Where(pidor).Count(&countAlltime)
 		_, err := Bot.Reply(m, fmt.Sprintf("В этом году ты был пидором дня — %v раз!\nЗа всё время ты был пидором дня — %v раз!", countYear, countAlltime))
 		if err != nil {
@@ -1536,7 +1539,7 @@ func main() {
 			}
 		}
 		var pidorall = "Топ-10 пидоров за " + strconv.Itoa(year) + " год:\n\n"
-		result, _ := DB.Select("username, COUNT(*) as count").Table("pidor_stats, pidor_lists").Where("pidor_stats.user_id=pidor_lists.id").Where("date BETWEEN ? AND ?", time.Date(year,1,1,0,0,0,0,time.Local), time.Date(year+1,1,1,0,0,0,0,time.Local)).Group("user_id").Order("count DESC").Limit(10).Rows()
+		result, _ := DB.Select("username, COUNT(*) as count").Table("pidor_stats, pidor_lists").Where("pidor_stats.user_id=pidor_lists.id").Where("date BETWEEN ? AND ?", time.Date(year, 1, 1, 0, 0, 0, 0, time.Local), time.Date(year+1, 1, 1, 0, 0, 0, 0, time.Local)).Group("user_id").Order("count DESC").Limit(10).Rows()
 		for result.Next() {
 			err := result.Scan(&username, &count)
 			if err != nil {
@@ -1568,7 +1571,7 @@ func main() {
 			return
 		}
 		busy["pidor"] = true
-		defer func() {busy["pidor"] = false}()
+		defer func() { busy["pidor"] = false }()
 		var pidor PidorStats
 		var pidorToday PidorList
 		result := DB.Model(PidorStats{}).Where("date BETWEEN ? AND ?", time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Local), time.Now()).First(&pidor)
@@ -1612,7 +1615,7 @@ func main() {
 				{"Стоять! Не двигаться! Ты объявлен пидором дня, ", "Ого, вы посмотрите только! А пидор дня то - ", "Пидор дня обыкновенный, 1шт. - ", ".∧＿∧ \n( ･ω･｡)つ━☆・*。 \n⊂  ノ    ・゜+. \nしーＪ   °。+ *´¨) \n         .· ´¸.·*´¨) \n          (¸.·´ (¸.·'* ☆ ВЖУХ И ТЫ ПИДОР, ", "Ага! Поздравляю! Сегодня ты пидор - ", "Кажется, пидор дня - ", "Анализ завершен. Ты пидор, "},
 			}
 			for i := 0; i <= 3; i++ {
-				duration := time.Second * time.Duration(i * 2)
+				duration := time.Second * time.Duration(i*2)
 				message := messages[i][RandInt(0, len(messages[i])-1)]
 				if i == 3 {
 					message += fmt.Sprintf("<a href=\"tg://user?id=%v\">%v</a>", pidorToday.ID, pidorToday.Username)
@@ -1820,7 +1823,7 @@ func main() {
 			russianrouletteMessage.Unixtime = 0
 		}
 		if busy["bot_is_dead"] {
-			if time.Now().Unix() - russianrouletteMessage.Time().Unix() > 3600 {
+			if time.Now().Unix()-russianrouletteMessage.Time().Unix() > 3600 {
 				busy["bot_is_dead"] = false
 			} else {
 				_, err := Bot.Reply(m, "Я не могу провести игру, т.к. я немного умер. Зайдите позже.")
@@ -1831,7 +1834,7 @@ func main() {
 				return
 			}
 		}
-		if busy["russianroulettePending"] && !busy["russianrouletteInProgress"] && time.Now().Unix() - russianrouletteMessage.Time().Unix() > 60 {
+		if busy["russianroulettePending"] && !busy["russianrouletteInProgress"] && time.Now().Unix()-russianrouletteMessage.Time().Unix() > 60 {
 			busy["russianroulette"] = false
 			busy["russianroulettePending"] = false
 			busy["russianrouletteInProgress"] = false
@@ -1841,12 +1844,12 @@ func main() {
 				return
 			}
 		}
-		if busy["russianrouletteInProgress"] && time.Now().Unix() - russianrouletteMessage.Time().Unix() > 120 {
+		if busy["russianrouletteInProgress"] && time.Now().Unix()-russianrouletteMessage.Time().Unix() > 120 {
 			busy["russianroulette"] = false
 			busy["russianroulettePending"] = false
 			busy["russianrouletteInProgress"] = false
 		}
-		if busy["russianroulette"] || busy["russianroulettePending"] || busy["russianrouletteInProgress"]  {
+		if busy["russianroulette"] || busy["russianroulettePending"] || busy["russianrouletteInProgress"] {
 			_, err := Bot.Reply(m, "Команда занята. Попробуйте позже.")
 			if err != nil {
 				ErrorReporting(err, m)
@@ -1855,7 +1858,7 @@ func main() {
 			return
 		}
 		busy["russianroulette"] = true
-		defer func() {busy["russianroulette"] = false}()
+		defer func() { busy["russianroulette"] = false }()
 		var text = strings.Split(m.Text, " ")
 		if (m.ReplyTo == nil && len(text) != 2) || (m.ReplyTo != nil && len(text) != 1) {
 			_, err := Bot.Reply(m, "Пример использования: <code>/russianroulette {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/russianroulette</code>")
@@ -1940,7 +1943,7 @@ func main() {
 		busy["russianroulette"] = false
 		busy["russianroulettePending"] = false
 		busy["russianrouletteInProgress"] = true
-		defer func() {busy["russianrouletteInProgress"] = false}()
+		defer func() { busy["russianrouletteInProgress"] = false }()
 		success := []string{"%v остаётся в живых. Хм... может порох отсырел?", "В воздухе повисла тишина. %v остаётся в живых.", "%v сегодня заново родился.", "%v остаётся в живых. Хм... я ведь зарядил его?", "%v остаётся в живых. Прикольно, а давай проверим на ком-нибудь другом?"}
 		invincible := []string{"пуля отскочила от головы %v и улетела в другой чат.", "%v похмурил брови и отклеил расплющенную пулю со своей головы.", "но ничего не произошло. %v взглянул на револьвер, он был неисправен.", "пуля прошла навылет, но не оставила каких-либо следов на %v."}
 		fail := []string{"мозги %v разлетелись по чату!", "%v упал со стула и его кровь растеклась по месседжу.", "%v замер и спустя секунду упал на стол.", "пуля едва не задела кого-то из участников чата! А? Что? А, %v мёртв, да.", "и в воздухе повисла тишина. Все начали оглядываться, когда %v уже был мёртв."}
@@ -1957,7 +1960,7 @@ func main() {
 			return
 		}
 		time.Sleep(time.Second * 2)
-		if RandInt(1,360)%2 == 0 {
+		if RandInt(1, 360)%2 == 0 {
 			player, victim = victim, player
 		}
 		_, err = Bot.Edit(message, fmt.Sprintf("%vРевольвер останавливается на %v, первый ход за ним.", prefix, MentionUser(victim)))
@@ -1965,7 +1968,7 @@ func main() {
 			ErrorReporting(err, c.Message)
 			return
 		}
-		bullet := RandInt(1,6)
+		bullet := RandInt(1, 6)
 		for i := 1; i <= bullet; i++ {
 			time.Sleep(time.Second * 2)
 			prefix = fmt.Sprintf("Дуэль! %v против %v, раунд %v:\n%v берёт револьвер, приставляет его к голове и...\n", MentionUser(player), MentionUser(victim), i, MentionUser(victim))
@@ -2150,7 +2153,7 @@ func main() {
 	//Repost channel post to chat
 	Bot.Handle(tb.OnChannelPost, func(m *tb.Message) {
 		if m.Chat.Username == Config.Telegram.Channel {
-			chat, err := Bot.ChatByID("@"+Config.Telegram.Chat)
+			chat, err := Bot.ChatByID("@" + Config.Telegram.Chat)
 			if err != nil {
 				ErrorReporting(err, m)
 				return
@@ -2166,11 +2169,11 @@ func main() {
 	//User join
 	var welcomeMessage *tb.Message
 	welcomeSelector := tb.ReplyMarkup{}
-	welcomeFirstWrongButton := welcomeSelector.Data("Джабир, Латиф и Хиляль", "Button"+strconv.Itoa(RandInt(10000,99999)))
-	welcomeRightButton := welcomeSelector.Data("Дмитрий, Тимур и Максим", "Button"+strconv.Itoa(RandInt(10000,99999)))
-	welcomeSecondWrongButton := welcomeSelector.Data("Бубылда, Чингачгук и Гавкошмыг", "Button"+strconv.Itoa(RandInt(10000,99999)))
-	welcomeThirdWrongButton := welcomeSelector.Data("Мандарин, Оладушек и Эчпочмак", "Button"+strconv.Itoa(RandInt(10000,99999)))
-	buttons := []tb.Btn {welcomeRightButton, welcomeFirstWrongButton, welcomeSecondWrongButton, welcomeThirdWrongButton}
+	welcomeFirstWrongButton := welcomeSelector.Data("Джабир, Латиф и Хиляль", "Button"+strconv.Itoa(RandInt(10000, 99999)))
+	welcomeRightButton := welcomeSelector.Data("Дмитрий, Тимур и Максим", "Button"+strconv.Itoa(RandInt(10000, 99999)))
+	welcomeSecondWrongButton := welcomeSelector.Data("Бубылда, Чингачгук и Гавкошмыг", "Button"+strconv.Itoa(RandInt(10000, 99999)))
+	welcomeThirdWrongButton := welcomeSelector.Data("Мандарин, Оладушек и Эчпочмак", "Button"+strconv.Itoa(RandInt(10000, 99999)))
+	buttons := []tb.Btn{welcomeRightButton, welcomeFirstWrongButton, welcomeSecondWrongButton, welcomeThirdWrongButton}
 	pseudorand.Seed(time.Now().UnixNano())
 	pseudorand.Shuffle(len(buttons), func(i, j int) {
 		buttons[i], buttons[j] = buttons[j], buttons[i]
@@ -2243,7 +2246,7 @@ func main() {
 				return
 			}
 		}
-		if time.Now().Unix() - welcomeMessage.Time().Unix() > 10 {
+		if time.Now().Unix()-welcomeMessage.Time().Unix() > 10 {
 			welcomeMessage, err = Bot.Send(Chat, fmt.Sprintf("Добро пожаловать, %v!\nЧтобы получить доступ в чат, ответь на вопрос.\nКак зовут ведущих подкаста?", MentionUser(User)), &welcomeSelector)
 			if err != nil {
 				ErrorReporting(err, m)
@@ -2403,7 +2406,7 @@ func main() {
 			err := ZavtraStreamCheck("youtube")
 			if err != nil {
 				log.Println(err.Error())
-				chat, _ := Bot.ChatByID("@"+Config.Telegram.SysAdmin)
+				chat, _ := Bot.ChatByID("@" + Config.Telegram.SysAdmin)
 				_, _ = Bot.Send(chat, fmt.Sprintf("ZavtraStreamCheck error:\n<code>%v</code>", err.Error()))
 			}
 		}
