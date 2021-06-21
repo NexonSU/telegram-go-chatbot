@@ -1,4 +1,4 @@
-package userActions
+package services
 
 import (
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"

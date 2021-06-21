@@ -4,20 +4,12 @@ import (
 	"github.com/NexonSU/telegram-go-chatbot/app/commands"
 	"github.com/NexonSU/telegram-go-chatbot/app/roulette"
 	"github.com/NexonSU/telegram-go-chatbot/app/services"
-	"github.com/NexonSU/telegram-go-chatbot/app/userActions"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"github.com/NexonSU/telegram-go-chatbot/app/welcome"
 	tb "gopkg.in/tucnak/telebot.v2"
-	"log"
-	pseudorand "math/rand"
-	"regexp"
-	"strconv"
-	"time"
 )
 
 func main() {
-	var busy = make(map[string]bool)
-
-	// commands
 	utils.Bot.Handle("/admin", commands.Admin)
 	utils.Bot.Handle("/debug", commands.Debug)
 	utils.Bot.Handle("/get", commands.Get)
@@ -52,58 +44,33 @@ func main() {
 	utils.Bot.Handle("/pidorlist", commands.Pidorlist)
 	utils.Bot.Handle("/pidorall", commands.Pidorall)
 	utils.Bot.Handle("/pidorstats", commands.Pidorstats)
-	utils.Bot.Handle("/pidor", commands.Pidor(busy))
+	utils.Bot.Handle("/pidor", commands.Pidor)
 	utils.Bot.Handle("/blessing", commands.Blessing)
-	utils.Bot.Handle("/suicide", commands.Suicide)
+	utils.Bot.Handle("/suicide", commands.Blessing)
 	utils.Bot.Handle("/kill", commands.Kill)
 	utils.Bot.Handle("/duelstats", commands.Duelstats)
 
-	// Roulette
-	var russianRouletteMessage *tb.Message
-	russianRouletteSelector := tb.ReplyMarkup{}
-	russianRouletteAcceptButton := russianRouletteSelector.Data("👍 Принять вызов", "russianroulette_accept")
-	russianRouletteDenyButton := russianRouletteSelector.Data("👎 Бежать с позором", "russianroulette_deny")
-	russianRouletteSelector.Inline(
-		russianRouletteSelector.Row(russianRouletteAcceptButton, russianRouletteDenyButton),
-	)
-	utils.Bot.Handle("/russianroulette", roulette.RussianRoulette(busy, russianRouletteMessage, russianRouletteSelector))
-	utils.Bot.Handle(&russianRouletteAcceptButton, roulette.RouletteAccept(busy))
-	utils.Bot.Handle(&russianRouletteDenyButton, roulette.RouletteDeny(busy))
+	//Russian Roulette game
+	utils.Bot.Handle("/russianroulette", roulette.Request)
+	utils.Bot.Handle(&roulette.AcceptButton, roulette.Accept)
+	utils.Bot.Handle(&roulette.DenyButton, roulette.Deny)
 
-	// Gather text
-	utils.Bot.Handle(tb.OnText, userActions.OnText)
-	utils.Bot.Handle(tb.OnChannelPost, userActions.OnPost)
+	//Gather user data on text
+	utils.Bot.Handle(tb.OnText, services.OnText)
 
-	// User join
-	var welcomeMessage *tb.Message
-	welcomeSelector := tb.ReplyMarkup{}
-	welcomeFirstWrongButton := welcomeSelector.Data("Джабир, Латиф и Хиляль", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
-	welcomeRightButton := welcomeSelector.Data("Дмитрий, Тимур и Максим", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
-	welcomeSecondWrongButton := welcomeSelector.Data("Бубылда, Чингачгук и Гавкошмыг", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
-	welcomeThirdWrongButton := welcomeSelector.Data("Мандарин, Оладушек и Эчпочмак", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
-	buttons := []tb.Btn{welcomeRightButton, welcomeFirstWrongButton, welcomeSecondWrongButton, welcomeThirdWrongButton}
-	pseudorand.Seed(time.Now().UnixNano())
-	pseudorand.Shuffle(len(buttons), func(i, j int) {
-		buttons[i], buttons[j] = buttons[j], buttons[i]
-	})
-	welcomeSelector.Inline(
-		welcomeSelector.Row(buttons[0], buttons[1]),
-		welcomeSelector.Row(buttons[2], buttons[3]),
-	)
+	//Repost channel post to chat
+	utils.Bot.Handle(tb.OnChannelPost, services.OnPost)
 
-	arab, err := regexp.Compile("[\u0600-\u06ff]|[\u0750-\u077f]|[\ufb50-\ufbc1]|[\ufbd3-\ufd3f]|[\ufd50-\ufd8f]|[\ufd92-\ufdc7]|[\ufe70-\ufefc]|[\uFDF0-\uFDFD]")
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-	utils.Bot.Handle(tb.OnUserJoined, userActions.OnJoin(welcomeMessage, welcomeSelector, arab))
-	utils.Bot.Handle(tb.OnUserLeft, userActions.OnLeft)
+	//User join
+	utils.Bot.Handle(tb.OnUserJoined, welcome.OnJoin)
+	utils.Bot.Handle(tb.OnUserLeft, welcome.OnLeft)
+	utils.Bot.Handle(&welcome.CorrectButton, welcome.OnClickCorrectButton)
+	utils.Bot.Handle(&welcome.FirstWrongButton, welcome.OnClickWrongButton)
+	utils.Bot.Handle(&welcome.SecondWrongButton, welcome.OnClickWrongButton)
+	utils.Bot.Handle(&welcome.ThirdWrongButton, welcome.OnClickWrongButton)
 
-	utils.Bot.Handle(&welcomeRightButton, userActions.OnClickRightButton)
-	utils.Bot.Handle(&welcomeFirstWrongButton, userActions.OnClickWrongButton)
-	utils.Bot.Handle(&welcomeSecondWrongButton, userActions.OnClickWrongButton)
-	utils.Bot.Handle(&welcomeThirdWrongButton, userActions.OnClickWrongButton)
-
+	//Stream watcher
 	go services.ZavtraStreamCheckService()
+
 	utils.Bot.Start()
 }
