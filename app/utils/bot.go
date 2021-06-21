@@ -3,20 +3,30 @@ package utils
 import (
 	"errors"
 	tb "gopkg.in/tucnak/telebot.v2"
+	"log"
 	"strconv"
 	"strings"
 	"time"
 )
 
-var Bot, _ = tb.NewBot(tb.Settings{
-	URL:       Config.Telegram.BotApiUrl,
-	Token:     Config.Telegram.Token,
-	ParseMode: tb.ModeHTML,
-	Poller: &tb.LongPoller{
-		Timeout:        10 * time.Second,
-		AllowedUpdates: Config.Webhook.AllowedUpdates,
-	},
-})
+func BotInit() tb.Bot {
+	var Bot, err = tb.NewBot(tb.Settings{
+		URL:       Config.Telegram.BotApiUrl,
+		Token:     Config.Telegram.Token,
+		ParseMode: tb.ModeHTML,
+		Poller: &tb.LongPoller{
+			Timeout:        10 * time.Second,
+			AllowedUpdates: Config.Webhook.AllowedUpdates,
+		},
+	})
+	if err != nil {
+		log.Println(Config.Telegram.BotApiUrl)
+		log.Fatal(err)
+	}
+	return *Bot
+}
+
+var Bot = BotInit()
 
 func FindUserInMessage(m tb.Message) (tb.User, int64, error) {
 	var user tb.User

@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/logger"
+	"log"
 	"strconv"
 	"time"
 )
@@ -36,7 +37,32 @@ type Warn struct {
 	LastWarn time.Time
 }
 
-var DB, _ = gorm.Open(sqlite.Open("../../bot.db"), &gorm.Config{Logger: logger.Default.LogMode(logger.Info)})
+type ZavtraStream struct {
+	Service   string `gorm:"primaryKey"`
+	LastCheck time.Time
+	VideoID   string
+}
+
+func DataBaseInit(file string) gorm.DB {
+	database, err := gorm.Open(
+		sqlite.Open(file),
+		&gorm.Config{
+			Logger: logger.Default.LogMode(logger.Info),
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	//Create tables, if they not exists in DB
+	err = database.AutoMigrate(tb.User{}, Get{}, Warn{}, PidorStats{}, PidorList{}, Duelist{}, ZavtraStream{})
+	if err != nil {
+		log.Println(err)
+	}
+	return *database
+}
+
+var DB = DataBaseInit("bot.db")
 
 func GetUserFromDB(findstring string) (tb.User, error) {
 	var user tb.User

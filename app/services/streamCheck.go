@@ -13,12 +13,6 @@ import (
 	"time"
 )
 
-type ZavtraStream struct {
-	Service   string `gorm:"primaryKey"`
-	LastCheck time.Time
-	VideoID   string
-}
-
 func ZavtraStreamCheckService() {
 	for {
 		delay := 240
@@ -37,7 +31,7 @@ func ZavtraStreamCheckService() {
 
 func zavtraStreamCheck(service string) error {
 	if service == "youtube" {
-		var stream ZavtraStream
+		var stream utils.ZavtraStream
 		var httpClient = &http.Client{Timeout: 10 * time.Second}
 		r, err := httpClient.Get(fmt.Sprintf("https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=%v&type=video&eventType=live&key=%v", utils.Config.Youtube.ChannelID, utils.Config.Youtube.ApiKey))
 		if err != nil {

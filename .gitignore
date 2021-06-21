@@ -12,3 +12,5 @@
 *.out
 
 .idea
+/bot.db
+/config.json

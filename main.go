@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"github.com/NexonSU/telegram-go-chatbot/app/commands"
 	"github.com/NexonSU/telegram-go-chatbot/app/roulette"
 	"github.com/NexonSU/telegram-go-chatbot/app/services"
@@ -15,17 +14,7 @@ import (
 	"time"
 )
 
-var _ = json.NewDecoder(utils.ConfigFile).Decode(&utils.Config)
-
 func main() {
-	//Create tables, if they not exists in DB
-	//DB.AutoMigrate(tb.User{})
-	//DB.AutoMigrate(Get{})
-	//DB.AutoMigrate(Warn{})
-	//DB.AutoMigrate(PidorStats{})
-	//DB.AutoMigrate(PidorList{})
-	//DB.AutoMigrate(Duelist{})
-	//DB.AutoMigrate(ZavtraStream{})
 	var busy = make(map[string]bool)
 
 	// commands
