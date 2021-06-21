@@ -13,6 +13,13 @@ import (
 
 //Send releases of 2 weeks on /releases
 func Releases(m *tb.Message) {
+	if utils.Config.ReleasesUrl == "" {
+		_, err := utils.Bot.Reply(m, "Список ближайших релизов не настроен")
+		if err != nil {
+			utils.ErrorReporting(err, m)
+			return
+		}
+	}
 	resp, err := http.Get(utils.Config.ReleasesUrl)
 	if err != nil {
 		utils.ErrorReporting(err, m)

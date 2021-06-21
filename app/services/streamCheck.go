@@ -31,6 +31,9 @@ func ZavtraStreamCheckService() {
 
 func zavtraStreamCheck(service string) error {
 	if service == "youtube" {
+		if utils.Config.Youtube.ApiKey == "" || utils.Config.Youtube.ChannelName == "" || utils.Config.Youtube.ChannelID == "" || utils.Config.Youtube.StreamChannel == "" {
+			return nil
+		}
 		var stream utils.ZavtraStream
 		var httpClient = &http.Client{Timeout: 10 * time.Second}
 		r, err := httpClient.Get(fmt.Sprintf("https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=%v&type=video&eventType=live&key=%v", utils.Config.Youtube.ChannelID, utils.Config.Youtube.ApiKey))
@@ -56,7 +59,7 @@ func zavtraStreamCheck(service string) error {
 			if stream.VideoID != videoId {
 				thumbnail := fmt.Sprintf("https://i.ytimg.com/vi/%v/maxresdefault_live.jpg", videoId)
 				caption := fmt.Sprintf("Стрим \"%v\" начался.\nhttps://youtube.com/%v/live", title, utils.Config.Youtube.ChannelName)
-				chat, err := utils.Bot.ChatByID("@" + utils.Config.Telegram.StreamChannel)
+				chat, err := utils.Bot.ChatByID("@" + utils.Config.Youtube.StreamChannel)
 				if err != nil {
 					return err
 				}

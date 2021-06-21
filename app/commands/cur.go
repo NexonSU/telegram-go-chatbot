@@ -13,6 +13,13 @@ import (
 
 //Reply currency "cur"
 func Cur(m *tb.Message) {
+	if utils.Config.CurrencyKey == "" {
+		_, err := utils.Bot.Reply(m, "Конвертация валют не настроена")
+		if err != nil {
+			utils.ErrorReporting(err, m)
+			return
+		}
+	}
 	var target = *m
 	var text = strings.Split(m.Text, " ")
 	if len(text) != 4 {
