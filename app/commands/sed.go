@@ -1,24 +1,18 @@
 package commands
 
 import (
-	"fmt"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	tb "gopkg.in/tucnak/telebot.v2"
-	"os/exec"
 	"strings"
 )
 
-//Replace text in target message and send result on /sed
+// Sed Replace text in target message
 func Sed(m *tb.Message) {
 	var text = strings.Split(m.Text, " ")
-	if m.ReplyTo != nil {
-		cmd := fmt.Sprintf("echo \"%v\" | sed \"%v\"", strings.ReplaceAll(m.ReplyTo.Text, "\"", "\\\""), strings.ReplaceAll(text[1], "\"", "\\\""))
-		out, err := exec.Command("bash", "-c", cmd).Output()
-		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
-		}
-		_, err = utils.Bot.Reply(m, string(out))
+	var foo = strings.Split(text[1], "/")[1]
+	var bar = strings.Split(text[1], "/")[2]
+	if m.ReplyTo != nil && foo != "" && bar != "" {
+		_, err := utils.Bot.Reply(m, strings.ReplaceAll(m.ReplyTo.Text, foo, bar))
 		if err != nil {
 			utils.ErrorReporting(err, m)
 			return
