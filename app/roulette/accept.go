@@ -104,7 +104,7 @@ func Accept(c *tb.Callback) {
 		busy["bot_is_dead"] = true
 		return
 	}
-	if utils.StringInSlice(victim.Username, utils.Config.Telegram.Admins) {
+	if utils.IsAdmin(victim.Username) {
 		_, err = utils.Bot.Edit(message, fmt.Sprintf("%v😈 Наводит револьвер на %v и стреляет.", prefix, utils.MentionUser(player)))
 		if err != nil {
 			utils.ErrorReporting(err, c.Message)

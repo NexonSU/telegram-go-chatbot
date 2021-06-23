@@ -4,10 +4,8 @@ import (
 	tb "gopkg.in/tucnak/telebot.v2"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 	"gorm.io/gorm/logger"
 	"log"
-	"strconv"
 	"time"
 )
 
@@ -63,28 +61,3 @@ func DataBaseInit(file string) gorm.DB {
 }
 
 var DB = DataBaseInit("bot.db")
-
-func GetUserFromDB(findstring string) (tb.User, error) {
-	var user tb.User
-	var err error = nil
-	if string(findstring[0]) == "@" {
-		user.Username = findstring[1:]
-	} else {
-		user.ID, err = strconv.Atoi(findstring)
-	}
-	result := DB.Where(&user).First(&user)
-	if result.Error != nil {
-		err = result.Error
-	}
-	return user, err
-}
-
-func GatherData(user *tb.User) error {
-	result := DB.Clauses(clause.OnConflict{
-		UpdateAll: true,
-	}).Create(user)
-	if result.Error != nil {
-		return result.Error
-	}
-	return nil
-}

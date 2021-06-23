@@ -9,6 +9,9 @@ import (
 
 //Send Get to user on /get
 func Get(m *tb.Message) {
+	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
+		return
+	}
 	var get utils.Get
 	var text = strings.Split(m.Text, " ")
 	if len(text) != 2 {

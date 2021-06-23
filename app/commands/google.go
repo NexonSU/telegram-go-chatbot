@@ -10,6 +10,9 @@ import (
 
 //Reply google URL on "google"
 func Google(m *tb.Message) {
+	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
+		return
+	}
 	var target = *m
 	var text = strings.Split(m.Text, " ")
 	if len(text) == 1 {

@@ -9,6 +9,9 @@ import (
 
 //Send DB result on /pidoreg
 func Pidoreg(m *tb.Message) {
+	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
+		return
+	}
 	var pidor utils.PidorList
 	result := utils.DB.First(&pidor, m.Sender.ID)
 	if result.RowsAffected != 0 {

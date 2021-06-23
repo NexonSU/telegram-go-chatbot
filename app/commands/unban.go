@@ -9,7 +9,10 @@ import (
 
 //Unban user on /unban
 func Unban(m *tb.Message) {
-	if !utils.StringInSlice(m.Sender.Username, utils.Config.Telegram.Admins) && !utils.StringInSlice(m.Sender.Username, utils.Config.Telegram.Moders) {
+	if !utils.IsAdminOrModer(m.Sender.Username) {
+		if m.Chat.Username != utils.Config.Telegram.Chat {
+			return
+		}
 		_, err := utils.Bot.Reply(m, &tb.Animation{File: tb.File{FileID: "CgACAgIAAx0CQvXPNQABHGrDYIBIvDLiVV6ZMPypWMi_NVDkoFQAAq4LAAIwqQlIQT82LRwIpmoeBA"}})
 		if err != nil {
 			utils.ErrorReporting(err, m)

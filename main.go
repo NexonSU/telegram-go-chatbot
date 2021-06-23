@@ -30,7 +30,6 @@ func main() {
 	utils.Bot.Handle("/mute", commands.Mute)
 	utils.Bot.Handle("/unmute", commands.Unmute)
 	utils.Bot.Handle("/me", commands.Me)
-	utils.Bot.Handle("/topic", commands.Topic)
 	utils.Bot.Handle("/bonk", commands.Bonk)
 	utils.Bot.Handle("/hug", commands.Hug)
 	utils.Bot.Handle("/slap", commands.Slap)

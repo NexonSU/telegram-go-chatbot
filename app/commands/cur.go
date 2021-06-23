@@ -13,6 +13,9 @@ import (
 
 //Reply currency "cur"
 func Cur(m *tb.Message) {
+	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
+		return
+	}
 	if utils.Config.CurrencyKey == "" {
 		_, err := utils.Bot.Reply(m, "Конвертация валют не настроена")
 		if err != nil {

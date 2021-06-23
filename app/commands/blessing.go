@@ -10,6 +10,9 @@ import (
 
 //Kill user on /blessing, /suicide
 func Blessing(m *tb.Message) {
+	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
+		return
+	}
 	err := utils.Bot.Delete(m)
 	if err != nil {
 		utils.ErrorReporting(err, m)

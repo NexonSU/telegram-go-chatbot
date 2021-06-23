@@ -8,6 +8,9 @@ import (
 
 //Send admin list to user on /admin
 func Admin(m *tb.Message) {
+	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
+		return
+	}
 	var get utils.Get
 	result := utils.DB.Where(&utils.Get{Name: "admin"}).First(&get)
 	if result.RowsAffected != 0 {

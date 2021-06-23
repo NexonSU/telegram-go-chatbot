@@ -8,6 +8,9 @@ import (
 
 // Sed Replace text in target message
 func Sed(m *tb.Message) {
+	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
+		return
+	}
 	var text = strings.Split(m.Text, " ")
 	var foo = strings.Split(text[1], "/")[1]
 	var bar = strings.Split(text[1], "/")[2]

@@ -11,6 +11,9 @@ import (
 
 //Send top 10 pidors of year on /pidorstats
 func Pidorstats(m *tb.Message) {
+	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
+		return
+	}
 	var text = strings.Split(m.Text, " ")
 	var i = 0
 	var year = time.Now().Year()

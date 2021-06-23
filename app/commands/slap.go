@@ -10,15 +10,10 @@ import (
 func Slap(m *tb.Message) {
 	var action = "дал леща"
 	var target tb.User
-	ChatMember, err := utils.Bot.ChatMemberOf(m.Chat, m.Sender)
-	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
-	}
-	if ChatMember.CanRestrictMembers || ChatMember.Role == "creator" {
+	if utils.IsAdminOrModer(m.Sender.Username) {
 		action = "дал отцовского леща"
 	}
-	target, _, err = utils.FindUserInMessage(*m)
+	target, _, err := utils.FindUserInMessage(*m)
 	if err != nil {
 		_, err := utils.Bot.Reply(m, fmt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
 		if err != nil {

@@ -16,6 +16,9 @@ var DenyButton = Selector.Data("👎 Бежать с позором", "russianro
 var busy = make(map[string]bool)
 
 func Request(m *tb.Message) {
+	if m.Chat.Username != utils.Config.Telegram.Chat {
+		return
+	}
 	if Message == nil {
 		Message = m
 		Message.Unixtime = 0

@@ -8,6 +8,9 @@ import (
 
 //Send user utils.Duelist stats on /duelstats
 func Duelstats(m *tb.Message) {
+	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
+		return
+	}
 	var duelist utils.Duelist
 	result := utils.DB.Model(utils.Duelist{}).Where(m.Sender.ID).First(&duelist)
 	if result.RowsAffected == 0 {

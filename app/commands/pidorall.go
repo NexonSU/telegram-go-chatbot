@@ -8,6 +8,9 @@ import (
 
 //Send top 10 pidors of all time on /pidorall
 func Pidorall(m *tb.Message) {
+	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
+		return
+	}
 	var i = 0
 	var username string
 	var count int64

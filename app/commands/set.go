@@ -10,6 +10,9 @@ import (
 
 //Save Get to DB on /set
 func Set(m *tb.Message) {
+	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
+		return
+	}
 	var get utils.Get
 	var text = strings.Split(m.Text, " ")
 	if (m.ReplyTo == nil && len(text) < 3) || (m.ReplyTo != nil && len(text) != 2) {

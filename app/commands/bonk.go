@@ -12,6 +12,9 @@ import (
 
 //Write username on bonk picture and send to target
 func Bonk(m *tb.Message) {
+	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
+		return
+	}
 	if m.ReplyTo == nil {
 		_, err := utils.Bot.Reply(m, "Просто отправь <code>/bonk</code> в ответ на чье-либо сообщение.")
 		if err != nil {

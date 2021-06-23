@@ -13,6 +13,9 @@ import (
 
 //Send releases of 2 weeks on /releases
 func Releases(m *tb.Message) {
+	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
+		return
+	}
 	if utils.Config.ReleasesUrl == "" {
 		_, err := utils.Bot.Reply(m, "Список ближайших релизов не настроен")
 		if err != nil {

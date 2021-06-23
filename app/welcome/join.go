@@ -35,12 +35,12 @@ var buttons = shuffleButtons([]tb.Btn{CorrectButton, FirstWrongButton, SecondWro
 var arabicSymbols, _ = regexp.Compile("[\u0600-\u06ff]|[\u0750-\u077f]|[\ufb50-\ufbc1]|[\ufbd3-\ufd3f]|[\ufd50-\ufd8f]|[\ufd92-\ufdc7]|[\ufe70-\ufefc]|[\uFDF0-\uFDFD]")
 
 func OnJoin(m *tb.Message) {
+	if m.Chat.Username != utils.Config.Telegram.Chat {
+		return
+	}
 	if Message == nil {
 		Message = m
 		Message.Unixtime = 0
-	}
-	if m.Chat.Username != utils.Config.Telegram.Chat {
-		return
 	}
 	err := utils.Bot.Delete(m)
 	if err != nil {

@@ -9,6 +9,9 @@ import (
 
 //Send warning amount on /mywarns
 func Mywarns(m *tb.Message) {
+	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
+		return
+	}
 	var warn utils.Warn
 	result := utils.DB.First(&warn, m.Sender.ID)
 	if result.RowsAffected != 0 {

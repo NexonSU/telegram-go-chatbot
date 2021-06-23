@@ -9,6 +9,17 @@ import (
 
 //Delete Get in DB on /del
 func Del(m *tb.Message) {
+	if !utils.IsAdminOrModer(m.Sender.Username) {
+		if m.Chat.Username != utils.Config.Telegram.Chat {
+			return
+		}
+		_, err := utils.Bot.Reply(m, &tb.Animation{File: tb.File{FileID: "CgACAgIAAx0CQvXPNQABHGrDYIBIvDLiVV6ZMPypWMi_NVDkoFQAAq4LAAIwqQlIQT82LRwIpmoeBA"}})
+		if err != nil {
+			utils.ErrorReporting(err, m)
+			return
+		}
+		return
+	}
 	var text = strings.Split(m.Text, " ")
 	if len(text) != 2 {
 		_, err := utils.Bot.Reply(m, "Пример использования: <code>/del {гет}</code>")

@@ -9,6 +9,9 @@ import (
 
 //Send DB stats on /pidorme
 func Pidorme(m *tb.Message) {
+	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
+		return
+	}
 	var pidor utils.PidorStats
 	var countYear int64
 	var countAlltime int64

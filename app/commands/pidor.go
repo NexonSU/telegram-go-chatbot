@@ -11,6 +11,9 @@ var busy = make(map[string]bool)
 
 // Pidor game
 func Pidor(m *tb.Message) {
+	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
+		return
+	}
 	if m.Private() {
 		return
 	}
