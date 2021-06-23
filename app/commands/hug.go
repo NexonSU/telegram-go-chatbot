@@ -6,6 +6,8 @@ import (
 	"github.com/chai2010/webp"
 	"github.com/fogleman/gg"
 	tb "gopkg.in/tucnak/telebot.v2"
+	"path/filepath"
+	"runtime"
 )
 
 //Write username on hug picture and send to target
@@ -20,7 +22,9 @@ func Hug(m *tb.Message) {
 
 	}
 	var target = *m.ReplyTo
-	im, err := webp.Load("files/hug.webp")
+	_, b, _, _ := runtime.Caller(0)
+	basepath := filepath.Dir(b)
+	im, err := webp.Load(basepath + "/../../files/hug.webp")
 	if err != nil {
 		utils.ErrorReporting(err, m)
 		return
@@ -29,7 +33,7 @@ func Hug(m *tb.Message) {
 	dc.DrawImage(im, 0, 0)
 	dc.Rotate(gg.Radians(15))
 	dc.SetRGB(0, 0, 0)
-	err = dc.LoadFontFace("files/impact.ttf", 20)
+	err = dc.LoadFontFace(basepath+"/../../files/impact.ttf", 20)
 	if err != nil {
 		utils.ErrorReporting(err, m)
 		return

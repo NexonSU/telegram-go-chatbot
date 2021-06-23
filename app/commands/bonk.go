@@ -6,6 +6,8 @@ import (
 	"github.com/chai2010/webp"
 	"github.com/fogleman/gg"
 	tb "gopkg.in/tucnak/telebot.v2"
+	"path/filepath"
+	"runtime"
 )
 
 //Write username on bonk picture and send to target
@@ -20,7 +22,9 @@ func Bonk(m *tb.Message) {
 
 	}
 	var target = *m.ReplyTo
-	im, err := webp.Load("files/bonk.webp")
+	_, b, _, _ := runtime.Caller(0)
+	basepath := filepath.Dir(b)
+	im, err := webp.Load(basepath + "/../../files/bonk.webp")
 	if err != nil {
 		utils.ErrorReporting(err, m)
 		return
@@ -28,7 +32,7 @@ func Bonk(m *tb.Message) {
 	dc := gg.NewContextForImage(im)
 	dc.DrawImage(im, 0, 0)
 	dc.SetRGB(0, 0, 0)
-	err = dc.LoadFontFace("files/impact.ttf", 20)
+	err = dc.LoadFontFace(basepath+"/../../files/impact.ttf", 20)
 	if err != nil {
 		utils.ErrorReporting(err, m)
 		return
