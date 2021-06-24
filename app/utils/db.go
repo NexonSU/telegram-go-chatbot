@@ -45,7 +45,7 @@ func DataBaseInit(file string) gorm.DB {
 	database, err := gorm.Open(
 		sqlite.Open(file),
 		&gorm.Config{
-			Logger: logger.Default.LogMode(logger.Info),
+			Logger: logger.Default.LogMode(logger.Warn),
 		},
 	)
 	if err != nil {
