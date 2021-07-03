@@ -81,11 +81,7 @@ func ErrorReporting(err error, message *tb.Message) {
 	MarshalledMessage, _ := json.MarshalIndent(message, "", "    ")
 	JsonMessage := html.EscapeString(string(MarshalledMessage))
 	text := fmt.Sprintf("An exception was raised while handling an update\n<pre>%v</pre>\n\nMessage:\n<pre>%v</pre>", err, JsonMessage)
-	chat, err := Bot.ChatByID("@" + Config.Telegram.SysAdmin)
-	if err != nil {
-		return
-	}
-	_, err = Bot.Send(chat, text)
+	_, err = Bot.Send(tb.ChatID(Config.Telegram.SysAdmin), text)
 	if err != nil {
 		return
 	}

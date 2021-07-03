@@ -19,13 +19,12 @@ func ZavtraStreamCheckService() {
 		if time.Now().Hour() < 24 && time.Now().Hour() >= 18 {
 			delay = 30
 		}
-		time.Sleep(time.Duration(delay) * time.Second)
 		err := zavtraStreamCheck("youtube")
 		if err != nil {
 			log.Println(err.Error())
-			chat, _ := utils.Bot.ChatByID("@" + utils.Config.Telegram.SysAdmin)
-			_, _ = utils.Bot.Send(chat, fmt.Sprintf("ZavtraStreamCheck error:\n<code>%v</code>", err.Error()))
+			_, _ = utils.Bot.Send(tb.ChatID(utils.Config.Telegram.SysAdmin), fmt.Sprintf("ZavtraStreamCheck error:\n<code>%v</code>", err.Error()))
 		}
+		time.Sleep(time.Duration(delay) * time.Second)
 	}
 }
 
