@@ -68,8 +68,9 @@ func main() {
 	utils.Bot.Handle(&welcome.SecondWrongButton, welcome.OnClickWrongButton)
 	utils.Bot.Handle(&welcome.ThirdWrongButton, welcome.OnClickWrongButton)
 
-	//Stream watcher
+	//Services
 	go services.ZavtraStreamCheckService()
+	go welcome.JoinMessageUpdateService()
 
 	utils.Bot.Start()
 }

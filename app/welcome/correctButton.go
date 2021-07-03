@@ -8,49 +8,28 @@ import (
 )
 
 func OnClickCorrectButton(c *tb.Callback) {
-	for _, element := range c.Message.Entities {
-		if element.User.ID == c.Sender.ID {
-			err := utils.Bot.Respond(c, &tb.CallbackResponse{Text: fmt.Sprintf("Добро пожаловать, %v!\nТеперь у тебя есть доступ к чату.", utils.UserFullName(c.Sender)), ShowAlert: true})
-			if err != nil {
-				utils.ErrorReporting(err, c.Message)
-				return
-			}
-			ChatMember, err := utils.Bot.ChatMemberOf(c.Message.Chat, c.Sender)
-			if err != nil {
-				utils.ErrorReporting(err, c.Message)
-				return
-			}
+	for i, e := range Border.Users {
+		if e.User.ID == c.Sender.ID && e.Status == "pending" {
+			var ChatMember tb.ChatMember
+			ChatMember.User = c.Sender
 			ChatMember.CanSendMessages = true
-			ChatMember.RestrictedUntil = time.Now().Add(time.Hour).Unix()
-			err = utils.Bot.Promote(c.Message.Chat, ChatMember)
+			ChatMember.CanSendMedia = true
+			ChatMember.CanSendPolls = true
+			ChatMember.CanSendOther = true
+			ChatMember.CanAddPreviews = true
+			ChatMember.RestrictedUntil = time.Now().Unix() + 60
+			err := utils.Bot.Restrict(Border.Chat, &ChatMember)
 			if err != nil {
 				utils.ErrorReporting(err, c.Message)
 				return
 			}
-			if len(c.Message.Entities) == 1 {
-				if Message.ID == c.Message.ID {
-					Message.Unixtime = 0
-				}
-				err = utils.Bot.Delete(c.Message)
-				if err != nil {
-					utils.ErrorReporting(err, c.Message)
-					return
-				}
-			} else {
-				text := "Добро пожаловать"
-				for _, element := range c.Message.Entities {
-					if element.User.ID != c.Sender.ID {
-						text += ", " + utils.MentionUser(element.User)
-					}
-				}
-				text += "!\nЧтобы получить доступ в чат, ответь на вопрос.\nКак зовут ведущих подкаста?"
-				_, err = utils.Bot.Edit(c.Message, text, &Selector)
-				if err != nil {
-					utils.ErrorReporting(err, c.Message)
-					return
-				}
+			Border.Users[i].Status = "accepted"
+			Border.NeedUpdate = true
+			err = utils.Bot.Respond(c, &tb.CallbackResponse{Text: fmt.Sprintf("Добро пожаловать, %v!\nТеперь у тебя есть доступ к чату.", utils.UserFullName(c.Sender)), ShowAlert: true})
+			if err != nil {
+				utils.ErrorReporting(err, c.Message)
+				return
 			}
-			return
 		}
 	}
 	err := utils.Bot.Respond(c, &tb.CallbackResponse{})
