@@ -46,8 +46,8 @@ func Cur(m *tb.Message) {
 		return
 	}
 	var symbol = strings.ToUpper(text[2])
-	if !regexp.MustCompile(`^[A-Z]{3,4}$`).MatchString(symbol) {
-		_, err := utils.Bot.Reply(m, "Имя валюты должно состоять из 3-4 больших латинских символов.")
+	if !regexp.MustCompile(`^[A-Z$]{3,5}$`).MatchString(symbol) {
+		_, err := utils.Bot.Reply(m, "Имя валюты должно состоять из 3-5 латинских символов.")
 		if err != nil {
 			utils.ErrorReporting(err, m)
 			return
@@ -55,8 +55,8 @@ func Cur(m *tb.Message) {
 		return
 	}
 	var convert = strings.ToUpper(text[3])
-	if !regexp.MustCompile(`^[A-Z]{3,4}$`).MatchString(convert) {
-		_, err := utils.Bot.Reply(m, "Имя валюты должно состоять из 3-4 больших латинских символов.")
+	if !regexp.MustCompile(`^[A-Z$]{3,5}$`).MatchString(convert) {
+		_, err := utils.Bot.Reply(m, "Имя валюты должно состоять из 3-5 латинских символов.")
 		if err != nil {
 			utils.ErrorReporting(err, m)
 			return
