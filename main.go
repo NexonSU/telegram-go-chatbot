@@ -29,6 +29,8 @@ func main() {
 	utils.Bot.Handle("/unban", commands.Unban)
 	utils.Bot.Handle("/mute", commands.Mute)
 	utils.Bot.Handle("/unmute", commands.Unmute)
+	utils.Bot.Handle("/revive", commands.Revive)
+	utils.Bot.Handle("/resurrect", commands.Revive)
 	utils.Bot.Handle("/me", commands.Me)
 	utils.Bot.Handle("/bonk", commands.Bonk)
 	utils.Bot.Handle("/hug", commands.Hug)
