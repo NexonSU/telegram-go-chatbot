@@ -1,19 +1,20 @@
 package welcome
 
 import (
-	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
 	"log"
 	"math/rand"
 	"strconv"
 	"time"
+
+	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	tb "gopkg.in/tucnak/telebot.v2"
 )
 
 var Selector = tb.ReplyMarkup{}
 var CorrectButton = Selector.Data("Дмитрий, Тимур, Максим", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
-var FirstWrongButton = Selector.Data("Франсуа, Гюго, Эркюль", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
-var SecondWrongButton = Selector.Data("Хасан, Камаран, Хидео", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
-var ThirdWrongButton = Selector.Data("Ганс, Шульц, Фриц", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
+var FirstWrongButton = Selector.Data("Иван, Пётр, Александр", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
+var SecondWrongButton = Selector.Data("Руслан, Андрей, Кирилл", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
+var ThirdWrongButton = Selector.Data("Миша, Паша, Рома", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
 
 func shuffleButtons(array []tb.Btn) []tb.Btn {
 	rand.Seed(time.Now().UnixNano())
