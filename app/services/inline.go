@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 
@@ -11,7 +12,7 @@ import (
 //Answer on inline query
 func OnInline(q *tb.Query) {
 	var count int64
-	gets := utils.DB.Limit(50).Model(utils.Get{}).Where("name LIKE ?", "%"+q.Text+"%").Order("name asc").Count(&count)
+	gets := utils.DB.Limit(50).Model(utils.Get{}).Where("name LIKE ?", "%"+q.Text+"%").Count(&count)
 	get_rows, err := gets.Rows()
 	if err != nil {
 		log.Println(err.Error())
@@ -69,9 +70,12 @@ func OnInline(q *tb.Query) {
 		case get.Type == "Text":
 			results[i] = &tb.ArticleResult{
 				Title:       get.Name,
-				Text:        get.Data,
 				Description: get.Data,
 			}
+			results[i].SetContent(tb.InputMessageContent(&tb.InputTextMessageContent{
+				Text:      fmt.Sprintf("<b>%v</b>\n%v", get.Name, get.Data),
+				ParseMode: "HTML",
+			}))
 		default:
 			log.Printf("Не удалось отправить гет %v через inline.", get.Name)
 		}
@@ -82,7 +86,8 @@ func OnInline(q *tb.Query) {
 	}
 
 	err = utils.Bot.Answer(q, &tb.QueryResponse{
-		Results: results,
+		Results:   results,
+		CacheTime: 0,
 	})
 
 	if err != nil {
