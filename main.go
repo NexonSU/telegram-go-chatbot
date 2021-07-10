@@ -51,6 +51,9 @@ func main() {
 	utils.Bot.Handle("/kill", commands.Kill)
 	utils.Bot.Handle("/duelstats", commands.Duelstats)
 
+	//Inline
+	utils.Bot.Handle(tb.OnQuery, services.OnInline)
+
 	//Russian Roulette game
 	utils.Bot.Handle("/russianroulette", roulette.Request)
 	utils.Bot.Handle(&roulette.AcceptButton, roulette.Accept)
