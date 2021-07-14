@@ -22,6 +22,7 @@ type Configuration struct {
 	Webhook struct {
 		Listen            string `json:"listen"`
 		EndpointPublicURL string `json:"endpoint_public_url"`
+		MaxConnections    int    `json:"max_connections"`
 	}
 	Youtube struct {
 		ApiKey        string `json:"api_key"`

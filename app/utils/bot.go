@@ -1,9 +1,10 @@
 package utils
 
 import (
-	tb "gopkg.in/tucnak/telebot.v2"
 	"log"
 	"time"
+
+	tb "gopkg.in/tucnak/telebot.v2"
 )
 
 func BotInit() tb.Bot {
@@ -28,6 +29,7 @@ func BotInit() tb.Bot {
 			Endpoint: &tb.WebhookEndpoint{
 				PublicURL: Config.Webhook.EndpointPublicURL,
 			},
+			MaxConnections: Config.Webhook.MaxConnections,
 			AllowedUpdates: Config.Telegram.AllowedUpdates,
 		}
 	} else {
