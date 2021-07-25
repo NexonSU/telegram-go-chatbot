@@ -2,21 +2,22 @@ package services
 
 import (
 	"fmt"
-	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	"github.com/valyala/fastjson"
-	tb "gopkg.in/tucnak/telebot.v2"
-	"gorm.io/gorm/clause"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"github.com/valyala/fastjson"
+	tb "gopkg.in/tucnak/telebot.v2"
+	"gorm.io/gorm/clause"
 )
 
 func ZavtraStreamCheckService() {
 	for {
 		delay := 240
-		if time.Now().Hour() < 24 && time.Now().Hour() >= 18 {
+		if time.Now().Hour() < 2 && time.Now().Hour() >= 20 {
 			delay = 30
 		}
 		err := zavtraStreamCheck("youtube")
