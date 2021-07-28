@@ -2,9 +2,10 @@ package commands
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	tb "gopkg.in/tucnak/telebot.v2"
-	"strings"
 )
 
 //Unban user on /unban
@@ -33,6 +34,14 @@ func Unban(m *tb.Message) {
 	target, _, err := utils.FindUserInMessage(*m)
 	if err != nil {
 		_, err := utils.Bot.Reply(m, fmt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
+		if err != nil {
+			utils.ErrorReporting(err, m)
+			return
+		}
+		return
+	}
+	if utils.Bot.Me.ID == target.ID {
+		_, err := utils.Bot.Reply(m, &tb.Animation{File: tb.File{FileID: "AAMCBAADHQJC9c81AAEfrbJhAdSSlo857v01bhmfBhlYI0ldbwACCgEAAr6qRVCdFdcYrTd0QwEAB20AAyAE"}})
 		if err != nil {
 			utils.ErrorReporting(err, m)
 			return
