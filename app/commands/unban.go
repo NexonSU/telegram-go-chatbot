@@ -41,7 +41,7 @@ func Unban(m *tb.Message) {
 		return
 	}
 	if utils.Bot.Me.ID == target.ID {
-		_, err := utils.Bot.Reply(m, &tb.Animation{File: tb.File{FileID: "AAMCBAADHQJC9c81AAEfrbJhAdSSlo857v01bhmfBhlYI0ldbwACCgEAAr6qRVCdFdcYrTd0QwEAB20AAyAE"}})
+		_, err := utils.Bot.Reply(m, &tb.Animation{File: tb.File{FileID: "CgACAgQAAx0CQvXPNQABH62yYQHUkpaPOe79NW4ZnwYZWCNJXW8AAgoBAAK-qkVQnRXXGK03dEMgBA"}})
 		if err != nil {
 			utils.ErrorReporting(err, m)
 			return
