@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
@@ -22,11 +23,21 @@ func Update(m *tb.Message) {
 		return
 	}
 	utils.Bot.Delete(m)
-	out, err := exec.Command("go", "get", "-u", "-v", "github.com/NexonSU/telegram-go-chatbot").CombinedOutput()
+	_, err := utils.Bot.Send(m.Sender, "Starting go get...")
 	if err != nil {
 		utils.ErrorReporting(err, m)
 	}
-	_, err = utils.Bot.Send(m.Sender, fmt.Sprintf("Update finished:\n<pre>%v</pre>", out))
+	shell := "bash"
+	shellArg := "-c"
+	if _, err := os.Stat(shell); os.IsNotExist(err) {
+		shell = "cmd"
+		shellArg = "/c"
+	}
+	cmd, err := exec.Command(shell, shellArg, "go", "get", "-u", "-v", "github.com/NexonSU/telegram-go-chatbot").CombinedOutput()
+	if err != nil {
+		utils.ErrorReporting(err, m)
+	}
+	_, err = utils.Bot.Send(m.Sender, fmt.Sprintf("Update finished:\n<pre>%s</pre>", cmd))
 	if err != nil {
 		utils.ErrorReporting(err, m)
 	}
