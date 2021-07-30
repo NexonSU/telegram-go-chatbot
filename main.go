@@ -50,6 +50,7 @@ func main() {
 	utils.Bot.Handle("/suicide", commands.Blessing)
 	utils.Bot.Handle("/kill", commands.Kill)
 	utils.Bot.Handle("/duelstats", commands.Duelstats)
+	utils.Bot.Handle("/restart", commands.Restart)
 
 	//Inline
 	utils.Bot.Handle(tb.OnQuery, services.OnInline)
