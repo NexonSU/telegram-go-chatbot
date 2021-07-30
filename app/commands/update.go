@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
@@ -27,13 +26,7 @@ func Update(m *tb.Message) {
 	if err != nil {
 		utils.ErrorReporting(err, m)
 	}
-	shell := "bash"
-	shellArg := "-c"
-	if _, err := os.Stat(shell); os.IsNotExist(err) {
-		shell = "cmd"
-		shellArg = "/c"
-	}
-	cmd, err := exec.Command(shell, shellArg, "go", "get", "-u", "-v", "github.com/NexonSU/telegram-go-chatbot").CombinedOutput()
+	cmd, err := exec.Command("bash", "-c", "go get -u -v github.com/NexonSU/telegram-go-chatbot").CombinedOutput()
 	if err != nil {
 		utils.ErrorReporting(err, m)
 	}
