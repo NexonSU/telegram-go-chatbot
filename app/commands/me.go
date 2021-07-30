@@ -2,9 +2,10 @@ package commands
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	tb "gopkg.in/tucnak/telebot.v2"
-	"strings"
 )
 
 //Send formatted text on /me
@@ -14,7 +15,7 @@ func Me(m *tb.Message) {
 	}
 	var text = strings.Split(m.Text, " ")
 	if len(text) == 1 {
-		_, err := utils.Bot.Reply(m, fmt.Sprintf("Пример использования:\n<code>/me {делает что-то}</code>"))
+		_, err := utils.Bot.Reply(m, "Пример использования:\n<code>/me {делает что-то}</code>")
 		if err != nil {
 			utils.ErrorReporting(err, m)
 			return

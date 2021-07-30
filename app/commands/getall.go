@@ -2,9 +2,10 @@ package commands
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	tb "gopkg.in/tucnak/telebot.v2"
-	"strings"
 )
 
 //Send list of Gets to user on /getall
@@ -28,5 +29,4 @@ func Getall(m *tb.Message) {
 		utils.ErrorReporting(err, m)
 		return
 	}
-	return
 }

@@ -2,9 +2,10 @@ package commands
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	tb "gopkg.in/tucnak/telebot.v2"
-	"time"
 )
 
 //Send warning amount on /mywarns
@@ -15,7 +16,7 @@ func Mywarns(m *tb.Message) {
 	var warn utils.Warn
 	result := utils.DB.First(&warn, m.Sender.ID)
 	if result.RowsAffected != 0 {
-		warn.Amount = warn.Amount - int(time.Now().Sub(warn.LastWarn).Hours()/24/7)
+		warn.Amount = warn.Amount - int(time.Since(warn.LastWarn).Hours()/24/7)
 		if warn.Amount < 0 {
 			warn.Amount = 0
 		}

@@ -2,10 +2,11 @@ package commands
 
 import (
 	"fmt"
-	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
 	"net/url"
 	"strings"
+
+	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	tb "gopkg.in/tucnak/telebot.v2"
 )
 
 //Reply google URL on "google"
@@ -16,7 +17,7 @@ func Google(m *tb.Message) {
 	var target = *m
 	var text = strings.Split(m.Text, " ")
 	if len(text) == 1 {
-		_, err := utils.Bot.Reply(m, fmt.Sprintf("Пример использования:\n<code>/google {запрос}</code>"))
+		_, err := utils.Bot.Reply(m, "Пример использования:\n<code>/google {запрос}</code>")
 		if err != nil {
 			utils.ErrorReporting(err, m)
 			return

@@ -1,9 +1,10 @@
 package commands
 
 import (
+	"strconv"
+
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	tb "gopkg.in/tucnak/telebot.v2"
-	"strconv"
 )
 
 //List add pidors from DB on /pidorlist
@@ -50,5 +51,4 @@ func Pidorlist(m *tb.Message) {
 		utils.ErrorReporting(err, m)
 		return
 	}
-	return
 }
