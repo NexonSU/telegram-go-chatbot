@@ -22,7 +22,7 @@ func Update(m *tb.Message) {
 		return
 	}
 	utils.Bot.Delete(m)
-	out, err := exec.Command("go get -u -v github.com/NexonSU/telegram-go-chatbot").Output()
+	out, err := exec.Command("go", "get -u -v github.com/NexonSU/telegram-go-chatbot").Output()
 	if err != nil {
 		utils.ErrorReporting(err, m)
 	}
