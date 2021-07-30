@@ -26,7 +26,7 @@ func Update(m *tb.Message) {
 	if err != nil {
 		utils.ErrorReporting(err, m)
 	}
-	_, err = utils.Bot.Reply(m, fmt.Sprintf("Update finished:\n<pre>%v</pre>", out))
+	_, err = utils.Bot.Send(m.Sender, fmt.Sprintf("Update finished:\n<pre>%v</pre>", out))
 	if err != nil {
 		utils.ErrorReporting(err, m)
 	}
