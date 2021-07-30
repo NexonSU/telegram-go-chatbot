@@ -38,6 +38,13 @@ func BotInit() tb.Bot {
 			AllowedUpdates: Config.Telegram.AllowedUpdates,
 		}
 	}
+	settings.Poller = tb.NewMiddlewarePoller(settings.Poller, func(upd *tb.Update) bool {
+		if upd.Message != nil && upd.Message.Sender != nil {
+			GatherData(upd.Message.Sender)
+		}
+
+		return true
+	})
 	var Bot, err = tb.NewBot(settings)
 	if err != nil {
 		log.Println(Config.Telegram.BotApiUrl)

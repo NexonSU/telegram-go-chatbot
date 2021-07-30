@@ -59,9 +59,6 @@ func main() {
 	utils.Bot.Handle(&roulette.AcceptButton, roulette.Accept)
 	utils.Bot.Handle(&roulette.DenyButton, roulette.Deny)
 
-	//Gather user data on text
-	utils.Bot.Handle(tb.OnText, services.OnText)
-
 	//Repost channel post to chat
 	utils.Bot.Handle(tb.OnChannelPost, services.OnPost)
 
