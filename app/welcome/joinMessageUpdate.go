@@ -127,6 +127,10 @@ func JoinMessageUpdate() error {
 	if Border.NeedCreate {
 		Border.NeedCreate = false
 		Border.NeedUpdate = false
+		CorrectButton.Unique = "Button" + strconv.Itoa(utils.RandInt(10000, 99999))
+		FirstWrongButton.Unique = "Button" + strconv.Itoa(utils.RandInt(10000, 99999))
+		SecondWrongButton.Unique = "Button" + strconv.Itoa(utils.RandInt(10000, 99999))
+		ThirdWrongButton.Unique = "Button" + strconv.Itoa(utils.RandInt(10000, 99999))
 		newMessage, err := utils.Bot.Send(Border.Chat, text, &Selector)
 		if err != nil {
 			return err
