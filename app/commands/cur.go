@@ -2,13 +2,14 @@ package commands
 
 import (
 	"fmt"
-	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	cmc "github.com/miguelmota/go-coinmarketcap/pro/v1"
-	tb "gopkg.in/tucnak/telebot.v2"
 	"math"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	cmc "github.com/miguelmota/go-coinmarketcap/pro/v1"
+	tb "gopkg.in/tucnak/telebot.v2"
 )
 
 //Reply currency "cur"
@@ -22,6 +23,7 @@ func Cur(m *tb.Message) {
 			utils.ErrorReporting(err, m)
 			return
 		}
+		return
 	}
 	var target = *m
 	var text = strings.Split(m.Text, " ")
