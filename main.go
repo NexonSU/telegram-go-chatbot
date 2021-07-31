@@ -68,8 +68,9 @@ func main() {
 	utils.Bot.Handle(telebot.OnChannelPost, utils.Repost, middleware.ChannelOnly)
 
 	//User join
-	utils.Bot.Handle(telebot.OnUserJoined, checkpoint.OnJoin, middleware.ChatOnly)
-	utils.Bot.Handle(telebot.OnUserLeft, checkpoint.OnLeft, middleware.ChatOnly)
+	utils.Bot.Handle(telebot.OnChatMember, checkpoint.ChatMemberUpdate, middleware.ChatOnly)
+	utils.Bot.Handle(telebot.OnUserJoined, utils.Remove, middleware.ChatOnly)
+	utils.Bot.Handle(telebot.OnUserLeft, utils.Remove, middleware.ChatOnly)
 	utils.Bot.Handle(&checkpoint.CorrectButton, checkpoint.OnClickCorrectButton, middleware.ChatOnly)
 	utils.Bot.Handle(&checkpoint.FirstWrongButton, checkpoint.OnClickWrongButton, middleware.ChatOnly)
 	utils.Bot.Handle(&checkpoint.SecondWrongButton, checkpoint.OnClickWrongButton, middleware.ChatOnly)

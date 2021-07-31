@@ -3,6 +3,7 @@ package checkpoint
 import (
 	"log"
 	"math/rand"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -10,6 +11,25 @@ import (
 	"gopkg.in/tucnak/telebot.v3"
 )
 
+type BorderUser struct {
+	User     *telebot.User
+	Status   string
+	Reason   string
+	Role     string
+	Checked  bool
+	JoinedAt int64
+}
+
+type JoinBorder struct {
+	Message    *telebot.Message
+	Chat       *telebot.Chat
+	Users      []BorderUser
+	NeedUpdate bool
+	NeedCreate bool
+}
+
+var Border JoinBorder
+var arabicSymbols, _ = regexp.Compile("[\u0600-\u06ff]|[\u0750-\u077f]|[\ufb50-\ufbc1]|[\ufbd3-\ufd3f]|[\ufd50-\ufd8f]|[\ufd92-\ufdc7]|[\ufe70-\ufefc]|[\uFDF0-\uFDFD]")
 var Selector = telebot.ReplyMarkup{}
 var CorrectButton = Selector.Data("Дмитрий, Тимур, Максим", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
 var FirstWrongButton = Selector.Data("Иван, Пётр, Александр", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
@@ -55,22 +75,11 @@ func JoinMessageUpdate() error {
 	var accepted []BorderUser
 	var text string
 	for i, user := range Border.Users {
+		user = Check(user)
+		Border.Users[i] = user
 		switch user.Status {
 		case "pending":
-			if time.Now().Unix()-user.JoinedAt.Unix() > 120 {
-				err := utils.Bot.Ban(Border.Chat, &telebot.ChatMember{User: user.User})
-				if err != nil {
-					continue
-				}
-				Border.Users[i].Status = "banned"
-				user.Status = "banned"
-				Border.Users[i].Reason = "не прошел проверку"
-				user.Reason = "не прошел проверку"
-				banned = append(banned, user)
-				Border.NeedUpdate = true
-			} else {
-				pending = append(pending, user)
-			}
+			pending = append(pending, user)
 		case "banned":
 			banned = append(banned, user)
 		case "accepted":
@@ -119,10 +128,7 @@ func JoinMessageUpdate() error {
 	if Border.NeedUpdate && !Border.NeedCreate {
 		Border.NeedUpdate = false
 		_, err := utils.Bot.Edit(Border.Message, text, &Selector)
-		if err != nil {
-			return err
-		}
-		return nil
+		return err
 	}
 	if Border.NeedCreate {
 		Border.NeedCreate = false
@@ -135,9 +141,9 @@ func JoinMessageUpdate() error {
 		if err != nil {
 			return err
 		}
-		_ = utils.Bot.Delete(Border.Message)
+		utils.Bot.Delete(Border.Message)
 		Border.Message = newMessage
-		return nil
+		return err
 	}
 	if len(pending) == 0 && time.Now().Unix()-Border.Message.Time().Unix() > 60 {
 		Border.Users = []BorderUser{}

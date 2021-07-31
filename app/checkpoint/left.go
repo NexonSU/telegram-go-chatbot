@@ -7,25 +7,17 @@ import (
 	"gopkg.in/tucnak/telebot.v3"
 )
 
-func OnLeft(context telebot.Context) error {
-	var err error
-	if context.Chat().Username != utils.Config.Telegram.Chat {
-		return err
-	}
-	err = utils.Bot.Delete(context.Message())
+func UserLeft(context telebot.Context) error {
 	for i, user := range Border.Users {
-		if user.User.ID == context.Sender().ID && user.Status == "pending" {
+		if user.User.ID == context.ChatMember().NewChatMember.User.ID && user.Status == "pending" {
 			err := utils.Bot.Ban(Border.Chat, &telebot.ChatMember{User: user.User, RestrictedUntil: time.Now().Unix() + 7200})
 			if err != nil {
-				continue
+				return err
 			}
 			Border.Users[i].Status = "banned"
 			Border.Users[i].Reason = "сбежал"
 			Border.NeedUpdate = true
 		}
 	}
-	if err != nil {
-		return err
-	}
-	return err
+	return nil
 }
