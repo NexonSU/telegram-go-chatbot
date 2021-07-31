@@ -14,8 +14,5 @@ func Google(context telebot.Context) error {
 	if len(text) == 1 {
 		return context.Reply("Пример использования:\n<code>/google {запрос}</code>")
 	}
-	if context.Message().ReplyTo != nil {
-		context.Message().Sender = context.Message().ReplyTo.Sender
-	}
-	return context.Reply(fmt.Sprintf("https://www.google.com/search?q=%v", url.QueryEscape(strings.Join(text[1:], " "))))
+	return context.Send(fmt.Sprintf("https://www.google.com/search?q=%v", url.QueryEscape(strings.Join(text[1:], " "))), &telebot.SendOptions{DisableWebPagePreview: true, ReplyTo: context.Message().ReplyTo, AllowWithoutReply: true})
 }

@@ -21,9 +21,6 @@ func Cur(context telebot.Context) error {
 	if len(text) != 4 {
 		return context.Reply("Пример использования:\n/cur {количество} {EUR/USD/RUB} {EUR/USD/RUB}")
 	}
-	if context.Message().ReplyTo != nil {
-		context.Message().Sender = context.Message().ReplyTo.Sender
-	}
 	amount, err := strconv.ParseFloat(text[1], 64)
 	if err != nil {
 		return context.Reply(fmt.Sprintf("Ошибка определения количества:\n<code>%v</code>", err))
@@ -41,5 +38,5 @@ func Cur(context telebot.Context) error {
 	if err != nil {
 		return context.Reply("Ошибка при запросе. Возможно, одна из валют не найдена.\nОнлайн-версия: https://coinmarketcap.com/ru/converter/", &telebot.SendOptions{DisableWebPagePreview: true})
 	}
-	return context.Reply(fmt.Sprintf("%v %v = %v %v", conversion.Amount, conversion.Name, math.Round(conversion.Quote[convert].Price*100)/100, convert))
+	return context.Send(fmt.Sprintf("%v %v = %v %v", conversion.Amount, conversion.Name, math.Round(conversion.Quote[convert].Price*100)/100, convert), &telebot.SendOptions{ReplyTo: context.Message().ReplyTo, AllowWithoutReply: true})
 }

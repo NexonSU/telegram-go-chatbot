@@ -16,6 +16,7 @@ func Bonk(context telebot.Context) error {
 	if context.Message().ReplyTo == nil {
 		return context.Reply("Просто отправь <code>/bonk</code> в ответ на чье-либо сообщение.")
 	}
+	context.Delete()
 	_, b, _, _ := runtime.Caller(0)
 	basepath := filepath.Dir(b)
 	im, err := webp.Load(basepath + "/../../files/bonk.webp")
@@ -49,6 +50,5 @@ func Bonk(context telebot.Context) error {
 	if err != nil {
 		return err
 	}
-	context.Message().Sender = context.Message().ReplyTo.Sender
-	return context.Reply(&telebot.Sticker{File: telebot.FromReader(buf)})
+	return context.Send(&telebot.Sticker{File: telebot.FromReader(buf)}, &telebot.SendOptions{ReplyTo: context.Message().ReplyTo})
 }

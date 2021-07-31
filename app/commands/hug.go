@@ -51,6 +51,5 @@ func Hug(context telebot.Context) error {
 	if err != nil {
 		return err
 	}
-	context.Message().Sender = context.Message().ReplyTo.Sender
-	return context.Reply(&telebot.Sticker{File: telebot.FromReader(buf)})
+	return context.Reply(&telebot.Sticker{File: telebot.FromReader(buf)}, &telebot.SendOptions{ReplyTo: context.Message().ReplyTo})
 }
