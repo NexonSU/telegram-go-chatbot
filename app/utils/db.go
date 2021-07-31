@@ -1,12 +1,13 @@
 package utils
 
 import (
-	tb "gopkg.in/tucnak/telebot.v2"
+	"log"
+	"time"
+
+	"gopkg.in/tucnak/telebot.v3"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"log"
-	"time"
 )
 
 type Get struct {
@@ -18,19 +19,19 @@ type Get struct {
 
 type PidorStats struct {
 	Date   time.Time `gorm:"primaryKey"`
-	UserID int
+	UserID int64
 }
 
-type PidorList tb.User
+type PidorList telebot.User
 
 type Duelist struct {
-	UserID int `gorm:"primaryKey"`
+	UserID int64 `gorm:"primaryKey"`
 	Deaths int
 	Kills  int
 }
 
 type Warn struct {
-	UserID   int `gorm:"primaryKey"`
+	UserID   int64 `gorm:"primaryKey"`
 	Amount   int
 	LastWarn time.Time
 }
@@ -53,7 +54,7 @@ func DataBaseInit(file string) gorm.DB {
 	}
 
 	//Create tables, if they not exists in DB
-	err = database.AutoMigrate(tb.User{}, Get{}, Warn{}, PidorStats{}, PidorList{}, Duelist{}, ZavtraStream{})
+	err = database.AutoMigrate(telebot.User{}, Get{}, Warn{}, PidorStats{}, PidorList{}, Duelist{}, ZavtraStream{})
 	if err != nil {
 		log.Println(err)
 	}

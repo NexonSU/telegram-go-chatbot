@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	tb "gopkg.in/tucnak/telebot.v2"
-	"gorm.io/gorm/clause"
 	"html"
 	"log"
 	"math/big"
@@ -14,9 +12,12 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"gopkg.in/tucnak/telebot.v3"
+	"gorm.io/gorm/clause"
 )
 
-func UserFullName(user *tb.User) string {
+func UserFullName(user *telebot.User) string {
 	fullname := user.FirstName
 	if user.LastName != "" {
 		fullname = fmt.Sprintf("%v %v", user.FirstName, user.LastName)
@@ -24,7 +25,7 @@ func UserFullName(user *tb.User) string {
 	return fullname
 }
 
-func UserName(user *tb.User) string {
+func UserName(user *telebot.User) string {
 	username := user.Username
 	if user.Username == "" {
 		username = UserFullName(user)
@@ -32,7 +33,7 @@ func UserName(user *tb.User) string {
 	return username
 }
 
-func MentionUser(user *tb.User) string {
+func MentionUser(user *telebot.User) string {
 	return fmt.Sprintf("<a href=\"tg://user?id=%v\">%v</a>", user.ID, UserFullName(user))
 }
 
@@ -75,25 +76,22 @@ func RestrictionTimeMessage(seconds int64) string {
 	return message
 }
 
-func ErrorReporting(err error, message *tb.Message) {
+func ErrorReporting(err error, context telebot.Context) {
 	_, fn, line, _ := runtime.Caller(1)
-	log.Printf("[%s:%d] %v at MessageID \"%v\" in Chat \"%v\"", fn, line, err, message.ID, message.Chat.Username)
-	MarshalledMessage, _ := json.MarshalIndent(message, "", "    ")
+	log.Printf("[%s:%d] %v at MessageID \"%v\" in Chat \"%v\"", fn, line, err, context.Message().ID, context.Chat().Username)
+	MarshalledMessage, _ := json.MarshalIndent(context, "", "    ")
 	JsonMessage := html.EscapeString(string(MarshalledMessage))
 	text := fmt.Sprintf("An exception was raised while handling an update\n<pre>%v</pre>\n\nMessage:\n<pre>%v</pre>", err, JsonMessage)
-	_, err = Bot.Send(tb.ChatID(Config.Telegram.SysAdmin), text)
-	if err != nil {
-		return
-	}
+	Bot.Send(telebot.ChatID(Config.Telegram.SysAdmin), text)
 }
 
-func FindUserInMessage(m tb.Message) (tb.User, int64, error) {
-	var user tb.User
+func FindUserInMessage(context telebot.Context) (telebot.User, int64, error) {
+	var user telebot.User
 	var err error = nil
 	var untildate = time.Now().Unix()
-	var text = strings.Split(m.Text, " ")
-	if m.ReplyTo != nil {
-		user = *m.ReplyTo.Sender
+	var text = strings.Split(context.Text(), " ")
+	if context.Message().ReplyTo != nil {
+		user = *context.Message().ReplyTo.Sender
 		if len(text) == 2 {
 			addtime, err := strconv.ParseInt(text[1], 10, 64)
 			if err != nil {
@@ -121,7 +119,7 @@ func FindUserInMessage(m tb.Message) (tb.User, int64, error) {
 	return user, untildate, err
 }
 
-func GatherData(user *tb.User) error {
+func GatherData(user *telebot.User) error {
 	result := DB.Clauses(clause.OnConflict{
 		UpdateAll: true,
 	}).Create(user)
@@ -131,13 +129,13 @@ func GatherData(user *tb.User) error {
 	return nil
 }
 
-func GetUserFromDB(findstring string) (tb.User, error) {
-	var user tb.User
+func GetUserFromDB(findstring string) (telebot.User, error) {
+	var user telebot.User
 	var err error = nil
 	if string(findstring[0]) == "@" {
 		user.Username = findstring[1:]
 	} else {
-		user.ID, err = strconv.Atoi(findstring)
+		user.ID, err = strconv.ParseInt(findstring, 10, 64)
 	}
 	result := DB.Where(&user).First(&user)
 	if result.Error != nil {

@@ -2,14 +2,16 @@ package commands
 
 import (
 	"fmt"
+
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Send top 10 pidors of all time on /pidorall
-func Pidorall(m *tb.Message) {
-	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
-		return
+func Pidorall(context telebot.Context) error {
+	var err error
+	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
+		return err
 	}
 	var i = 0
 	var username string
@@ -19,17 +21,12 @@ func Pidorall(m *tb.Message) {
 	for result.Next() {
 		err := result.Scan(&username, &count)
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
 		i++
 		pidorall += fmt.Sprintf("%v. %v - %v раз(а)\n", i, username, count)
 	}
 	utils.DB.Model(utils.PidorList{}).Count(&count)
 	pidorall += fmt.Sprintf("\nВсего участников — %v", count)
-	_, err := utils.Bot.Reply(m, pidorall)
-	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
-	}
+	return context.Reply(pidorall)
 }

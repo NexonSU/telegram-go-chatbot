@@ -2,26 +2,21 @@ package commands
 
 import (
 	"fmt"
+
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Send user utils.Duelist stats on /duelstats
-func Duelstats(m *tb.Message) {
-	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
-		return
+func Duelstats(context telebot.Context) error {
+	var err error
+	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
+		return err
 	}
 	var duelist utils.Duelist
-	result := utils.DB.Model(utils.Duelist{}).Where(m.Sender.ID).First(&duelist)
+	result := utils.DB.Model(utils.Duelist{}).Where(context.Sender().ID).First(&duelist)
 	if result.RowsAffected == 0 {
-		_, err := utils.Bot.Reply(m, "У тебя нет статистики.")
-		if err != nil {
-			utils.ErrorReporting(err, m)
-		}
-		return
+		return context.Reply("У тебя нет статистики.")
 	}
-	_, err := utils.Bot.Reply(m, fmt.Sprintf("Побед: %v\nСмертей: %v", duelist.Kills, duelist.Deaths))
-	if err != nil {
-		utils.ErrorReporting(err, m)
-	}
+	return context.Reply(fmt.Sprintf("Побед: %v\nСмертей: %v", duelist.Kills, duelist.Deaths))
 }

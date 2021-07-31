@@ -7,16 +7,16 @@ import (
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
-var Selector = tb.ReplyMarkup{}
+var Selector = telebot.ReplyMarkup{}
 var CorrectButton = Selector.Data("Дмитрий, Тимур, Максим", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
 var FirstWrongButton = Selector.Data("Иван, Пётр, Александр", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
 var SecondWrongButton = Selector.Data("Руслан, Андрей, Кирилл", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
 var ThirdWrongButton = Selector.Data("Миша, Паша, Рома", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
 
-func shuffleButtons(array []tb.Btn) []tb.Btn {
+func shuffleButtons(array []telebot.Btn) []telebot.Btn {
 	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(array), func(i, j int) {
 		array[i], array[j] = array[j], array[i]
@@ -24,13 +24,13 @@ func shuffleButtons(array []tb.Btn) []tb.Btn {
 	return array
 }
 
-var buttons = shuffleButtons([]tb.Btn{CorrectButton, SecondWrongButton, ThirdWrongButton})
+var buttons = shuffleButtons([]telebot.Btn{CorrectButton, SecondWrongButton, ThirdWrongButton})
 
 func JoinMessageUpdateService() {
-	Border.Message = &tb.Message{
+	Border.Message = &telebot.Message{
 		ID:       0,
 		Unixtime: 0,
-		Chat:     &tb.Chat{ID: 0},
+		Chat:     &telebot.Chat{ID: 0},
 	}
 	for {
 		delay := 1
@@ -58,7 +58,7 @@ func JoinMessageUpdate() error {
 		switch user.Status {
 		case "pending":
 			if time.Now().Unix()-user.JoinedAt.Unix() > 120 {
-				err := utils.Bot.Ban(Border.Chat, &tb.ChatMember{User: user.User})
+				err := utils.Bot.Ban(Border.Chat, &telebot.ChatMember{User: user.User})
 				if err != nil {
 					continue
 				}
@@ -93,7 +93,7 @@ func JoinMessageUpdate() error {
 		}
 		text += "!\nОтветь на вопрос, чтобы получить доступ в чат, иначе бан через 2 минуты.\nКак зовут ведущих подкаста?\n"
 	} else {
-		Selector = tb.ReplyMarkup{}
+		Selector = telebot.ReplyMarkup{}
 	}
 	if len(accepted) != 0 {
 		text += "Новые подтвержденные пользователи: "
@@ -141,10 +141,10 @@ func JoinMessageUpdate() error {
 	}
 	if len(pending) == 0 && time.Now().Unix()-Border.Message.Time().Unix() > 60 {
 		Border.Users = []BorderUser{}
-		Border.Message = &tb.Message{
+		Border.Message = &telebot.Message{
 			ID:       0,
 			Unixtime: 0,
-			Chat:     &tb.Chat{ID: 0},
+			Chat:     &telebot.Chat{ID: 0},
 		}
 	}
 	return nil

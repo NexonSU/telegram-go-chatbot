@@ -2,90 +2,65 @@ package commands
 
 import (
 	"fmt"
+
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Send admin list to user on /admin
-func Admin(m *tb.Message) {
-	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
-		return
+func Admin(context telebot.Context) error {
+	var err error
+	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
+		return err
 	}
 	var get utils.Get
 	result := utils.DB.Where(&utils.Get{Name: "admin"}).First(&get)
 	if result.RowsAffected != 0 {
 		switch {
 		case get.Type == "Animation":
-			_, err := utils.Bot.Reply(m, &tb.Animation{
-				File:    tb.File{FileID: get.Data},
+			err = context.Reply(&telebot.Animation{
+				File:    telebot.File{FileID: get.Data},
 				Caption: get.Caption,
 			})
-			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
-			}
+			return err
 		case get.Type == "Audio":
-			_, err := utils.Bot.Reply(m, &tb.Audio{
-				File:    tb.File{FileID: get.Data},
+			err = context.Reply(&telebot.Audio{
+				File:    telebot.File{FileID: get.Data},
 				Caption: get.Caption,
 			})
-			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
-			}
+			return err
 		case get.Type == "Photo":
-			_, err := utils.Bot.Reply(m, &tb.Photo{
-				File:    tb.File{FileID: get.Data},
+			err = context.Reply(&telebot.Photo{
+				File:    telebot.File{FileID: get.Data},
 				Caption: get.Caption,
 			})
-			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
-			}
+			return err
 		case get.Type == "Video":
-			_, err := utils.Bot.Reply(m, &tb.Video{
-				File:    tb.File{FileID: get.Data},
+			err = context.Reply(&telebot.Video{
+				File:    telebot.File{FileID: get.Data},
 				Caption: get.Caption,
 			})
-			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
-			}
+			return err
 		case get.Type == "Voice":
-			_, err := utils.Bot.Reply(m, &tb.Voice{
-				File: tb.File{FileID: get.Data},
+			err = context.Reply(&telebot.Voice{
+				File: telebot.File{FileID: get.Data},
 			})
-			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
-			}
+			return err
 		case get.Type == "Document":
-			_, err := utils.Bot.Reply(m, &tb.Document{
-				File:    tb.File{FileID: get.Data},
+			err = context.Reply(&telebot.Document{
+				File:    telebot.File{FileID: get.Data},
 				Caption: get.Caption,
 			})
-			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
-			}
+			return err
 		case get.Type == "Text":
-			_, err := utils.Bot.Reply(m, get.Data)
-			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
-			}
+			err = context.Reply(get.Data)
+			return err
 		default:
-			_, err := utils.Bot.Reply(m, fmt.Sprintf("Ошибка при определении типа гета, я не знаю тип <code>%v</code>.", get.Type))
-			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
-			}
+			err = context.Reply(fmt.Sprintf("Ошибка при определении типа гета, я не знаю тип <code>%v</code>.", get.Type))
+			return err
 		}
 	} else {
-		_, err := utils.Bot.Reply(m, "Гет <code>admin</code> не найден.")
-		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
-		}
+		err = context.Reply("Гет <code>admin</code> не найден.")
+		return err
 	}
 }

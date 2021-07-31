@@ -2,79 +2,73 @@ package commands
 
 import (
 	"fmt"
-	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
-	"gorm.io/gorm/clause"
 	"strings"
+
+	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
+	"gorm.io/gorm/clause"
 )
 
 //Save Get to DB on /set
-func Set(m *tb.Message) {
-	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
-		return
+func Set(context telebot.Context) error {
+	var err error
+	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
+		return err
 	}
 	var get utils.Get
-	var text = strings.Split(m.Text, " ")
-	if (m.ReplyTo == nil && len(text) < 3) || (m.ReplyTo != nil && len(text) != 2) {
-		_, err := utils.Bot.Reply(m, "Пример использования: <code>/set {гет} {значение}</code>\nИли отправь в ответ на какое-либо сообщение <code>/set {гет}</code>")
+	var text = strings.Split(context.Text(), " ")
+	if (context.Message().ReplyTo == nil && len(text) < 3) || (context.Message().ReplyTo != nil && len(text) != 2) {
+		err := context.Reply("Пример использования: <code>/set {гет} {значение}</code>\nИли отправь в ответ на какое-либо сообщение <code>/set {гет}</code>")
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
-		return
+		return err
 	}
 	get.Name = strings.ToLower(text[1])
-	if m.ReplyTo == nil && len(text) > 2 {
+	if context.Message().ReplyTo == nil && len(text) > 2 {
 		get.Type = "Text"
 		get.Data = strings.Join(text[2:], " ")
-	} else if m.ReplyTo != nil && len(text) == 2 {
-		get.Caption = m.ReplyTo.Caption
+	} else if context.Message().ReplyTo != nil && len(text) == 2 {
+		get.Caption = context.Message().ReplyTo.Caption
 		switch {
-		case m.ReplyTo.Animation != nil:
+		case context.Message().ReplyTo.Animation != nil:
 			get.Type = "Animation"
-			get.Data = m.ReplyTo.Animation.FileID
-		case m.ReplyTo.Audio != nil:
+			get.Data = context.Message().ReplyTo.Animation.FileID
+		case context.Message().ReplyTo.Audio != nil:
 			get.Type = "Audio"
-			get.Data = m.ReplyTo.Audio.FileID
-		case m.ReplyTo.Photo != nil:
+			get.Data = context.Message().ReplyTo.Audio.FileID
+		case context.Message().ReplyTo.Photo != nil:
 			get.Type = "Photo"
-			get.Data = m.ReplyTo.Photo.FileID
-		case m.ReplyTo.Video != nil:
+			get.Data = context.Message().ReplyTo.Photo.FileID
+		case context.Message().ReplyTo.Video != nil:
 			get.Type = "Video"
-			get.Data = m.ReplyTo.Video.FileID
-		case m.ReplyTo.Voice != nil:
+			get.Data = context.Message().ReplyTo.Video.FileID
+		case context.Message().ReplyTo.Voice != nil:
 			get.Type = "Voice"
-			get.Data = m.ReplyTo.Voice.FileID
-		case m.ReplyTo.Document != nil:
+			get.Data = context.Message().ReplyTo.Voice.FileID
+		case context.Message().ReplyTo.Document != nil:
 			get.Type = "Document"
-			get.Data = m.ReplyTo.Document.FileID
-		case m.ReplyTo.Text != "":
+			get.Data = context.Message().ReplyTo.Document.FileID
+		case context.Message().ReplyTo.Text != "":
 			get.Type = "Text"
-			get.Data = m.ReplyTo.Text
+			get.Data = context.Message().ReplyTo.Text
 		default:
-			_, err := utils.Bot.Reply(m, "Не удалось распознать файл в сообщении, возможно, он не поддерживается.")
+			err := context.Reply("Не удалось распознать файл в сообщении, возможно, он не поддерживается.")
 			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
+				return err
 			}
-			return
+			return err
 		}
 	}
 	result := utils.DB.Clauses(clause.OnConflict{
 		UpdateAll: true,
 	}).Create(get)
 	if result.Error != nil {
-		utils.ErrorReporting(result.Error, m)
-		_, err := utils.Bot.Reply(m, fmt.Sprintf("Не удалось сохранить гет <code>%v</code>.", get.Name))
+		err := context.Reply(fmt.Sprintf("Не удалось сохранить гет <code>%v</code>.", get.Name))
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
-		return
+		return err
 	}
-	_, err := utils.Bot.Reply(m, fmt.Sprintf("Гет <code>%v</code> сохранён как <code>%v</code>.", get.Name, get.Type))
-	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
-	}
+	return context.Reply(fmt.Sprintf("Гет <code>%v</code> сохранён как <code>%v</code>.", get.Name, get.Type))
 }

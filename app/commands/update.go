@@ -5,33 +5,30 @@ import (
 	"os/exec"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Restart bot on /restart
-func Update(m *tb.Message) {
-	if !utils.IsAdminOrModer(m.Sender.Username) {
-		if m.Chat.Username != utils.Config.Telegram.Chat {
-			return
+func Update(context telebot.Context) error {
+	var err error
+	if !utils.IsAdminOrModer(context.Sender().Username) {
+		if context.Chat().Username != utils.Config.Telegram.Chat {
+			return err
 		}
-		_, err := utils.Bot.Reply(m, &tb.Animation{File: tb.File{FileID: "CgACAgIAAx0CQvXPNQABHGrDYIBIvDLiVV6ZMPypWMi_NVDkoFQAAq4LAAIwqQlIQT82LRwIpmoeBA"}})
-		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
-		}
-		return
+		return context.Reply(&telebot.Animation{File: telebot.File{FileID: "CgACAgIAAx0CQvXPNQABHGrDYIBIvDLiVV6ZMPypWMi_NVDkoFQAAq4LAAIwqQlIQT82LRwIpmoeBA"}})
 	}
-	utils.Bot.Delete(m)
-	_, err := utils.Bot.Send(m.Sender, "Starting go get...")
+	utils.Bot.Delete(context.Message())
+	_, err = utils.Bot.Send(context.Sender(), "Starting go get...")
 	if err != nil {
-		utils.ErrorReporting(err, m)
+		return err
 	}
 	cmd, err := exec.Command("bash", "-c", "go get -u -v github.com/NexonSU/telegram-go-chatbot").CombinedOutput()
 	if err != nil {
-		utils.ErrorReporting(err, m)
+		return err
 	}
-	_, err = utils.Bot.Send(m.Sender, fmt.Sprintf("Update finished:\n<pre>%s</pre>", cmd))
+	_, err = utils.Bot.Send(context.Sender(), fmt.Sprintf("Update finished:\n<pre>%s</pre>", cmd))
 	if err != nil {
-		utils.ErrorReporting(err, m)
+		return err
 	}
+	return err
 }

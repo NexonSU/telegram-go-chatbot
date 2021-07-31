@@ -2,19 +2,21 @@ package commands
 
 import (
 	"fmt"
-	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Send top 10 pidors of year on /pidorstats
-func Pidorstats(m *tb.Message) {
-	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
-		return
+func Pidorstats(context telebot.Context) error {
+	var err error
+	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
+		return err
 	}
-	var text = strings.Split(m.Text, " ")
+	var text = strings.Split(context.Text(), " ")
 	var i = 0
 	var year = time.Now().Year()
 	var username string
@@ -22,12 +24,11 @@ func Pidorstats(m *tb.Message) {
 	if len(text) == 2 {
 		argYear, err := strconv.Atoi(text[1])
 		if err != nil {
-			_, err := utils.Bot.Reply(m, "Ошибка определения года.\nУкажите год с 2019 по предыдущий.")
+			err := context.Reply("Ошибка определения года.\nУкажите год с 2019 по предыдущий.")
 			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
+				return err
 			}
-			return
+			return err
 		}
 		if argYear < year && argYear > 2018 {
 			year = argYear
@@ -38,17 +39,12 @@ func Pidorstats(m *tb.Message) {
 	for result.Next() {
 		err := result.Scan(&username, &count)
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
 		i++
 		pidorall += fmt.Sprintf("%v. %v - %v раз(а)\n", i, username, count)
 	}
 	utils.DB.Model(utils.PidorList{}).Count(&count)
 	pidorall += fmt.Sprintf("\nВсего участников — %v", count)
-	_, err := utils.Bot.Reply(m, pidorall)
-	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
-	}
+	return context.Reply(pidorall)
 }

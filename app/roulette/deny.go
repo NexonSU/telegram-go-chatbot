@@ -2,31 +2,22 @@ package roulette
 
 import (
 	"fmt"
+
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
-func Deny(c *tb.Callback) {
-	err := utils.Bot.Respond(c, &tb.CallbackResponse{})
+func Deny(context telebot.Context) error {
+	err := utils.Bot.Respond(context.Callback(), &telebot.CallbackResponse{})
 	if err != nil {
-		utils.ErrorReporting(err, c.Message)
-		return
+		return err
 	}
-	victim := c.Message.Entities[0].User
-	if victim.ID != c.Sender.ID {
-		err := utils.Bot.Respond(c, &tb.CallbackResponse{})
-		if err != nil {
-			utils.ErrorReporting(err, c.Message)
-			return
-		}
-		return
+	victim := context.Message().Entities[0].User
+	if victim.ID != context.Sender().ID {
+		return context.Respond(&telebot.CallbackResponse{})
 	}
 	busy["russianroulette"] = false
 	busy["russianroulettePending"] = false
 	busy["russianrouletteInProgress"] = false
-	_, err = utils.Bot.Edit(c.Message, fmt.Sprintf("%v отказался от дуэли.", utils.UserFullName(c.Sender)))
-	if err != nil {
-		utils.ErrorReporting(err, c.Message)
-		return
-	}
+	return context.Edit(fmt.Sprintf("%v отказался от дуэли.", utils.UserFullName(context.Sender())))
 }

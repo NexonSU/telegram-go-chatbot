@@ -2,28 +2,29 @@ package commands
 
 import (
 	"fmt"
-	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
 	"time"
+
+	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 var busy = make(map[string]bool)
 
 // Pidor game
-func Pidor(m *tb.Message) {
-	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
-		return
+func Pidor(context telebot.Context) error {
+	var err error
+	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
+		return err
 	}
-	if m.Private() {
-		return
+	if context.Message().Private() {
+		return err
 	}
 	if busy["pidor"] {
-		_, err := utils.Bot.Reply(m, "Команда занята. Попробуйте позже.")
+		err := context.Reply("Команда занята. Попробуйте позже.")
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
-		return
+		return err
 	}
 	busy["pidor"] = true
 	defer func() { busy["pidor"] = false }()
@@ -32,33 +33,30 @@ func Pidor(m *tb.Message) {
 	result := utils.DB.Model(utils.PidorStats{}).Where("date BETWEEN ? AND ?", time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Local), time.Now()).First(&pidor)
 	if result.RowsAffected == 0 {
 		utils.DB.Model(utils.PidorList{}).Order("RANDOM()").First(&pidorToday)
-		TargetChatMember, err := utils.Bot.ChatMemberOf(m.Chat, &tb.User{ID: pidorToday.ID})
+		TargetChatMember, err := utils.Bot.ChatMemberOf(context.Chat(), &telebot.User{ID: pidorToday.ID})
 		if err != nil {
-			_, err := utils.Bot.Reply(m, fmt.Sprintf("Я нашел пидора дня, но похоже, что с <a href=\"tg://user?id=%v\">%v</a> что-то не так, так что попробуйте еще раз, пока я удаляю его из игры! Ошибка:\n<code>%v</code>", pidorToday.ID, pidorToday.Username, err.Error()))
+			err := context.Reply(fmt.Sprintf("Я нашел пидора дня, но похоже, что с <a href=\"tg://user?id=%v\">%v</a> что-то не так, так что попробуйте еще раз, пока я удаляю его из игры! Ошибка:\n<code>%v</code>", pidorToday.ID, pidorToday.Username, err.Error()))
 			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
+				return err
 			}
 			utils.DB.Delete(pidorToday)
-			return
+			return err
 		}
 		if TargetChatMember.Role == "left" {
-			_, err := utils.Bot.Reply(m, fmt.Sprintf("Я нашел пидора дня, но похоже, что <a href=\"tg://user?id=%v\">%v</a> вышел из этого чата (вот пидор!), так что попробуйте еще раз, пока я удаляю его из игры!", pidorToday.ID, pidorToday.Username))
+			err := context.Reply(fmt.Sprintf("Я нашел пидора дня, но похоже, что <a href=\"tg://user?id=%v\">%v</a> вышел из этого чата (вот пидор!), так что попробуйте еще раз, пока я удаляю его из игры!", pidorToday.ID, pidorToday.Username))
 			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
+				return err
 			}
 			utils.DB.Delete(pidorToday)
-			return
+			return err
 		}
 		if TargetChatMember.Role == "kicked" {
-			_, err := utils.Bot.Reply(m, fmt.Sprintf("Я нашел пидора дня, но похоже, что <a href=\"tg://user?id=%v\">%v</a> был забанен в этом чате (получил пидор!), так что попробуйте еще раз, пока я удаляю его из игры!", pidorToday.ID, pidorToday.Username))
+			err := context.Reply(fmt.Sprintf("Я нашел пидора дня, но похоже, что <a href=\"tg://user?id=%v\">%v</a> был забанен в этом чате (получил пидор!), так что попробуйте еще раз, пока я удаляю его из игры!", pidorToday.ID, pidorToday.Username))
 			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
+				return err
 			}
 			utils.DB.Delete(pidorToday)
-			return
+			return err
 		}
 		pidor.UserID = pidorToday.ID
 		pidor.Date = time.Now()
@@ -77,19 +75,12 @@ func Pidor(m *tb.Message) {
 			}
 			go func() {
 				time.Sleep(duration)
-				_, err := utils.Bot.Send(m.Chat, message)
-				if err != nil {
-					utils.ErrorReporting(err, m)
-					return
-				}
+				context.Send(message)
 			}()
 		}
 	} else {
 		utils.DB.Model(utils.PidorList{}).Where(pidor.UserID).First(&pidorToday)
-		_, err := utils.Bot.Reply(m, fmt.Sprintf("Согласно моей информации, по результатам сегодняшнего розыгрыша пидор дня - %v!", pidorToday.Username))
-		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
-		}
+		return context.Reply(fmt.Sprintf("Согласно моей информации, по результатам сегодняшнего розыгрыша пидор дня - %v!", pidorToday.Username))
 	}
+	return err
 }

@@ -4,21 +4,21 @@ import (
 	"strconv"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //List add pidors from DB on /pidorlist
-func Pidorlist(m *tb.Message) {
-	if !utils.IsAdminOrModer(m.Sender.Username) {
-		if m.Chat.Username != utils.Config.Telegram.Chat {
-			return
+func Pidorlist(context telebot.Context) error {
+	var err error
+	if !utils.IsAdminOrModer(context.Sender().Username) {
+		if context.Chat().Username != utils.Config.Telegram.Chat {
+			return err
 		}
-		_, err := utils.Bot.Reply(m, &tb.Animation{File: tb.File{FileID: "CgACAgIAAx0CQvXPNQABHGrDYIBIvDLiVV6ZMPypWMi_NVDkoFQAAq4LAAIwqQlIQT82LRwIpmoeBA"}})
+		err := context.Reply(&telebot.Animation{File: telebot.File{FileID: "CgACAgIAAx0CQvXPNQABHGrDYIBIvDLiVV6ZMPypWMi_NVDkoFQAAq4LAAIwqQlIQT82LRwIpmoeBA"}})
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
-		return
+		return err
 	}
 	var pidorlist string
 	var pidor utils.PidorList
@@ -27,28 +27,25 @@ func Pidorlist(m *tb.Message) {
 	for result.Next() {
 		err := utils.DB.ScanRows(result, &pidor)
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
 		i++
-		pidorlist += strconv.Itoa(i) + ". @" + pidor.Username + " (" + strconv.Itoa(pidor.ID) + ")\n"
+		pidorlist += strconv.Itoa(i) + ". @" + pidor.Username + " (" + strconv.FormatInt(pidor.ID, 10) + ")\n"
 		if len(pidorlist) > 3900 {
-			_, err = utils.Bot.Send(m.Sender, pidorlist)
+			_, err = utils.Bot.Send(context.Sender(), pidorlist)
 			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
+				return err
 			}
 			pidorlist = ""
 		}
 	}
-	_, err := utils.Bot.Send(m.Sender, pidorlist)
+	_, err = utils.Bot.Send(context.Sender(), pidorlist)
 	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
+		return err
 	}
-	_, err = utils.Bot.Reply(m, "Список отправлен в личку.\nЕсли список не пришел, то убедитесь, что бот запущен и не заблокирован в личке.")
+	err = context.Reply("Список отправлен в личку.\nЕсли список не пришел, то убедитесь, что бот запущен и не заблокирован в личке.")
 	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
+		return err
 	}
+	return err
 }

@@ -6,30 +6,21 @@ import (
 	"strings"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Reply google URL on "google"
-func Google(m *tb.Message) {
-	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
-		return
+func Google(context telebot.Context) error {
+	var err error
+	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
+		return err
 	}
-	var target = *m
-	var text = strings.Split(m.Text, " ")
+	var text = strings.Split(context.Text(), " ")
 	if len(text) == 1 {
-		_, err := utils.Bot.Reply(m, "Пример использования:\n<code>/google {запрос}</code>")
-		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
-		}
-		return
+		return context.Reply("Пример использования:\n<code>/google {запрос}</code>")
 	}
-	if m.ReplyTo != nil {
-		target = *m.ReplyTo
+	if context.Message().ReplyTo != nil {
+		context.Message().Sender = context.Message().ReplyTo.Sender
 	}
-	_, err := utils.Bot.Reply(&target, fmt.Sprintf("https://www.google.com/search?q=%v", url.QueryEscape(strings.Join(text[1:], " "))))
-	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
-	}
+	return context.Reply(fmt.Sprintf("https://www.google.com/search?q=%v", url.QueryEscape(strings.Join(text[1:], " "))))
 }

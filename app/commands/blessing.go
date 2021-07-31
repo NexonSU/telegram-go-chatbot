@@ -2,38 +2,34 @@ package commands
 
 import (
 	"fmt"
-	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
-	"gorm.io/gorm/clause"
 	"time"
+
+	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
+	"gorm.io/gorm/clause"
 )
 
 //Kill user on /blessing, /suicide
-func Blessing(m *tb.Message) {
-	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
-		return
+func Blessing(context telebot.Context) error {
+	var err error
+	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
+		return err
 	}
-	err := utils.Bot.Delete(m)
+	err = utils.Bot.Delete(context.Message())
 	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
+		return err
 	}
-	ChatMember, err := utils.Bot.ChatMemberOf(m.Chat, m.Sender)
+	ChatMember, err := utils.Bot.ChatMemberOf(context.Chat(), context.Sender())
 	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
+		return err
 	}
 	if ChatMember.Role == "administrator" || ChatMember.Role == "creator" {
-		_, err := utils.Bot.Reply(m, fmt.Sprintf("<code>👻 %v возродился у костра.</code>", utils.UserFullName(m.Sender)))
-		if err != nil {
-			utils.ErrorReporting(err, m)
-		}
-		return
+		return context.Reply(fmt.Sprintf("<code>👻 %v возродился у костра.</code>", utils.UserFullName(context.Sender())))
 	}
 	var duelist utils.Duelist
-	result := utils.DB.Model(utils.Duelist{}).Where(m.Sender.ID).First(&duelist)
+	result := utils.DB.Model(utils.Duelist{}).Where(context.Sender().ID).First(&duelist)
 	if result.RowsAffected == 0 {
-		duelist.UserID = m.Sender.ID
+		duelist.UserID = context.Sender().ID
 		duelist.Kills = 0
 		duelist.Deaths = 0
 	}
@@ -42,18 +38,12 @@ func Blessing(m *tb.Message) {
 		UpdateAll: true,
 	}).Create(duelist)
 	if result.Error != nil {
-		utils.ErrorReporting(result.Error, m)
-		return
+		return result.Error
 	}
 	ChatMember.RestrictedUntil = time.Now().Add(time.Second * time.Duration(600*duelist.Deaths)).Unix()
-	err = utils.Bot.Restrict(m.Chat, ChatMember)
+	err = utils.Bot.Restrict(context.Chat(), ChatMember)
 	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
+		return err
 	}
-	_, err = utils.Bot.Send(m.Chat, fmt.Sprintf("<code>💥 %v выбрал лёгкий путь.\nРеспавн через %v0 минут.</code>", utils.UserFullName(m.Sender), duelist.Deaths))
-	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
-	}
+	return context.Send(fmt.Sprintf("<code>💥 %v выбрал лёгкий путь.\nРеспавн через %v0 минут.</code>", utils.UserFullName(context.Sender()), duelist.Deaths))
 }

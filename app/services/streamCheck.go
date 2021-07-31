@@ -10,7 +10,7 @@ import (
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	"github.com/valyala/fastjson"
-	tb "gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/tucnak/telebot.v3"
 	"gorm.io/gorm/clause"
 )
 
@@ -23,7 +23,7 @@ func ZavtraStreamCheckService() {
 		err := zavtraStreamCheck("youtube")
 		if err != nil {
 			log.Println(err.Error())
-			_, _ = utils.Bot.Send(tb.ChatID(utils.Config.Telegram.SysAdmin), fmt.Sprintf("ZavtraStreamCheck error:\n<code>%v</code>", err.Error()))
+			_, _ = utils.Bot.Send(telebot.ChatID(utils.Config.Telegram.SysAdmin), fmt.Sprintf("ZavtraStreamCheck error:\n<code>%v</code>", err.Error()))
 		}
 		time.Sleep(time.Duration(delay) * time.Second)
 	}
@@ -41,10 +41,7 @@ func zavtraStreamCheck(service string) error {
 			return err
 		}
 		defer func(Body io.ReadCloser) {
-			err := Body.Close()
-			if err != nil {
-				return
-			}
+			Body.Close()
 		}(r.Body)
 		jsonBytes, err := ioutil.ReadAll(r.Body)
 		if err != nil {
@@ -63,7 +60,7 @@ func zavtraStreamCheck(service string) error {
 				if err != nil {
 					return err
 				}
-				_, err = utils.Bot.Send(chat, &tb.Photo{File: tb.File{FileURL: thumbnail}, Caption: caption})
+				_, err = utils.Bot.Send(chat, &telebot.Photo{File: telebot.File{FileURL: thumbnail}, Caption: caption})
 				if err != nil {
 					return err
 				}
