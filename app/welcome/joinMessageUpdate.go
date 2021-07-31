@@ -47,7 +47,6 @@ func JoinMessageUpdateService() {
 		}
 		time.Sleep(time.Second * time.Duration(delay))
 	}
-	return err
 }
 
 func JoinMessageUpdate() error {

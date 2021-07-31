@@ -38,12 +38,12 @@ func OnJoin(context telebot.Context) error {
 	if context.Chat().Username != utils.Config.Telegram.Chat {
 		return err
 	}
-	err := utils.Bot.Delete(context.Message())
+	err = utils.Bot.Delete(context.Message())
 	if err != nil {
 		return err
 	}
 	if Border.Message == nil {
-		Border.Message = m
+		Border.Message = context.Message()
 	}
 	log.Printf("New user detected in %v (%v)! ID: %v. Login: %v. Name: %v.", context.Chat().Title, context.Chat().ID, context.Sender().ID, utils.UserName(context.Sender()), utils.UserFullName(context.Sender()))
 	Border.Chat = context.Chat()
@@ -92,10 +92,7 @@ func OnJoin(context telebot.Context) error {
 	httpClient := &http.Client{Timeout: 10 * time.Second}
 	httpResponse, _ := httpClient.Get(fmt.Sprintf("https://api.cas.chat/check?user_id=%v", context.Sender().ID))
 	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			return err
-		}
+		Body.Close()
 	}(httpResponse.Body)
 	jsonBytes, _ := ioutil.ReadAll(httpResponse.Body)
 	if fastjson.GetBool(jsonBytes, "ok") {

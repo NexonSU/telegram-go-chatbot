@@ -27,7 +27,6 @@ func ZavtraStreamCheckService() {
 		}
 		time.Sleep(time.Duration(delay) * time.Second)
 	}
-	return err
 }
 
 func zavtraStreamCheck(service string) error {
@@ -42,10 +41,7 @@ func zavtraStreamCheck(service string) error {
 			return err
 		}
 		defer func(Body io.ReadCloser) {
-			err := Body.Close()
-			if err != nil {
-				return err
-			}
+			Body.Close()
 		}(r.Body)
 		jsonBytes, err := ioutil.ReadAll(r.Body)
 		if err != nil {

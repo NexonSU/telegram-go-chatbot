@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	//utils.Bot.OnError = utils.ErrorReporting
+	utils.Bot.OnError = utils.ErrorReporting
 	utils.Bot.Handle("/admin", commands.Admin)
 	utils.Bot.Handle("/debug", commands.Debug)
 	utils.Bot.Handle("/get", commands.Get)

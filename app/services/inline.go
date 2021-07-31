@@ -10,9 +10,9 @@ import (
 )
 
 //Answer on inline query
-func OnInline(q *telebot.Query) {
+func OnInline(context telebot.Context) error {
 	var count int64
-	gets := utils.DB.Limit(50).Model(utils.Get{}).Where("name LIKE ?", "%"+q.Text+"%").Count(&count)
+	gets := utils.DB.Limit(50).Model(utils.Get{}).Where("name LIKE ?", "%"+context.Text()+"%").Count(&count)
 	get_rows, err := gets.Rows()
 	if err != nil {
 		log.Println(err.Error())
@@ -85,13 +85,8 @@ func OnInline(q *telebot.Query) {
 		i++
 	}
 
-	err = utils.Bot.Answer(q, &telebot.QueryResponse{
+	return context.Answer(&telebot.QueryResponse{
 		Results:   results,
 		CacheTime: 0,
 	})
-
-	if err != nil {
-		log.Println(err.Error())
-	}
-	return err
 }

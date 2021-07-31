@@ -13,7 +13,7 @@ func OnPost(context telebot.Context) error {
 		if err != nil {
 			return err
 		}
-		_, err = utils.Bot.Forward(chat, m)
+		_, err = utils.Bot.Forward(chat, context.Message())
 		if err != nil {
 			return err
 		}

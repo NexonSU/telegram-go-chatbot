@@ -9,23 +9,18 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func Accept(c *telebot.Callback) {
-	err := utils.Bot.Respond(c, &telebot.CallbackResponse{})
+func Accept(context telebot.Context) error {
+	var err error
+	err = utils.Bot.Respond(context.Callback(), &telebot.CallbackResponse{})
 	if err != nil {
-		utils.ErrorReporting(err, c.Message)
 		return err
 	}
-	message := c.Message
-	victim := c.Message.Entities[0].User
-	if victim.ID != c.Sender.ID {
-		err := utils.Bot.Respond(c, &telebot.CallbackResponse{})
-		if err != nil {
-			utils.ErrorReporting(err, c.Message)
-			return err
-		}
-		return err
+	message := context.Message()
+	victim := message.Entities[0].User
+	if victim.ID != context.Sender().ID {
+		return context.Respond(&telebot.CallbackResponse{})
 	}
-	player := c.Message.Entities[1].User
+	player := message.Entities[1].User
 	busy["russianroulette"] = false
 	busy["russianroulettePending"] = false
 	busy["russianrouletteInProgress"] = true
@@ -36,13 +31,11 @@ func Accept(c *telebot.Callback) {
 	prefix := fmt.Sprintf("Дуэль! %v против %v!\n", utils.MentionUser(player), utils.MentionUser(victim))
 	_, err = utils.Bot.Edit(message, fmt.Sprintf("%vЗаряжаю один патрон в револьвер и прокручиваю барабан.", prefix), &telebot.SendOptions{ReplyMarkup: nil})
 	if err != nil {
-		utils.ErrorReporting(err, c.Message)
 		return err
 	}
 	time.Sleep(time.Second * 2)
 	_, err = utils.Bot.Edit(message, fmt.Sprintf("%vКладу револьвер на стол и раскручиваю его.", prefix))
 	if err != nil {
-		utils.ErrorReporting(err, c.Message)
 		return err
 	}
 	time.Sleep(time.Second * 2)
@@ -51,7 +44,6 @@ func Accept(c *telebot.Callback) {
 	}
 	_, err = utils.Bot.Edit(message, fmt.Sprintf("%vРевольвер останавливается на %v, первый ход за ним.", prefix, utils.MentionUser(victim)))
 	if err != nil {
-		utils.ErrorReporting(err, c.Message)
 		return err
 	}
 	bullet := utils.RandInt(1, 6)
@@ -60,46 +52,39 @@ func Accept(c *telebot.Callback) {
 		prefix = fmt.Sprintf("Дуэль! %v против %v, раунд %v:\n%v берёт револьвер, приставляет его к голове и...\n", utils.MentionUser(player), utils.MentionUser(victim), i, utils.MentionUser(victim))
 		_, err := utils.Bot.Edit(message, prefix)
 		if err != nil {
-			utils.ErrorReporting(err, c.Message)
 			return err
 		}
 		if bullet != i {
 			time.Sleep(time.Second * 2)
 			_, err := utils.Bot.Edit(message, fmt.Sprintf("%v🍾 %v", prefix, fmt.Sprintf(success[utils.RandInt(0, len(success)-1)], utils.MentionUser(victim))))
 			if err != nil {
-				utils.ErrorReporting(err, c.Message)
 				return err
 			}
 			player, victim = victim, player
 		}
 	}
 	time.Sleep(time.Second * 2)
-	PlayerChatMember, err := utils.Bot.ChatMemberOf(c.Message.Chat, player)
+	PlayerChatMember, err := utils.Bot.ChatMemberOf(context.Message().Chat, player)
 	if err != nil {
-		utils.ErrorReporting(err, c.Message)
 		return err
 	}
-	VictimChatMember, err := utils.Bot.ChatMemberOf(c.Message.Chat, victim)
+	VictimChatMember, err := utils.Bot.ChatMemberOf(context.Message().Chat, victim)
 	if err != nil {
-		utils.ErrorReporting(err, c.Message)
 		return err
 	}
 	if (PlayerChatMember.Role == "creator" || PlayerChatMember.Role == "administrator") && (VictimChatMember.Role == "creator" || VictimChatMember.Role == "administrator") {
 		_, err = utils.Bot.Edit(message, fmt.Sprintf("%vПуля отскакивает от головы %v и летит в голову %v.", prefix, utils.MentionUser(victim), utils.MentionUser(player)))
 		if err != nil {
-			utils.ErrorReporting(err, c.Message)
 			return err
 		}
 		time.Sleep(time.Second * 2)
 		_, err = utils.Bot.Edit(message, fmt.Sprintf("%vПуля отскакивает от головы %v и летит в голову %v.", prefix, utils.MentionUser(player), utils.MentionUser(victim)))
 		if err != nil {
-			utils.ErrorReporting(err, c.Message)
 			return err
 		}
 		time.Sleep(time.Second * 2)
 		_, err = utils.Bot.Edit(message, fmt.Sprintf("%vПуля отскакивает от головы %v и летит в мою голову... блять.", prefix, utils.MentionUser(victim)))
 		if err != nil {
-			utils.ErrorReporting(err, c.Message)
 			return err
 		}
 		busy["bot_is_dead"] = true
@@ -108,7 +93,6 @@ func Accept(c *telebot.Callback) {
 	if utils.IsAdmin(victim.Username) {
 		_, err = utils.Bot.Edit(message, fmt.Sprintf("%v😈 Наводит револьвер на %v и стреляет.", prefix, utils.MentionUser(player)))
 		if err != nil {
-			utils.ErrorReporting(err, c.Message)
 			return err
 		}
 		time.Sleep(time.Second * 3)
@@ -124,18 +108,15 @@ func Accept(c *telebot.Callback) {
 			UpdateAll: true,
 		}).Create(duelist)
 		if result.Error != nil {
-			utils.ErrorReporting(result.Error, c.Message)
 			return err
 		}
 		PlayerChatMember.RestrictedUntil = time.Now().Add(time.Second * time.Duration(600*duelist.Deaths)).Unix()
-		err = utils.Bot.Restrict(c.Message.Chat, PlayerChatMember)
+		err = utils.Bot.Restrict(context.Message().Chat, PlayerChatMember)
 		if err != nil {
-			utils.ErrorReporting(err, c.Message)
 			return err
 		}
 		_, err = utils.Bot.Edit(message, fmt.Sprintf("%v😈 Наводит револьвер на %v и стреляет.\nЯ хз как это объяснить, но %v победитель!\n%v отправился на респавн на %v0 минут.", prefix, utils.MentionUser(player), utils.MentionUser(victim), utils.MentionUser(player), duelist.Deaths))
 		if err != nil {
-			utils.ErrorReporting(err, c.Message)
 			return err
 		}
 		return err
@@ -144,13 +125,11 @@ func Accept(c *telebot.Callback) {
 		prefix = fmt.Sprintf("%v💥 %v", prefix, fmt.Sprintf(invincible[utils.RandInt(0, len(invincible)-1)], utils.MentionUser(victim)))
 		_, err := utils.Bot.Edit(message, prefix)
 		if err != nil {
-			utils.ErrorReporting(err, c.Message)
 			return err
 		}
 		time.Sleep(time.Second * 2)
 		_, err = utils.Bot.Edit(message, fmt.Sprintf("%v\nПохоже, у нас ничья.", prefix))
 		if err != nil {
-			utils.ErrorReporting(err, c.Message)
 			return err
 		}
 		return err
@@ -158,7 +137,6 @@ func Accept(c *telebot.Callback) {
 	prefix = fmt.Sprintf("%v💥 %v", prefix, fmt.Sprintf(fail[utils.RandInt(0, len(fail)-1)], utils.MentionUser(victim)))
 	_, err = utils.Bot.Edit(message, prefix)
 	if err != nil {
-		utils.ErrorReporting(err, c.Message)
 		return err
 	}
 	time.Sleep(time.Second * 2)
@@ -174,18 +152,15 @@ func Accept(c *telebot.Callback) {
 		UpdateAll: true,
 	}).Create(VictimDuelist)
 	if result.Error != nil {
-		utils.ErrorReporting(result.Error, c.Message)
 		return err
 	}
 	VictimChatMember.RestrictedUntil = time.Now().Add(time.Second * time.Duration(600*VictimDuelist.Deaths)).Unix()
-	err = utils.Bot.Restrict(c.Message.Chat, VictimChatMember)
+	err = utils.Bot.Restrict(context.Message().Chat, VictimChatMember)
 	if err != nil {
-		utils.ErrorReporting(err, c.Message)
 		return err
 	}
 	_, err = utils.Bot.Edit(message, fmt.Sprintf("%v\nПобедитель дуэли: %v.\n%v отправился на респавн на %v0 минут.", prefix, utils.MentionUser(player), utils.MentionUser(victim), VictimDuelist.Deaths))
 	if err != nil {
-		utils.ErrorReporting(err, c.Message)
 		return err
 	}
 	var PlayerDuelist utils.Duelist
@@ -200,7 +175,6 @@ func Accept(c *telebot.Callback) {
 		UpdateAll: true,
 	}).Create(PlayerDuelist)
 	if result.Error != nil {
-		utils.ErrorReporting(result.Error, c.Message)
 		return err
 	}
 	return err

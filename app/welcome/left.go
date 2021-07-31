@@ -12,7 +12,7 @@ func OnLeft(context telebot.Context) error {
 	if context.Chat().Username != utils.Config.Telegram.Chat {
 		return err
 	}
-	err := utils.Bot.Delete(context.Message())
+	err = utils.Bot.Delete(context.Message())
 	for i, user := range Border.Users {
 		if user.User.ID == context.Sender().ID && user.Status == "pending" {
 			err := utils.Bot.Ban(Border.Chat, &telebot.ChatMember{User: user.User, RestrictedUntil: time.Now().Unix() + 7200})
