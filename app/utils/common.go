@@ -82,11 +82,7 @@ func ErrorReporting(err error, context telebot.Context) {
 	MarshalledMessage, _ := json.MarshalIndent(context, "", "    ")
 	JsonMessage := html.EscapeString(string(MarshalledMessage))
 	text := fmt.Sprintf("An exception was raised while handling an update\n<pre>%v</pre>\n\nMessage:\n<pre>%v</pre>", err, JsonMessage)
-	_, err = Bot.Send(telebot.ChatID(Config.Telegram.SysAdmin), text)
-	if err != nil {
-		return err
-	}
-	return err
+	Bot.Send(telebot.ChatID(Config.Telegram.SysAdmin), text)
 }
 
 func FindUserInMessage(context telebot.Context) (telebot.User, int64, error) {

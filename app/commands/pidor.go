@@ -75,18 +75,12 @@ func Pidor(context telebot.Context) error {
 			}
 			go func() {
 				time.Sleep(duration)
-				_, err := utils.Bot.Send(context.Chat(), message)
-				if err != nil {
-					return err
-				}
+				context.Send(message)
 			}()
 		}
 	} else {
 		utils.DB.Model(utils.PidorList{}).Where(pidor.UserID).First(&pidorToday)
-		err := context.Reply(fmt.Sprintf("Согласно моей информации, по результатам сегодняшнего розыгрыша пидор дня - %v!", pidorToday.Username))
-		if err != nil {
-			return err
-		}
+		return context.Reply(fmt.Sprintf("Согласно моей информации, по результатам сегодняшнего розыгрыша пидор дня - %v!", pidorToday.Username))
 	}
 	return err
 }

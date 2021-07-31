@@ -28,9 +28,5 @@ func Pidorall(context telebot.Context) error {
 	}
 	utils.DB.Model(utils.PidorList{}).Count(&count)
 	pidorall += fmt.Sprintf("\nВсего участников — %v", count)
-	err := context.Reply(pidorall)
-	if err != nil {
-		return err
-	}
-	return err
+	return context.Reply(pidorall)
 }

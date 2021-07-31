@@ -59,5 +59,4 @@ func Get(context telebot.Context) error {
 	} else {
 		return context.Reply(fmt.Sprintf("Гет <code>%v</code> не найден.", text[1]))
 	}
-	return err
 }

@@ -22,7 +22,7 @@ func Pidordel(context telebot.Context) error {
 	}
 	var user telebot.User
 	var pidor utils.PidorList
-	user, _, err := utils.FindUserInMessage(context)
+	user, _, err = utils.FindUserInMessage(context)
 	if err != nil {
 		err := context.Reply(fmt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
 		if err != nil {

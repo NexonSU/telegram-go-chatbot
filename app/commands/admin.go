@@ -63,5 +63,4 @@ func Admin(context telebot.Context) error {
 		err = context.Reply("Гет <code>admin</code> не найден.")
 		return err
 	}
-	return err
 }

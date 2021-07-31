@@ -31,7 +31,7 @@ func Unmute(context telebot.Context) error {
 		}
 		return err
 	}
-	target, _, err := utils.FindUserInMessage(context)
+	target, _, err = utils.FindUserInMessage(context)
 	if err != nil {
 		err := context.Reply(fmt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
 		if err != nil {
@@ -61,9 +61,5 @@ func Unmute(context telebot.Context) error {
 		}
 		return err
 	}
-	err = context.Reply(fmt.Sprintf("<a href=\"tg://user?id=%v\">%v</a> снова может отправлять сообщения в чат.", target.ID, utils.UserFullName(&target)))
-	if err != nil {
-		return err
-	}
-	return err
+	return context.Reply(fmt.Sprintf("<a href=\"tg://user?id=%v\">%v</a> снова может отправлять сообщения в чат.", target.ID, utils.UserFullName(&target)))
 }

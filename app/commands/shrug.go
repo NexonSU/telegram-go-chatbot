@@ -11,9 +11,5 @@ func Shrug(context telebot.Context) error {
 	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
 		return err
 	}
-	_, err := utils.Bot.Send(context.Chat(), "¯\\_(ツ)_/¯")
-	if err != nil {
-		return err
-	}
-	return err
+	return context.Send("¯\\_(ツ)_/¯")
 }

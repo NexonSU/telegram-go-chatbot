@@ -11,9 +11,5 @@ func Ping(context telebot.Context) error {
 	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
 		return err
 	}
-	err := context.Reply("Pong!")
-	if err != nil {
-		return err
-	}
-	return err
+	return context.Reply("Pong!")
 }

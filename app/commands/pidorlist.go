@@ -39,7 +39,7 @@ func Pidorlist(context telebot.Context) error {
 			pidorlist = ""
 		}
 	}
-	_, err := utils.Bot.Send(context.Sender(), pidorlist)
+	_, err = utils.Bot.Send(context.Sender(), pidorlist)
 	if err != nil {
 		return err
 	}

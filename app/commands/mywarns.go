@@ -27,9 +27,5 @@ func Mywarns(context telebot.Context) error {
 		warn.Amount = 0
 	}
 	warnStrings := []string{"предупреждений", "предупреждение", "предупреждения", "предупреждения"}
-	err := context.Reply(fmt.Sprintf("У тебя %v %v.", warn.Amount, warnStrings[warn.Amount]))
-	if err != nil {
-		return err
-	}
-	return err
+	return context.Reply(fmt.Sprintf("У тебя %v %v.", warn.Amount, warnStrings[warn.Amount]))
 }

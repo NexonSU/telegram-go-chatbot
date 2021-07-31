@@ -70,9 +70,5 @@ func Set(context telebot.Context) error {
 		}
 		return err
 	}
-	err := context.Reply(fmt.Sprintf("Гет <code>%v</code> сохранён как <code>%v</code>.", get.Name, get.Type))
-	if err != nil {
-		return err
-	}
-	return err
+	return context.Reply(fmt.Sprintf("Гет <code>%v</code> сохранён как <code>%v</code>.", get.Name, get.Type))
 }

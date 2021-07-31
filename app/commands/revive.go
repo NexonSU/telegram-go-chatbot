@@ -31,7 +31,7 @@ func Revive(context telebot.Context) error {
 		}
 		return err
 	}
-	target, _, err := utils.FindUserInMessage(context)
+	target, _, err = utils.FindUserInMessage(context)
 	if err != nil {
 		err := context.Reply(fmt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
 		if err != nil {
@@ -55,15 +55,7 @@ func Revive(context telebot.Context) error {
 	TargetChatMember.RestrictedUntil = time.Now().Unix() + 60
 	err = utils.Bot.Restrict(context.Chat(), TargetChatMember)
 	if err != nil {
-		err := context.Reply(fmt.Sprintf("Ошибка возрождения пользователя:\n<code>%v</code>", err.Error()))
-		if err != nil {
-			return err
-		}
-		return err
+		return context.Reply(fmt.Sprintf("Ошибка возрождения пользователя:\n<code>%v</code>", err.Error()))
 	}
-	err = context.Reply(fmt.Sprintf("%v возродился в чате.", utils.MentionUser(&target)))
-	if err != nil {
-		return err
-	}
-	return err
+	return context.Reply(fmt.Sprintf("%v возродился в чате.", utils.MentionUser(&target)))
 }

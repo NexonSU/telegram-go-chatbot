@@ -22,4 +22,5 @@ func Restart(context telebot.Context) error {
 	}
 	utils.Bot.Delete(context.Message())
 	os.Exit(0)
+	return err
 }

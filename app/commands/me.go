@@ -16,19 +16,11 @@ func Me(context telebot.Context) error {
 	}
 	var text = strings.Split(context.Text(), " ")
 	if len(text) == 1 {
-		err := context.Reply("Пример использования:\n<code>/me {делает что-то}</code>")
-		if err != nil {
-			return err
-		}
-		return err
+		return context.Reply("Пример использования:\n<code>/me {делает что-то}</code>")
 	}
-	err := utils.Bot.Delete(context.Message())
+	err = utils.Bot.Delete(context.Message())
 	if err != nil {
 		return err
 	}
-	_, err = utils.Bot.Send(context.Chat(), fmt.Sprintf("<code>%v %v</code>", utils.UserFullName(context.Sender()), strings.Join(text[1:], " ")))
-	if err != nil {
-		return err
-	}
-	return err
+	return context.Send(fmt.Sprintf("<code>%v %v</code>", utils.UserFullName(context.Sender()), strings.Join(text[1:], " ")))
 }
