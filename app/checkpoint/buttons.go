@@ -27,7 +27,8 @@ func ButtonCallback(context telebot.Context) error {
 				return context.Respond(&telebot.CallbackResponse{Text: fmt.Sprintf("Добро пожаловать, %v!\nТеперь у тебя есть доступ к чату.", utils.UserFullName(context.Sender())), ShowAlert: true})
 			}
 		}
-		return context.Respond(&telebot.CallbackResponse{})
+		time.Sleep(1 * time.Second)
+		return context.Respond(&telebot.CallbackResponse{Text: utils.Nopes[utils.RandInt(0, len(utils.Nopes))]})
 	}
 	if FirstWrongButton.Data == context.Data() || SecondWrongButton.Data == context.Data() || ThirdWrongButton.Data == context.Data() {
 		for i, e := range Border.Users {
@@ -45,8 +46,8 @@ func ButtonCallback(context telebot.Context) error {
 				Border.NeedUpdate = true
 			}
 		}
-		return context.Respond(&telebot.CallbackResponse{})
+		time.Sleep(1 * time.Second)
+		return context.Respond(&telebot.CallbackResponse{Text: utils.Nopes[utils.RandInt(0, len(utils.Nopes))]})
 	}
-	time.Sleep(5 * time.Second)
-	return context.Respond(&telebot.CallbackResponse{})
+	return nil
 }

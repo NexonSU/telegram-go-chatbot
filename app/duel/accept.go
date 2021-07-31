@@ -13,7 +13,7 @@ func Accept(context telebot.Context) error {
 	message := context.Message()
 	victim := message.Entities[0].User
 	if victim.ID != context.Sender().ID {
-		return context.Respond(&telebot.CallbackResponse{})
+		return context.Respond(&telebot.CallbackResponse{Text: utils.Nopes[utils.RandInt(0, len(utils.Nopes))]})
 	}
 	err := utils.Bot.Respond(context.Callback(), &telebot.CallbackResponse{})
 	if err != nil {

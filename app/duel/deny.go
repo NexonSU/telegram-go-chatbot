@@ -10,7 +10,7 @@ import (
 func Deny(context telebot.Context) error {
 	victim := context.Message().Entities[0].User
 	if victim.ID != context.Sender().ID {
-		return context.Respond(&telebot.CallbackResponse{})
+		return context.Respond(&telebot.CallbackResponse{Text: utils.Nopes[utils.RandInt(0, len(utils.Nopes))]})
 	}
 	err := utils.Bot.Respond(context.Callback(), &telebot.CallbackResponse{})
 	if err != nil {
