@@ -3,7 +3,6 @@ package commands
 import (
 	"fmt"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
@@ -12,13 +11,12 @@ import (
 
 //Send top 10 pidors of year on /pidorstats
 func Pidorstats(context telebot.Context) error {
-	var text = strings.Split(context.Text(), " ")
 	var i = 0
 	var year = time.Now().Year()
 	var username string
 	var count int64
-	if len(text) == 2 {
-		argYear, err := strconv.Atoi(text[1])
+	if len(context.Args()) == 1 {
+		argYear, err := strconv.Atoi(context.Data())
 		if err != nil {
 			return context.Reply("Ошибка определения года.\nУкажите год с 2019.")
 		}

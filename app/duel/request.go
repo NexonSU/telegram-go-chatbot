@@ -3,7 +3,6 @@ package duel
 import (
 	"fmt"
 	"log"
-	"strings"
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
@@ -44,8 +43,7 @@ func Request(context telebot.Context) error {
 	}
 	busy["russianroulette"] = true
 	defer func() { busy["russianroulette"] = false }()
-	var text = strings.Split(context.Text(), " ")
-	if (context.Message().ReplyTo == nil && len(text) != 2) || (context.Message().ReplyTo != nil && len(text) != 1) {
+	if (context.Message().ReplyTo == nil && len(context.Args()) != 1) || (context.Message().ReplyTo != nil && len(context.Args()) != 0) {
 		return context.Reply("Пример использования: <code>/russianroulette {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/russianroulette</code>")
 	}
 	target, _, err := utils.FindUserInMessage(context)

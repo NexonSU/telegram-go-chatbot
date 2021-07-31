@@ -10,7 +10,6 @@ import (
 	"math/big"
 	"runtime"
 	"strconv"
-	"strings"
 	"time"
 
 	"gopkg.in/tucnak/telebot.v3"
@@ -89,27 +88,26 @@ func FindUserInMessage(context telebot.Context) (telebot.User, int64, error) {
 	var user telebot.User
 	var err error = nil
 	var untildate = time.Now().Unix()
-	var text = strings.Split(context.Text(), " ")
 	if context.Message().ReplyTo != nil {
 		user = *context.Message().ReplyTo.Sender
-		if len(text) == 2 {
-			addtime, err := strconv.ParseInt(text[1], 10, 64)
+		if len(context.Args()) == 1 {
+			addtime, err := strconv.ParseInt(context.Args()[0], 10, 64)
 			if err != nil {
 				return user, untildate, err
 			}
 			untildate += addtime
 		}
 	} else {
-		if len(text) == 1 {
+		if len(context.Args()) == 0 {
 			err = errors.New("пользователь не найден")
 			return user, untildate, err
 		}
-		user, err = GetUserFromDB(text[1])
+		user, err = GetUserFromDB(context.Args()[0])
 		if err != nil {
 			return user, untildate, err
 		}
-		if len(text) == 3 {
-			addtime, err := strconv.ParseInt(text[2], 10, 64)
+		if len(context.Args()) == 2 {
+			addtime, err := strconv.ParseInt(context.Args()[1], 10, 64)
 			if err != nil {
 				return user, untildate, err
 			}

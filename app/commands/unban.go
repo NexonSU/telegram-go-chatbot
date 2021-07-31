@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	"gopkg.in/tucnak/telebot.v3"
@@ -10,8 +9,7 @@ import (
 
 //Unban user on /unban
 func Unban(context telebot.Context) error {
-	var text = strings.Split(context.Text(), " ")
-	if (context.Message().ReplyTo == nil && len(text) != 2) || (context.Message().ReplyTo != nil && len(text) != 1) {
+	if (context.Message().ReplyTo == nil && len(context.Args()) != 1) || (context.Message().ReplyTo != nil && len(context.Args()) != 0) {
 		return context.Reply("Пример использования: <code>/unban {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/unban</code>")
 	}
 	target, _, err := utils.FindUserInMessage(context)

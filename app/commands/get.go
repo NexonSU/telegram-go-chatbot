@@ -11,11 +11,10 @@ import (
 //Send Get to user on /get
 func Get(context telebot.Context) error {
 	var get utils.Get
-	var text = strings.Split(context.Text(), " ")
-	if len(text) != 2 {
+	if len(context.Args()) != 1 {
 		return context.Reply("Пример использования: <code>/get {гет}</code>")
 	}
-	result := utils.DB.Where(&utils.Get{Name: strings.ToLower(text[1])}).First(&get)
+	result := utils.DB.Where(&utils.Get{Name: strings.ToLower(context.Data())}).First(&get)
 	if result.RowsAffected != 0 {
 		switch {
 		case get.Type == "Animation":
@@ -53,6 +52,6 @@ func Get(context telebot.Context) error {
 			return context.Reply(fmt.Sprintf("Ошибка при определении типа гета, я не знаю тип <code>%v</code>.", get.Type))
 		}
 	} else {
-		return context.Reply(fmt.Sprintf("Гет <code>%v</code> не найден.", text[1]))
+		return context.Reply(fmt.Sprintf("Гет <code>%v</code> не найден.", context.Data()))
 	}
 }

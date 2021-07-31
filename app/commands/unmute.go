@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
@@ -11,8 +10,7 @@ import (
 
 //Unmute user on /unmute
 func Unmute(context telebot.Context) error {
-	var text = strings.Split(context.Text(), " ")
-	if (context.Message().ReplyTo == nil && len(text) != 2) || (context.Message().ReplyTo != nil && len(text) != 1) {
+	if (context.Message().ReplyTo == nil && len(context.Args()) != 1) || (context.Message().ReplyTo != nil && len(context.Args()) != 0) {
 		return context.Reply("Пример использования: <code>/unmute {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/unmute</code>")
 	}
 	target, _, err := utils.FindUserInMessage(context)

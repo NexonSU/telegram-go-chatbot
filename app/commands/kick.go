@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
@@ -11,8 +10,7 @@ import (
 
 //Kick user on /kick
 func Kick(context telebot.Context) error {
-	var text = strings.Split(context.Text(), " ")
-	if (context.Message().ReplyTo == nil && len(text) == 1) || (context.Message().ReplyTo != nil && len(text) != 2) {
+	if (context.Message().ReplyTo == nil && len(context.Args()) == 0) || (context.Message().ReplyTo != nil && len(context.Args()) != 0) {
 		return context.Reply("Пример использования: <code>/kick {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/kick</code>")
 	}
 	target, _, err := utils.FindUserInMessage(context)

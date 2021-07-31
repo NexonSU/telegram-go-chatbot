@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	"gopkg.in/tucnak/telebot.v3"
@@ -10,8 +9,7 @@ import (
 
 //Mute user on /mute
 func Mute(context telebot.Context) error {
-	var text = strings.Split(context.Text(), " ")
-	if (context.Message().ReplyTo == nil && len(text) < 2) || (context.Message().ReplyTo != nil && len(text) > 2) {
+	if (context.Message().ReplyTo == nil && len(context.Args()) == 0) || (context.Message().ReplyTo != nil && len(context.Args()) > 1) {
 		return context.Reply("Пример использования: <code>/mute {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/mute</code>\nЕсли нужно замьютить на время, то добавь время в секундах через пробел.")
 	}
 	target, untildate, err := utils.FindUserInMessage(context)

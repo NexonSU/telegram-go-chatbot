@@ -17,19 +17,18 @@ func Cur(context telebot.Context) error {
 	if utils.Config.CurrencyKey == "" {
 		return context.Reply("Конвертация валют не настроена")
 	}
-	var text = strings.Split(context.Text(), " ")
-	if len(text) != 4 {
+	if len(context.Args()) != 3 {
 		return context.Reply("Пример использования:\n/cur {количество} {EUR/USD/RUB} {EUR/USD/RUB}")
 	}
-	amount, err := strconv.ParseFloat(text[1], 64)
+	amount, err := strconv.ParseFloat(context.Args()[0], 64)
 	if err != nil {
 		return context.Reply(fmt.Sprintf("Ошибка определения количества:\n<code>%v</code>", err))
 	}
-	var symbol = strings.ToUpper(text[2])
+	var symbol = strings.ToUpper(context.Args()[1])
 	if !regexp.MustCompile(`^[A-Z$]{3,5}$`).MatchString(symbol) {
 		return context.Reply("Имя валюты должно состоять из 3-5 латинских символов.")
 	}
-	var convert = strings.ToUpper(text[3])
+	var convert = strings.ToUpper(context.Args()[2])
 	if !regexp.MustCompile(`^[A-Z$]{3,5}$`).MatchString(convert) {
 		return context.Reply("Имя валюты должно состоять из 3-5 латинских символов.")
 	}

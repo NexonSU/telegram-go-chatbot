@@ -10,14 +10,13 @@ import (
 
 //Delete Get in DB on /del
 func Del(context telebot.Context) error {
-	var text = strings.Split(context.Text(), " ")
-	if len(text) != 2 {
+	if len(context.Args()) != 1 {
 		return context.Reply("Пример использования: <code>/del {гет}</code>")
 	}
-	result := utils.DB.Delete(&utils.Get{Name: strings.ToLower(text[1])})
+	result := utils.DB.Delete(&utils.Get{Name: strings.ToLower(context.Data())})
 	if result.RowsAffected != 0 {
-		return context.Reply(fmt.Sprintf("Гет <code>%v</code> удалён.", text[1]))
+		return context.Reply(fmt.Sprintf("Гет <code>%v</code> удалён.", context.Data()))
 	} else {
-		return context.Reply(fmt.Sprintf("Гет <code>%v</code> не найден.", text[1]))
+		return context.Reply(fmt.Sprintf("Гет <code>%v</code> не найден.", context.Data()))
 	}
 }
