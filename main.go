@@ -72,10 +72,7 @@ func main() {
 	utils.Bot.Handle(telebot.OnChatMember, checkpoint.ChatMemberUpdate, middleware.ChatOnly)
 	utils.Bot.Handle(telebot.OnUserJoined, utils.Remove, middleware.ChatOnly)
 	utils.Bot.Handle(telebot.OnUserLeft, utils.Remove, middleware.ChatOnly)
-	utils.Bot.Handle(&checkpoint.CorrectButton, checkpoint.OnClickCorrectButton, middleware.ChatOnly)
-	utils.Bot.Handle(&checkpoint.FirstWrongButton, checkpoint.OnClickWrongButton, middleware.ChatOnly)
-	utils.Bot.Handle(&checkpoint.SecondWrongButton, checkpoint.OnClickWrongButton, middleware.ChatOnly)
-	utils.Bot.Handle(&checkpoint.ThirdWrongButton, checkpoint.OnClickWrongButton, middleware.ChatOnly)
+	utils.Bot.Handle(telebot.OnCallback, checkpoint.ButtonCallback, middleware.ChatOnly)
 
 	//Cron
 	go services.ZavtraStreamCheckService()

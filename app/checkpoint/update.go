@@ -1,10 +1,10 @@
 package checkpoint
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"regexp"
-	"strconv"
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
@@ -28,23 +28,47 @@ type JoinBorder struct {
 	NeedCreate bool
 }
 
+type Question struct {
+	Text              string
+	CorrectButton     string
+	FirstWrongButton  string
+	SecondWrongButton string
+	ThirdWrongButton  string
+}
+
 var Border JoinBorder
 var arabicSymbols, _ = regexp.Compile("[\u0600-\u06ff]|[\u0750-\u077f]|[\ufb50-\ufbc1]|[\ufbd3-\ufd3f]|[\ufd50-\ufd8f]|[\ufd92-\ufdc7]|[\ufe70-\ufefc]|[\uFDF0-\uFDFD]")
 var Selector = telebot.ReplyMarkup{}
-var CorrectButton = Selector.Data("Дмитрий, Тимур, Максим", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
-var FirstWrongButton = Selector.Data("Иван, Пётр, Александр", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
-var SecondWrongButton = Selector.Data("Руслан, Андрей, Кирилл", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
-var ThirdWrongButton = Selector.Data("Миша, Паша, Рома", "Button"+strconv.Itoa(utils.RandInt(10000, 99999)))
+var CorrectButton = Selector.Data("", "")
+var FirstWrongButton = Selector.Data("", "")
+var SecondWrongButton = Selector.Data("", "")
+var ThirdWrongButton = Selector.Data("", "")
 
-func shuffleButtons(array []telebot.Btn) []telebot.Btn {
+func GetQuestionWithButtons() (string, []telebot.Btn) {
+	questions := [][]string{
+		{"Как зовут одного из ведущих подкаста?", "Дмитрий", "Иван", "Пётр", "Александр"},
+		{"Как зовут одного из ведущих подкаста?", "Тимур", "Руслан", "Андрей", "Кирилл"},
+		{"Как зовут одного из ведущих подкаста?", "Максим", "Миша", "Паша", "Рома"},
+		{"Как зовут кота Тимура?", "Борян", "Барсик", "Вискас", "Чилипиздрик"},
+		{"Какой подкаст не имеет отношения к этому чату?", "Радио-Т", "Завтракаст", "ДТКД", "Мама, я в стартапе"},
+		{"Какой подкаст не имеет отношения к этому чату?", "BeardyCast", "Сторикаст", "ДТКД", "Мама, я в стартапе"},
+	}
+	i := utils.RandInt(0, len(questions))
+	CorrectButton.Text = questions[i][1]
+	CorrectButton.Data = fmt.Sprintf("%v", utils.RandInt(10000, 99999))
+	FirstWrongButton.Text = questions[i][2]
+	FirstWrongButton.Data = fmt.Sprintf("%v", utils.RandInt(10000, 99999))
+	SecondWrongButton.Text = questions[i][3]
+	SecondWrongButton.Data = fmt.Sprintf("%v", utils.RandInt(10000, 99999))
+	ThirdWrongButton.Text = questions[i][4]
+	ThirdWrongButton.Data = fmt.Sprintf("%v", utils.RandInt(10000, 99999))
+	array := []telebot.Btn{CorrectButton, FirstWrongButton, SecondWrongButton, ThirdWrongButton}
 	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(array), func(i, j int) {
 		array[i], array[j] = array[j], array[i]
 	})
-	return array
+	return questions[i][0], array
 }
-
-var buttons = shuffleButtons([]telebot.Btn{CorrectButton, SecondWrongButton, ThirdWrongButton})
 
 func JoinMessageUpdateService() {
 	Border.Message = &telebot.Message{
@@ -86,12 +110,15 @@ func JoinMessageUpdate() error {
 			accepted = append(accepted, user)
 		}
 	}
-	Selector.Inline(
-		Selector.Row(FirstWrongButton),
-		Selector.Row(buttons[0]),
-		Selector.Row(buttons[1]),
-		Selector.Row(buttons[2]),
-	)
+	var question string
+	if Border.NeedCreate {
+		var buttons []telebot.Btn
+		question, buttons = GetQuestionWithButtons()
+		Selector.Inline(
+			Selector.Row(buttons[3], buttons[1]),
+			Selector.Row(buttons[2], buttons[0]),
+		)
+	}
 	if len(pending) != 0 {
 		text += "Добро пожаловать: "
 		for i, user := range pending {
@@ -100,7 +127,8 @@ func JoinMessageUpdate() error {
 			}
 			text += utils.MentionUser(user.User)
 		}
-		text += "!\nОтветь на вопрос, чтобы получить доступ в чат, иначе бан через 2 минуты.\nКак зовут ведущих подкаста?\n"
+		text += "!\nОтветь на вопрос, чтобы получить доступ в чат, иначе бан.\n"
+		text += "<b>" + question + "</b>"
 	} else {
 		Selector = telebot.ReplyMarkup{}
 	}
@@ -133,10 +161,6 @@ func JoinMessageUpdate() error {
 	if Border.NeedCreate {
 		Border.NeedCreate = false
 		Border.NeedUpdate = false
-		CorrectButton.Unique = "Button" + strconv.Itoa(utils.RandInt(10000, 99999))
-		FirstWrongButton.Unique = "Button" + strconv.Itoa(utils.RandInt(10000, 99999))
-		SecondWrongButton.Unique = "Button" + strconv.Itoa(utils.RandInt(10000, 99999))
-		ThirdWrongButton.Unique = "Button" + strconv.Itoa(utils.RandInt(10000, 99999))
 		newMessage, err := utils.Bot.Send(Border.Chat, text, &Selector)
 		if err != nil {
 			return err
