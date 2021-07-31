@@ -19,5 +19,6 @@ func Debug(context telebot.Context) error {
 		message = context.Message().ReplyTo
 	}
 	MarshalledMessage, _ := json.MarshalIndent(message, "", "    ")
-	return context.Send(fmt.Sprintf("<pre>%v</pre>", string(MarshalledMessage)))
+	_, err = utils.Bot.Send(context.Sender(), fmt.Sprintf("<pre>%v</pre>", string(MarshalledMessage)))
+	return err
 }
