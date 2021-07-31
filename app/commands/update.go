@@ -19,5 +19,6 @@ func Update(context telebot.Context) error {
 	if err != nil {
 		return err
 	}
-	return context.Send(fmt.Sprintf("Update finished:\n<pre>%s</pre>", cmd))
+	_, err = utils.Bot.Send(context.Sender(), fmt.Sprintf("Update finished:\n<pre>%s</pre>", cmd))
+	return err
 }
