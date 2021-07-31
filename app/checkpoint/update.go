@@ -128,7 +128,7 @@ func JoinMessageUpdate() error {
 			text += utils.MentionUser(user.User)
 		}
 		text += "!\nОтветь на вопрос, чтобы получить доступ в чат, иначе бан.\n"
-		text += "<b>" + question + "</b>"
+		text += "<b>" + question + "</b>\n"
 	} else {
 		Selector = telebot.ReplyMarkup{}
 	}
