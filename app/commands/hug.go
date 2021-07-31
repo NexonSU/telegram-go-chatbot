@@ -17,6 +17,7 @@ func Hug(context telebot.Context) error {
 	if context.Message().ReplyTo == nil {
 		return context.Reply("Просто отправь <code>/hug</code> в ответ на чье-либо сообщение.")
 	}
+	context.Delete()
 	_, b, _, _ := runtime.Caller(0)
 	basepath := filepath.Dir(b)
 	im, err := webp.Load(basepath + "/../../files/hug.webp")
