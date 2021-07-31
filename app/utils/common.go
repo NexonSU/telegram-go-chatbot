@@ -9,6 +9,7 @@ import (
 	"log"
 	"math/big"
 	"runtime"
+	"sort"
 	"strconv"
 	"time"
 
@@ -142,13 +143,122 @@ func GetUserFromDB(findstring string) (telebot.User, error) {
 	return user, err
 }
 
+type ForwardedMesssage struct {
+	ChannelMessage *telebot.Message
+	ChatMessage    telebot.Message
+}
+type ForwardMesssage struct {
+	AlbumID            string
+	Messages           []*telebot.Message
+	Caption            string
+	ForwardedMesssages []ForwardedMesssage
+}
+
+var Forward ForwardMesssage
+
 //Repost channel post to chat
 func Repost(context telebot.Context) error {
 	chat, err := Bot.ChatByID("@" + Config.Telegram.Chat)
 	if err != nil {
 		return err
 	}
-	return context.ForwardTo(chat)
+	if context.Message().AlbumID != "" {
+		Forward.Messages = append(Forward.Messages, context.Message())
+		if context.Message().Caption != "" {
+			Forward.Caption = context.Message().Caption
+		}
+		if context.Message().AlbumID != Forward.AlbumID {
+			Forward.AlbumID = context.Message().AlbumID
+			time.Sleep(5 * time.Second)
+			sort.SliceStable(Forward.Messages, func(i, j int) bool {
+				return Forward.Messages[i].ID < Forward.Messages[j].ID
+			})
+			var Album []telebot.InputMedia
+			for i, message := range Forward.Messages {
+				switch {
+				case context.Message().Audio != nil:
+					message.Audio.Caption = ""
+					if i == 0 {
+						message.Audio.Caption = Forward.Caption
+					}
+					Album = append(Album, message.Audio)
+				case context.Message().Document != nil:
+					message.Document.Caption = ""
+					if i == 0 {
+						message.Document.Caption = Forward.Caption
+					}
+					Album = append(Album, message.Document)
+				case context.Message().Photo != nil:
+					message.Photo.Caption = ""
+					if i == 0 {
+						message.Photo.Caption = Forward.Caption
+					}
+					Album = append(Album, message.Photo)
+				case context.Message().Video != nil:
+					message.Video.Caption = ""
+					if i == 0 {
+						message.Video.Caption = Forward.Caption
+					}
+					Album = append(Album, message.Video)
+				}
+			}
+			ChatMessage, err := Bot.SendAlbum(chat, Album)
+			for i, message := range Forward.Messages {
+				Forward.ForwardedMesssages = append(Forward.ForwardedMesssages, ForwardedMesssage{message, ChatMessage[i]})
+			}
+			Forward.AlbumID = ""
+			Forward.Messages = []*telebot.Message{}
+			Forward.Caption = ""
+			return err
+		}
+		return nil
+	}
+
+	var ChatMessage *telebot.Message
+	switch {
+	case context.Message().Animation != nil:
+		ChatMessage, err = Bot.Send(chat, &telebot.Animation{File: context.Message().Animation.File, Caption: context.Message().Caption})
+	case context.Message().Audio != nil:
+		ChatMessage, err = Bot.Send(chat, &telebot.Audio{File: context.Message().Audio.File, Caption: context.Message().Caption})
+	case context.Message().Photo != nil:
+		ChatMessage, err = Bot.Send(chat, &telebot.Photo{File: context.Message().Photo.File, Caption: context.Message().Caption})
+	case context.Message().Video != nil:
+		ChatMessage, err = Bot.Send(chat, &telebot.Video{File: context.Message().Video.File, Caption: context.Message().Caption})
+	case context.Message().Voice != nil:
+		ChatMessage, err = Bot.Send(chat, &telebot.Voice{File: context.Message().Voice.File, Caption: context.Message().Caption})
+	case context.Message().Document != nil:
+		ChatMessage, err = Bot.Send(chat, &telebot.Document{File: context.Message().Document.File, Caption: context.Message().Caption})
+	default:
+		ChatMessage, err = Bot.Send(chat, context.Message().Text)
+	}
+	Forward.ForwardedMesssages = append(Forward.ForwardedMesssages, ForwardedMesssage{context.Message(), *ChatMessage})
+	return err
+}
+
+//Edit reposted post
+func EditRepost(context telebot.Context) error {
+	var err error
+	for _, ForwardedMesssage := range Forward.ForwardedMesssages {
+		if ForwardedMesssage.ChannelMessage.ID == context.Message().ID {
+			switch {
+			case context.Message().Animation != nil:
+				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Animation{File: context.Message().Animation.File, Caption: context.Message().Caption})
+			case context.Message().Audio != nil:
+				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Audio{File: context.Message().Audio.File, Caption: context.Message().Caption})
+			case context.Message().Photo != nil:
+				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Photo{File: context.Message().Photo.File, Caption: context.Message().Caption})
+			case context.Message().Video != nil:
+				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Video{File: context.Message().Video.File, Caption: context.Message().Caption})
+			case context.Message().Voice != nil:
+				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Voice{File: context.Message().Voice.File, Caption: context.Message().Caption})
+			case context.Message().Document != nil:
+				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Document{File: context.Message().Document.File, Caption: context.Message().Caption})
+			default:
+				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, context.Message().Text)
+			}
+		}
+	}
+	return err
 }
 
 //Remove message

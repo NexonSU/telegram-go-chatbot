@@ -66,6 +66,7 @@ func main() {
 
 	//Repost channel post to chat
 	utils.Bot.Handle(telebot.OnChannelPost, utils.Repost, middleware.ChannelOnly)
+	utils.Bot.Handle(telebot.OnEditedChannelPost, utils.EditRepost, middleware.ChannelOnly)
 
 	//User join
 	utils.Bot.Handle(telebot.OnChatMember, checkpoint.ChatMemberUpdate, middleware.ChatOnly)
