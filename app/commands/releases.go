@@ -16,10 +16,7 @@ import (
 func Releases(context telebot.Context) error {
 	var err error
 	if utils.Config.ReleasesUrl == "" {
-		err := context.Reply("Список ближайших релизов не настроен")
-		if err != nil {
-			return err
-		}
+		return context.Reply("Список ближайших релизов не настроен")
 	}
 	resp, err := http.Get(utils.Config.ReleasesUrl)
 	if err != nil {
@@ -40,9 +37,5 @@ func Releases(context telebot.Context) error {
 			releases = fmt.Sprintf("<b>%v</b> - %v.%v.%v\n%v", strings.ReplaceAll(name, "\\,", ","), date[6:8], date[4:6], date[0:4], releases)
 		}
 	}
-	err = context.Reply(releases)
-	if err != nil {
-		return err
-	}
-	return err
+	return context.Reply(releases)
 }
