@@ -152,3 +152,8 @@ func Repost(context telebot.Context) error {
 	}
 	return context.ForwardTo(chat)
 }
+
+//Remove message
+func Remove(context telebot.Context) error {
+	return context.Delete()
+}
