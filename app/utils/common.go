@@ -143,3 +143,12 @@ func GetUserFromDB(findstring string) (telebot.User, error) {
 	}
 	return user, err
 }
+
+//Repost channel post to chat
+func Repost(context telebot.Context) error {
+	chat, err := Bot.ChatByID("@" + Config.Telegram.Chat)
+	if err != nil {
+		return err
+	}
+	return context.ForwardTo(chat)
+}

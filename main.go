@@ -64,7 +64,7 @@ func main() {
 	utils.Bot.Handle(&roulette.DenyButton, roulette.Deny, middleware.ChatOnly)
 
 	//Repost channel post to chat
-	utils.Bot.Handle(telebot.OnChannelPost, services.OnPost, middleware.ChannelOnly)
+	utils.Bot.Handle(telebot.OnChannelPost, utils.Repost, middleware.ChannelOnly)
 
 	//User join
 	utils.Bot.Handle(telebot.OnUserJoined, welcome.OnJoin, middleware.ChatOnly)
