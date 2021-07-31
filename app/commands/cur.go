@@ -14,65 +14,32 @@ import (
 
 //Reply currency "cur"
 func Cur(context telebot.Context) error {
-	var err error
-	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
-		return err
-	}
 	if utils.Config.CurrencyKey == "" {
-		err := context.Reply("Конвертация валют не настроена")
-		if err != nil {
-			return err
-		}
-		return err
+		return context.Reply("Конвертация валют не настроена")
 	}
-	var target = context.Message()
 	var text = strings.Split(context.Text(), " ")
 	if len(text) != 4 {
-		err := context.Reply("Пример использования:\n/cur {количество} {EUR/USD/RUB} {EUR/USD/RUB}")
-		if err != nil {
-			return err
-		}
-		return err
+		return context.Reply("Пример использования:\n/cur {количество} {EUR/USD/RUB} {EUR/USD/RUB}")
 	}
 	if context.Message().ReplyTo != nil {
-		target = context.Message().ReplyTo
+		context.Message().Sender = context.Message().ReplyTo.Sender
 	}
 	amount, err := strconv.ParseFloat(text[1], 64)
 	if err != nil {
-		err := context.Reply(fmt.Sprintf("Ошибка определения количества:\n<code>%v</code>", err))
-		if err != nil {
-			return err
-		}
-		return err
+		return context.Reply(fmt.Sprintf("Ошибка определения количества:\n<code>%v</code>", err))
 	}
 	var symbol = strings.ToUpper(text[2])
 	if !regexp.MustCompile(`^[A-Z$]{3,5}$`).MatchString(symbol) {
-		err := context.Reply("Имя валюты должно состоять из 3-5 латинских символов.")
-		if err != nil {
-			return err
-		}
-		return err
+		return context.Reply("Имя валюты должно состоять из 3-5 латинских символов.")
 	}
 	var convert = strings.ToUpper(text[3])
 	if !regexp.MustCompile(`^[A-Z$]{3,5}$`).MatchString(convert) {
-		err := context.Reply("Имя валюты должно состоять из 3-5 латинских символов.")
-		if err != nil {
-			return err
-		}
-		return err
+		return context.Reply("Имя валюты должно состоять из 3-5 латинских символов.")
 	}
 	client := cmc.NewClient(&cmc.Config{ProAPIKey: utils.Config.CurrencyKey})
 	conversion, err := client.Tools.PriceConversion(&cmc.ConvertOptions{Amount: amount, Symbol: symbol, Convert: convert})
 	if err != nil {
-		err := context.Reply("Ошибка при запросе. Возможно, одна из валют не найдена.\nОнлайн-версия: https://coinmarketcap.com/ru/converter/", &telebot.SendOptions{DisableWebPagePreview: true})
-		if err != nil {
-			return err
-		}
-		return err
+		return context.Reply("Ошибка при запросе. Возможно, одна из валют не найдена.\nОнлайн-версия: https://coinmarketcap.com/ru/converter/", &telebot.SendOptions{DisableWebPagePreview: true})
 	}
-	_, err = utils.Bot.Reply(target, fmt.Sprintf("%v %v = %v %v", conversion.Amount, conversion.Name, math.Round(conversion.Quote[convert].Price*100)/100, convert))
-	if err != nil {
-		return err
-	}
-	return err
+	return context.Reply(fmt.Sprintf("%v %v = %v %v", conversion.Amount, conversion.Name, math.Round(conversion.Quote[convert].Price*100)/100, convert))
 }

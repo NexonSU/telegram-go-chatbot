@@ -11,18 +11,10 @@ import (
 
 //Save Get to DB on /set
 func Set(context telebot.Context) error {
-	var err error
-	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
-		return err
-	}
 	var get utils.Get
 	var text = strings.Split(context.Text(), " ")
 	if (context.Message().ReplyTo == nil && len(text) < 3) || (context.Message().ReplyTo != nil && len(text) != 2) {
-		err := context.Reply("Пример использования: <code>/set {гет} {значение}</code>\nИли отправь в ответ на какое-либо сообщение <code>/set {гет}</code>")
-		if err != nil {
-			return err
-		}
-		return err
+		return context.Reply("Пример использования: <code>/set {гет} {значение}</code>\nИли отправь в ответ на какое-либо сообщение <code>/set {гет}</code>")
 	}
 	get.Name = strings.ToLower(text[1])
 	if context.Message().ReplyTo == nil && len(text) > 2 {
@@ -53,22 +45,14 @@ func Set(context telebot.Context) error {
 			get.Type = "Text"
 			get.Data = context.Message().ReplyTo.Text
 		default:
-			err := context.Reply("Не удалось распознать файл в сообщении, возможно, он не поддерживается.")
-			if err != nil {
-				return err
-			}
-			return err
+			return context.Reply("Не удалось распознать файл в сообщении, возможно, он не поддерживается.")
 		}
 	}
 	result := utils.DB.Clauses(clause.OnConflict{
 		UpdateAll: true,
 	}).Create(get)
 	if result.Error != nil {
-		err := context.Reply(fmt.Sprintf("Не удалось сохранить гет <code>%v</code>.", get.Name))
-		if err != nil {
-			return err
-		}
-		return err
+		return context.Reply(fmt.Sprintf("Не удалось сохранить гет <code>%v</code>.", get.Name))
 	}
 	return context.Reply(fmt.Sprintf("Гет <code>%v</code> сохранён как <code>%v</code>.", get.Name, get.Type))
 }

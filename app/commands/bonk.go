@@ -13,19 +13,9 @@ import (
 
 //Write username on bonk picture and send to target
 func Bonk(context telebot.Context) error {
-	var err error
-	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
-		return err
-	}
 	if context.Message().ReplyTo == nil {
-		err := context.Reply("Просто отправь <code>/bonk</code> в ответ на чье-либо сообщение.")
-		if err != nil {
-			return err
-		}
-		return err
-
+		return context.Reply("Просто отправь <code>/bonk</code> в ответ на чье-либо сообщение.")
 	}
-	var target = *context.Message().ReplyTo
 	_, b, _, _ := runtime.Caller(0)
 	basepath := filepath.Dir(b)
 	im, err := webp.Load(basepath + "/../../files/bonk.webp")
@@ -59,9 +49,6 @@ func Bonk(context telebot.Context) error {
 	if err != nil {
 		return err
 	}
-	_, err = utils.Bot.Reply(&target, &telebot.Sticker{File: telebot.FromReader(buf)})
-	if err != nil {
-		return err
-	}
-	return err
+	context.Message().Sender = context.Message().ReplyTo.Sender
+	return context.Reply(&telebot.Sticker{File: telebot.FromReader(buf)})
 }

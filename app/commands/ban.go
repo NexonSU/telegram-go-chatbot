@@ -10,13 +10,6 @@ import (
 
 //Ban user on /ban
 func Ban(context telebot.Context) error {
-	var err error
-	if !utils.IsAdminOrModer(context.Sender().Username) {
-		if context.Chat().Username != utils.Config.Telegram.Chat {
-			return err
-		}
-		return context.Reply(&telebot.Animation{File: telebot.File{FileID: "CgACAgIAAx0CQvXPNQABHGrDYIBIvDLiVV6ZMPypWMi_NVDkoFQAAq4LAAIwqQlIQT82LRwIpmoeBA"}})
-	}
 	var text = strings.Split(context.Text(), " ")
 	if (context.Message().ReplyTo == nil && len(text) < 2) || (context.Message().ReplyTo != nil && len(text) > 2) {
 		return context.Reply("Пример использования: <code>/ban {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/ban</code>\nЕсли нужно забанить на время, то добавь время в секундах через пробел.")

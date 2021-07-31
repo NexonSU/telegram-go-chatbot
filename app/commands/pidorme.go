@@ -10,10 +10,6 @@ import (
 
 //Send DB stats on /pidorme
 func Pidorme(context telebot.Context) error {
-	var err error
-	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
-		return err
-	}
 	var pidor utils.PidorStats
 	var countYear int64
 	var countAlltime int64

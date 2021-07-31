@@ -12,10 +12,6 @@ import (
 
 //Send top 10 pidors of year on /pidorstats
 func Pidorstats(context telebot.Context) error {
-	var err error
-	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
-		return err
-	}
 	var text = strings.Split(context.Text(), " ")
 	var i = 0
 	var year = time.Now().Year()
@@ -24,11 +20,7 @@ func Pidorstats(context telebot.Context) error {
 	if len(text) == 2 {
 		argYear, err := strconv.Atoi(text[1])
 		if err != nil {
-			err := context.Reply("Ошибка определения года.\nУкажите год с 2019 по предыдущий.")
-			if err != nil {
-				return err
-			}
-			return err
+			return context.Reply("Ошибка определения года.\nУкажите год с 2019.")
 		}
 		if argYear < year && argYear > 2018 {
 			year = argYear

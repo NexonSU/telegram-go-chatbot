@@ -16,7 +16,7 @@ type Configuration struct {
 		BotApiUrl      string   `json:"bot_api_url"`
 		Admins         []string `json:"admins"`
 		Moders         []string `json:"moders"`
-		SysAdmin       int      `json:"sysadmin"`
+		SysAdmin       int64    `json:"sysadmin"`
 		AllowedUpdates []string `json:"allowed_updates"`
 	}
 	Webhook struct {

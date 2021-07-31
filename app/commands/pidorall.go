@@ -9,10 +9,6 @@ import (
 
 //Send top 10 pidors of all time on /pidorall
 func Pidorall(context telebot.Context) error {
-	var err error
-	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
-		return err
-	}
 	var i = 0
 	var username string
 	var count int64

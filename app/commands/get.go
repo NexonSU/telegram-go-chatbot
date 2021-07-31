@@ -10,10 +10,6 @@ import (
 
 //Send Get to user on /get
 func Get(context telebot.Context) error {
-	var err error
-	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
-		return err
-	}
 	var get utils.Get
 	var text = strings.Split(context.Text(), " ")
 	if len(text) != 2 {

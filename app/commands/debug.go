@@ -10,15 +10,7 @@ import (
 
 //Return message on /debug command
 func Debug(context telebot.Context) error {
-	var err error
-	if !utils.IsAdminOrModer(context.Sender().Username) {
-		if context.Chat().Username != utils.Config.Telegram.Chat {
-			return err
-		}
-		err = context.Reply(&telebot.Animation{File: telebot.File{FileID: "CgACAgIAAx0CQvXPNQABHGrDYIBIvDLiVV6ZMPypWMi_NVDkoFQAAq4LAAIwqQlIQT82LRwIpmoeBA"}})
-		return err
-	}
-	err = utils.Bot.Delete(context.Message())
+	err := utils.Bot.Delete(context.Message())
 	if err != nil {
 		return err
 	}

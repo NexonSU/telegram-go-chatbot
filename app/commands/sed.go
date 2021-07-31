@@ -3,16 +3,12 @@ package commands
 import (
 	"strings"
 
-	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	"gopkg.in/tucnak/telebot.v3"
 )
 
 // Sed Replace text in target message
 func Sed(context telebot.Context) error {
 	var err error
-	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
-		return err
-	}
 	var text = strings.Split(context.Text(), " ")
 	var foo = strings.Split(text[1], "/")[1]
 	var bar = strings.Split(text[1], "/")[2]

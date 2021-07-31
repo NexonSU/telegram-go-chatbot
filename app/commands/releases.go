@@ -15,9 +15,6 @@ import (
 //Send releases of 2 weeks on /releases
 func Releases(context telebot.Context) error {
 	var err error
-	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
-		return err
-	}
 	if utils.Config.ReleasesUrl == "" {
 		err := context.Reply("Список ближайших релизов не настроен")
 		if err != nil {

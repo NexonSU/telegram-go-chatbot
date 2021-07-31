@@ -10,10 +10,6 @@ import (
 
 //Send warning amount on /mywarns
 func Mywarns(context telebot.Context) error {
-	var err error
-	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
-		return err
-	}
 	var warn utils.Warn
 	result := utils.DB.First(&warn, context.Sender().ID)
 	if result.RowsAffected != 0 {

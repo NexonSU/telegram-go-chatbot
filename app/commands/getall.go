@@ -10,10 +10,6 @@ import (
 
 //Send list of Gets to user on /getall
 func Getall(context telebot.Context) error {
-	var err error
-	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
-		return err
-	}
 	var getall []string
 	var get utils.Get
 	result, _ := utils.DB.Model(&utils.Get{}).Rows()

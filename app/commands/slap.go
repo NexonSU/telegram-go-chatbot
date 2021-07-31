@@ -16,15 +16,7 @@ func Slap(context telebot.Context) error {
 	}
 	target, _, err := utils.FindUserInMessage(context)
 	if err != nil {
-		err := context.Reply(fmt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
-		if err != nil {
-			return err
-		}
-		return err
+		return context.Reply(fmt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
 	}
-	_, err = utils.Bot.Send(context.Chat(), fmt.Sprintf("👋 <b>%v</b> %v %v", utils.UserFullName(context.Sender()), action, utils.MentionUser(&target)))
-	if err != nil {
-		return err
-	}
-	return err
+	return context.Send(fmt.Sprintf("👋 <b>%v</b> %v %v", utils.UserFullName(context.Sender()), action, utils.MentionUser(&target)))
 }

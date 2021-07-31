@@ -11,11 +11,7 @@ import (
 
 //Kill user on /blessing, /suicide
 func Blessing(context telebot.Context) error {
-	var err error
-	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
-		return err
-	}
-	err = utils.Bot.Delete(context.Message())
+	err := utils.Bot.Delete(context.Message())
 	if err != nil {
 		return err
 	}

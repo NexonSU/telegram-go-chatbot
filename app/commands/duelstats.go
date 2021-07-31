@@ -9,10 +9,6 @@ import (
 
 //Send user utils.Duelist stats on /duelstats
 func Duelstats(context telebot.Context) error {
-	var err error
-	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
-		return err
-	}
 	var duelist utils.Duelist
 	result := utils.DB.Model(utils.Duelist{}).Where(context.Sender().ID).First(&duelist)
 	if result.RowsAffected == 0 {
