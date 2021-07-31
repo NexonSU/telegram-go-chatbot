@@ -2,35 +2,35 @@ package commands
 
 import (
 	"bytes"
+	"path/filepath"
+	"runtime"
+
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	"github.com/chai2010/webp"
 	"github.com/fogleman/gg"
-	tb "gopkg.in/tucnak/telebot.v2"
-	"path/filepath"
-	"runtime"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Write username on hug picture and send to target
-func Hug(m *tb.Message) {
-	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
-		return
+func Hug(context telebot.Context) error {
+	var err error
+	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
+		return err
 	}
-	if m.ReplyTo == nil {
-		_, err := utils.Bot.Reply(m, "Просто отправь <code>/hug</code> в ответ на чье-либо сообщение.")
+	if context.Message().ReplyTo == nil {
+		err := context.Reply("Просто отправь <code>/hug</code> в ответ на чье-либо сообщение.")
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
-		return
+		return err
 
 	}
-	var target = *m.ReplyTo
+	var target = *context.Message().ReplyTo
 	_, b, _, _ := runtime.Caller(0)
 	basepath := filepath.Dir(b)
 	im, err := webp.Load(basepath + "/../../files/hug.webp")
 	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
+		return err
 	}
 	dc := gg.NewContextForImage(im)
 	dc.DrawImage(im, 0, 0)
@@ -38,11 +38,10 @@ func Hug(m *tb.Message) {
 	dc.SetRGB(0, 0, 0)
 	err = dc.LoadFontFace(basepath+"/../../files/impact.ttf", 20)
 	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
+		return err
 	}
 	dc.SetRGB(1, 1, 1)
-	s := utils.UserFullName(m.Sender)
+	s := utils.UserFullName(context.Sender())
 	n := 4
 	for dy := -n; dy <= n; dy++ {
 		for dx := -n; dx <= n; dx++ {
@@ -59,12 +58,11 @@ func Hug(m *tb.Message) {
 	buf := new(bytes.Buffer)
 	err = webp.Encode(buf, dc.Image(), nil)
 	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
+		return err
 	}
-	_, err = utils.Bot.Reply(&target, &tb.Sticker{File: tb.FromReader(buf)})
+	_, err = utils.Bot.Reply(&target, &telebot.Sticker{File: telebot.FromReader(buf)})
 	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
+		return err
 	}
+	return err
 }

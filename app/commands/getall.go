@@ -5,13 +5,14 @@ import (
 	"strings"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Send list of Gets to user on /getall
-func Getall(m *tb.Message) {
-	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
-		return
+func Getall(context telebot.Context) error {
+	var err error
+	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
+		return err
 	}
 	var getall []string
 	var get utils.Get
@@ -19,14 +20,9 @@ func Getall(m *tb.Message) {
 	for result.Next() {
 		err := utils.DB.ScanRows(result, &get)
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
 		getall = append(getall, get.Name)
 	}
-	_, err := utils.Bot.Reply(m, fmt.Sprintf("Доступные геты: %v", strings.Join(getall[:], ", ")))
-	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
-	}
+	return context.Reply(fmt.Sprintf("Доступные геты: %v", strings.Join(getall[:], ", ")))
 }

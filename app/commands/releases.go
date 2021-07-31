@@ -2,36 +2,35 @@ package commands
 
 import (
 	"fmt"
-	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	ical "github.com/arran4/golang-ical"
-	tb "gopkg.in/tucnak/telebot.v2"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	ical "github.com/arran4/golang-ical"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Send releases of 2 weeks on /releases
-func Releases(m *tb.Message) {
-	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
-		return
+func Releases(context telebot.Context) error {
+	var err error
+	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
+		return err
 	}
 	if utils.Config.ReleasesUrl == "" {
-		_, err := utils.Bot.Reply(m, "Список ближайших релизов не настроен")
+		err := context.Reply("Список ближайших релизов не настроен")
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
 	}
 	resp, err := http.Get(utils.Config.ReleasesUrl)
 	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
+		return err
 	}
 	cal, err := ical.ParseCalendar(resp.Body)
 	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
+		return err
 	}
 	releases := ""
 	today, _ := strconv.Atoi(time.Now().Format("20060102"))
@@ -44,9 +43,9 @@ func Releases(m *tb.Message) {
 			releases = fmt.Sprintf("<b>%v</b> - %v.%v.%v\n%v", strings.ReplaceAll(name, "\\,", ","), date[6:8], date[4:6], date[0:4], releases)
 		}
 	}
-	_, err = utils.Bot.Reply(m, releases)
+	err = context.Reply(releases)
 	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
+		return err
 	}
+	return err
 }

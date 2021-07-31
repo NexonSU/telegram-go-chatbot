@@ -6,10 +6,11 @@ import (
 	"github.com/NexonSU/telegram-go-chatbot/app/services"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	"github.com/NexonSU/telegram-go-chatbot/app/welcome"
-	tb "gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 func main() {
+	//utils.Bot.OnError = utils.ErrorReporting
 	utils.Bot.Handle("/admin", commands.Admin)
 	utils.Bot.Handle("/debug", commands.Debug)
 	utils.Bot.Handle("/get", commands.Get)
@@ -54,7 +55,7 @@ func main() {
 	utils.Bot.Handle("/update", commands.Update)
 
 	//Inline
-	utils.Bot.Handle(tb.OnQuery, services.OnInline)
+	utils.Bot.Handle(telebot.OnQuery, services.OnInline)
 
 	//Russian Roulette game
 	utils.Bot.Handle("/russianroulette", roulette.Request)
@@ -62,11 +63,11 @@ func main() {
 	utils.Bot.Handle(&roulette.DenyButton, roulette.Deny)
 
 	//Repost channel post to chat
-	utils.Bot.Handle(tb.OnChannelPost, services.OnPost)
+	utils.Bot.Handle(telebot.OnChannelPost, services.OnPost)
 
 	//User join
-	utils.Bot.Handle(tb.OnUserJoined, welcome.OnJoin)
-	utils.Bot.Handle(tb.OnUserLeft, welcome.OnLeft)
+	utils.Bot.Handle(telebot.OnUserJoined, welcome.OnJoin)
+	utils.Bot.Handle(telebot.OnUserLeft, welcome.OnLeft)
 	utils.Bot.Handle(&welcome.CorrectButton, welcome.OnClickCorrectButton)
 	utils.Bot.Handle(&welcome.FirstWrongButton, welcome.OnClickWrongButton)
 	utils.Bot.Handle(&welcome.SecondWrongButton, welcome.OnClickWrongButton)

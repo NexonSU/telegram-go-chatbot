@@ -4,48 +4,48 @@ import (
 	"log"
 	"time"
 
-	tb "gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
-func BotInit() tb.Bot {
+func BotInit() telebot.Bot {
 	if Config.Telegram.Token == "" {
 		log.Fatal("Telegram Bot token not found in config.json")
 	}
 	if Config.Telegram.Chat == "" {
 		log.Fatal("Chat username not found in config.json")
 	}
-	settings := tb.Settings{
+	settings := telebot.Settings{
 		URL:       Config.Telegram.BotApiUrl,
 		Token:     Config.Telegram.Token,
-		ParseMode: tb.ModeHTML,
-		Poller: &tb.LongPoller{
+		ParseMode: telebot.ModeHTML,
+		Poller: &telebot.LongPoller{
 			Timeout:        10 * time.Second,
 			AllowedUpdates: Config.Telegram.AllowedUpdates,
 		},
 	}
 	if Config.Webhook.EndpointPublicURL != "" || Config.Webhook.Listen != "" {
-		settings.Poller = &tb.Webhook{
+		settings.Poller = &telebot.Webhook{
 			Listen: Config.Webhook.Listen,
-			Endpoint: &tb.WebhookEndpoint{
+			Endpoint: &telebot.WebhookEndpoint{
 				PublicURL: Config.Webhook.EndpointPublicURL,
 			},
 			MaxConnections: Config.Webhook.MaxConnections,
 			AllowedUpdates: Config.Telegram.AllowedUpdates,
 		}
 	} else {
-		settings.Poller = &tb.LongPoller{
+		settings.Poller = &telebot.LongPoller{
 			Timeout:        10 * time.Second,
 			AllowedUpdates: Config.Telegram.AllowedUpdates,
 		}
 	}
-	settings.Poller = tb.NewMiddlewarePoller(settings.Poller, func(upd *tb.Update) bool {
+	settings.Poller = telebot.NewMiddlewarePoller(settings.Poller, func(upd *telebot.Update) bool {
 		if upd.Message != nil && upd.Message.Sender != nil {
 			GatherData(upd.Message.Sender)
 		}
 
 		return true
 	})
-	var Bot, err = tb.NewBot(settings)
+	var Bot, err = telebot.NewBot(settings)
 	if err != nil {
 		log.Println(Config.Telegram.BotApiUrl)
 		log.Fatal(err)

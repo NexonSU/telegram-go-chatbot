@@ -2,21 +2,21 @@ package services
 
 import (
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Repost channel post to chat
-func OnPost(m *tb.Message) {
-	if m.Chat.Username == utils.Config.Telegram.Channel {
+func OnPost(context telebot.Context) error {
+	var err error
+	if context.Chat().Username == utils.Config.Telegram.Channel {
 		chat, err := utils.Bot.ChatByID("@" + utils.Config.Telegram.Chat)
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
 		_, err = utils.Bot.Forward(chat, m)
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
 	}
+	return err
 }

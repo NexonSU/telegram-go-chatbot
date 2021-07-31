@@ -2,42 +2,41 @@ package commands
 
 import (
 	"fmt"
+
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/tucnak/telebot.v3"
 	"gorm.io/gorm/clause"
 )
 
 //Send DB result on /pidoreg
-func Pidoreg(m *tb.Message) {
-	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
-		return
+func Pidoreg(context telebot.Context) error {
+	var err error
+	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
+		return err
 	}
 	var pidor utils.PidorList
-	result := utils.DB.First(&pidor, m.Sender.ID)
+	result := utils.DB.First(&pidor, context.Sender().ID)
 	if result.RowsAffected != 0 {
-		_, err := utils.Bot.Reply(m, "Эй, ты уже в игре!")
+		err := context.Reply("Эй, ты уже в игре!")
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
 	} else {
-		pidor = utils.PidorList(*m.Sender)
+		pidor = utils.PidorList(*context.Sender())
 		result = utils.DB.Clauses(clause.OnConflict{
 			UpdateAll: true,
 		}).Create(pidor)
 		if result.Error != nil {
-			utils.ErrorReporting(result.Error, m)
-			_, err := utils.Bot.Reply(m, fmt.Sprintf("Не удалось зарегистрироваться:\n<code>%v</code>.", result.Error))
+			err := context.Reply(fmt.Sprintf("Не удалось зарегистрироваться:\n<code>%v</code>.", result.Error))
 			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
+				return err
 			}
-			return
+			return err
 		}
-		_, err := utils.Bot.Reply(m, "OK! Ты теперь участвуешь в игре <b>Пидор Дня</b>!")
+		err := context.Reply("OK! Ты теперь участвуешь в игре <b>Пидор Дня</b>!")
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
 	}
+	return err
 }

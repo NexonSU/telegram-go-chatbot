@@ -5,55 +5,51 @@ import (
 	"strings"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Send userid on /getid
-func Getid(m *tb.Message) {
-	if !utils.IsAdminOrModer(m.Sender.Username) {
-		if m.Chat.Username != utils.Config.Telegram.Chat {
-			return
+func Getid(context telebot.Context) error {
+	var err error
+	if !utils.IsAdminOrModer(context.Sender().Username) {
+		if context.Chat().Username != utils.Config.Telegram.Chat {
+			return err
 		}
-		_, err := utils.Bot.Reply(m, &tb.Animation{File: tb.File{FileID: "CgACAgIAAx0CQvXPNQABHGrDYIBIvDLiVV6ZMPypWMi_NVDkoFQAAq4LAAIwqQlIQT82LRwIpmoeBA"}})
+		err := context.Reply(&telebot.Animation{File: telebot.File{FileID: "CgACAgIAAx0CQvXPNQABHGrDYIBIvDLiVV6ZMPypWMi_NVDkoFQAAq4LAAIwqQlIQT82LRwIpmoeBA"}})
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
-		return
+		return err
 	}
-	var text = strings.Split(m.Text, " ")
-	if m.ReplyTo != nil && m.ReplyTo.OriginalSender != nil {
-		_, err := utils.Bot.Send(m.Sender, fmt.Sprintf("Firstname: %v\nLastname: %v\nUsername: %v\nUserID: %v", m.ReplyTo.OriginalSender.FirstName, m.ReplyTo.OriginalSender.LastName, m.ReplyTo.OriginalSender.Username, m.ReplyTo.OriginalSender.ID))
+	var text = strings.Split(context.Text(), " ")
+	if context.Message().ReplyTo != nil && context.Message().ReplyTo.OriginalSender != nil {
+		_, err := utils.Bot.Send(context.Sender(), fmt.Sprintf("Firstname: %v\nLastname: %v\nUsername: %v\nUserID: %v", context.Message().ReplyTo.OriginalSender.FirstName, context.Message().ReplyTo.OriginalSender.LastName, context.Message().ReplyTo.OriginalSender.Username, context.Message().ReplyTo.OriginalSender.ID))
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
-	} else if m.ReplyTo != nil {
-		_, err := utils.Bot.Send(m.Sender, fmt.Sprintf("Firstname: %v\nLastname: %v\nUsername: %v\nUserID: %v", m.ReplyTo.Sender.FirstName, m.ReplyTo.Sender.LastName, m.ReplyTo.Sender.Username, m.ReplyTo.Sender.ID))
+	} else if context.Message().ReplyTo != nil {
+		_, err := utils.Bot.Send(context.Sender(), fmt.Sprintf("Firstname: %v\nLastname: %v\nUsername: %v\nUserID: %v", context.Message().ReplyTo.Sender.FirstName, context.Message().ReplyTo.Sender.LastName, context.Message().ReplyTo.Sender.Username, context.Message().ReplyTo.Sender.ID))
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
 	} else if len(text) == 2 {
-		target, _, err := utils.FindUserInMessage(*m)
+		target, _, err := utils.FindUserInMessage(context)
 		if err != nil {
-			_, err := utils.Bot.Reply(m, fmt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
+			err := context.Reply(fmt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
 			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
+				return err
 			}
-			return
+			return err
 		}
-		_, err = utils.Bot.Send(m.Sender, fmt.Sprintf("Firstname: %v\nLastname: %v\nUsername: %v\nUserID: %v", target.FirstName, target.LastName, target.Username, target.ID))
+		_, err = utils.Bot.Send(context.Sender(), fmt.Sprintf("Firstname: %v\nLastname: %v\nUsername: %v\nUserID: %v", target.FirstName, target.LastName, target.Username, target.ID))
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
 	} else {
-		_, err := utils.Bot.Send(m.Sender, fmt.Sprintf("Firstname: %v\nLastname: %v\nUsername: %v\nUserID: %v", m.Sender.FirstName, m.Sender.LastName, m.Sender.Username, m.Sender.ID))
+		_, err := utils.Bot.Send(context.Sender(), fmt.Sprintf("Firstname: %v\nLastname: %v\nUsername: %v\nUserID: %v", context.Sender().FirstName, context.Sender().LastName, context.Sender().Username, context.Sender().ID))
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
 	}
+	return err
 }

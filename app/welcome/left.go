@@ -4,17 +4,18 @@ import (
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
-func OnLeft(m *tb.Message) {
-	if m.Chat.Username != utils.Config.Telegram.Chat {
-		return
+func OnLeft(context telebot.Context) error {
+	var err error
+	if context.Chat().Username != utils.Config.Telegram.Chat {
+		return err
 	}
-	err := utils.Bot.Delete(m)
+	err := utils.Bot.Delete(context.Message())
 	for i, user := range Border.Users {
-		if user.User.ID == m.Sender.ID && user.Status == "pending" {
-			err := utils.Bot.Ban(Border.Chat, &tb.ChatMember{User: user.User, RestrictedUntil: time.Now().Unix() + 7200})
+		if user.User.ID == context.Sender().ID && user.Status == "pending" {
+			err := utils.Bot.Ban(Border.Chat, &telebot.ChatMember{User: user.User, RestrictedUntil: time.Now().Unix() + 7200})
 			if err != nil {
 				continue
 			}
@@ -24,7 +25,7 @@ func OnLeft(m *tb.Message) {
 		}
 	}
 	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
+		return err
 	}
+	return err
 }

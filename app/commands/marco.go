@@ -2,17 +2,14 @@ package commands
 
 import (
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Reply "Polo!" on "marco"
-func Marco(m *tb.Message) {
-	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
-		return
+func Marco(context telebot.Context) error {
+	var err error
+	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
+		return err
 	}
-	_, err := utils.Bot.Reply(m, "Polo!")
-	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
-	}
+	return context.Reply("Polo!")
 }

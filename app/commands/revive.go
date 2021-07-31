@@ -6,49 +6,46 @@ import (
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Unmute user on /unmute
-func Revive(m *tb.Message) {
-	if !utils.IsAdminOrModer(m.Sender.Username) {
-		if m.Chat.Username != utils.Config.Telegram.Chat {
-			return
+func Revive(context telebot.Context) error {
+	var err error
+	if !utils.IsAdminOrModer(context.Sender().Username) {
+		if context.Chat().Username != utils.Config.Telegram.Chat {
+			return err
 		}
-		_, err := utils.Bot.Reply(m, &tb.Animation{File: tb.File{FileID: "CgACAgIAAx0CQvXPNQABHGrDYIBIvDLiVV6ZMPypWMi_NVDkoFQAAq4LAAIwqQlIQT82LRwIpmoeBA"}})
+		err := context.Reply(&telebot.Animation{File: telebot.File{FileID: "CgACAgIAAx0CQvXPNQABHGrDYIBIvDLiVV6ZMPypWMi_NVDkoFQAAq4LAAIwqQlIQT82LRwIpmoeBA"}})
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
-		return
+		return err
 	}
-	var target tb.User
-	var text = strings.Split(m.Text, " ")
-	if (m.ReplyTo == nil && len(text) != 2) || (m.ReplyTo != nil && len(text) != 1) {
-		_, err := utils.Bot.Reply(m, "Пример использования: <code>/unmute {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/unmute</code>")
+	var target telebot.User
+	var text = strings.Split(context.Text(), " ")
+	if (context.Message().ReplyTo == nil && len(text) != 2) || (context.Message().ReplyTo != nil && len(text) != 1) {
+		err := context.Reply("Пример использования: <code>/unmute {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/unmute</code>")
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
-		return
+		return err
 	}
-	target, _, err := utils.FindUserInMessage(*m)
+	target, _, err := utils.FindUserInMessage(context)
 	if err != nil {
-		_, err := utils.Bot.Reply(m, fmt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
+		err := context.Reply(fmt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
-		return
+		return err
 	}
-	TargetChatMember, err := utils.Bot.ChatMemberOf(m.Chat, &target)
+	TargetChatMember, err := utils.Bot.ChatMemberOf(context.Chat(), &target)
 	if err != nil {
-		_, err := utils.Bot.Reply(m, fmt.Sprintf("Ошибка определения пользователя чата:\n<code>%v</code>", err.Error()))
+		err := context.Reply(fmt.Sprintf("Ошибка определения пользователя чата:\n<code>%v</code>", err.Error()))
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
-		return
+		return err
 	}
 	TargetChatMember.CanSendMessages = true
 	TargetChatMember.CanSendMedia = true
@@ -56,18 +53,17 @@ func Revive(m *tb.Message) {
 	TargetChatMember.CanSendOther = true
 	TargetChatMember.CanAddPreviews = true
 	TargetChatMember.RestrictedUntil = time.Now().Unix() + 60
-	err = utils.Bot.Restrict(m.Chat, TargetChatMember)
+	err = utils.Bot.Restrict(context.Chat(), TargetChatMember)
 	if err != nil {
-		_, err := utils.Bot.Reply(m, fmt.Sprintf("Ошибка возрождения пользователя:\n<code>%v</code>", err.Error()))
+		err := context.Reply(fmt.Sprintf("Ошибка возрождения пользователя:\n<code>%v</code>", err.Error()))
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
-		return
+		return err
 	}
-	_, err = utils.Bot.Reply(m, fmt.Sprintf("%v возродился в чате.", utils.MentionUser(&target)))
+	err = context.Reply(fmt.Sprintf("%v возродился в чате.", utils.MentionUser(&target)))
 	if err != nil {
-		utils.ErrorReporting(err, m)
-		return
+		return err
 	}
+	return err
 }

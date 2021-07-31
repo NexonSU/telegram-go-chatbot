@@ -2,45 +2,44 @@ package commands
 
 import (
 	"fmt"
-	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
 	"strings"
+
+	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Delete Get in DB on /del
-func Del(m *tb.Message) {
-	if !utils.IsAdminOrModer(m.Sender.Username) {
-		if m.Chat.Username != utils.Config.Telegram.Chat {
-			return
+func Del(context telebot.Context) error {
+	var err error
+	if !utils.IsAdminOrModer(context.Sender().Username) {
+		if context.Chat().Username != utils.Config.Telegram.Chat {
+			return err
 		}
-		_, err := utils.Bot.Reply(m, &tb.Animation{File: tb.File{FileID: "CgACAgIAAx0CQvXPNQABHGrDYIBIvDLiVV6ZMPypWMi_NVDkoFQAAq4LAAIwqQlIQT82LRwIpmoeBA"}})
+		err := context.Reply(&telebot.Animation{File: telebot.File{FileID: "CgACAgIAAx0CQvXPNQABHGrDYIBIvDLiVV6ZMPypWMi_NVDkoFQAAq4LAAIwqQlIQT82LRwIpmoeBA"}})
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
-		return
+		return err
 	}
-	var text = strings.Split(m.Text, " ")
+	var text = strings.Split(context.Text(), " ")
 	if len(text) != 2 {
-		_, err := utils.Bot.Reply(m, "Пример использования: <code>/del {гет}</code>")
+		err := context.Reply("Пример использования: <code>/del {гет}</code>")
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
-		return
+		return err
 	}
 	result := utils.DB.Delete(&utils.Get{Name: strings.ToLower(text[1])})
 	if result.RowsAffected != 0 {
-		_, err := utils.Bot.Reply(m, fmt.Sprintf("Гет <code>%v</code> удалён.", text[1]))
+		err := context.Reply(fmt.Sprintf("Гет <code>%v</code> удалён.", text[1]))
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
 	} else {
-		_, err := utils.Bot.Reply(m, fmt.Sprintf("Гет <code>%v</code> не найден.", text[1]))
+		err := context.Reply(fmt.Sprintf("Гет <code>%v</code> не найден.", text[1]))
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
 	}
+	return err
 }

@@ -1,30 +1,31 @@
 package commands
 
 import (
-	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
 	"strings"
+
+	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 // Sed Replace text in target message
-func Sed(m *tb.Message) {
-	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
-		return
+func Sed(context telebot.Context) error {
+	var err error
+	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
+		return err
 	}
-	var text = strings.Split(m.Text, " ")
+	var text = strings.Split(context.Text(), " ")
 	var foo = strings.Split(text[1], "/")[1]
 	var bar = strings.Split(text[1], "/")[2]
-	if m.ReplyTo != nil && foo != "" && bar != "" {
-		_, err := utils.Bot.Reply(m, strings.ReplaceAll(m.ReplyTo.Text, foo, bar))
+	if context.Message().ReplyTo != nil && foo != "" && bar != "" {
+		err := context.Reply(strings.ReplaceAll(context.Message().ReplyTo.Text, foo, bar))
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
 	} else {
-		_, err := utils.Bot.Reply(m, "Пример использования:\n/sed {патерн вида s/foo/bar/} в ответ на сообщение.")
+		err := context.Reply("Пример использования:\n/sed {патерн вида s/foo/bar/} в ответ на сообщение.")
 		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
+			return err
 		}
 	}
+	return err
 }

@@ -2,100 +2,62 @@ package commands
 
 import (
 	"fmt"
-	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
 	"strings"
+
+	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Send Get to user on /get
-func Get(m *tb.Message) {
-	if m.Chat.Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(m.Sender.Username) {
-		return
+func Get(context telebot.Context) error {
+	var err error
+	if context.Chat().Username != utils.Config.Telegram.Chat && !utils.IsAdminOrModer(context.Sender().Username) {
+		return err
 	}
 	var get utils.Get
-	var text = strings.Split(m.Text, " ")
+	var text = strings.Split(context.Text(), " ")
 	if len(text) != 2 {
-		_, err := utils.Bot.Reply(m, "Пример использования: <code>/get {гет}</code>")
-		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
-		}
-		return
+		return context.Reply("Пример использования: <code>/get {гет}</code>")
 	}
 	result := utils.DB.Where(&utils.Get{Name: strings.ToLower(text[1])}).First(&get)
 	if result.RowsAffected != 0 {
 		switch {
 		case get.Type == "Animation":
-			_, err := utils.Bot.Reply(m, &tb.Animation{
-				File:    tb.File{FileID: get.Data},
+			return context.Reply(&telebot.Animation{
+				File:    telebot.File{FileID: get.Data},
 				Caption: get.Caption,
 			})
-			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
-			}
 		case get.Type == "Audio":
-			_, err := utils.Bot.Reply(m, &tb.Audio{
-				File:    tb.File{FileID: get.Data},
+			return context.Reply(&telebot.Audio{
+				File:    telebot.File{FileID: get.Data},
 				Caption: get.Caption,
 			})
-			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
-			}
 		case get.Type == "Photo":
-			_, err := utils.Bot.Reply(m, &tb.Photo{
-				File:    tb.File{FileID: get.Data},
+			return context.Reply(&telebot.Photo{
+				File:    telebot.File{FileID: get.Data},
 				Caption: get.Caption,
 			})
-			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
-			}
 		case get.Type == "Video":
-			_, err := utils.Bot.Reply(m, &tb.Video{
-				File:    tb.File{FileID: get.Data},
+			return context.Reply(&telebot.Video{
+				File:    telebot.File{FileID: get.Data},
 				Caption: get.Caption,
 			})
-			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
-			}
 		case get.Type == "Voice":
-			_, err := utils.Bot.Reply(m, &tb.Voice{
-				File: tb.File{FileID: get.Data},
+			return context.Reply(&telebot.Voice{
+				File: telebot.File{FileID: get.Data},
 			})
-			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
-			}
 		case get.Type == "Document":
-			_, err := utils.Bot.Reply(m, &tb.Document{
-				File:    tb.File{FileID: get.Data},
+			return context.Reply(&telebot.Document{
+				File:    telebot.File{FileID: get.Data},
 				Caption: get.Caption,
 			})
-			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
-			}
 		case get.Type == "Text":
-			_, err := utils.Bot.Reply(m, get.Data)
-			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
-			}
+			return context.Reply(get.Data)
 		default:
-			_, err := utils.Bot.Reply(m, fmt.Sprintf("Ошибка при определении типа гета, я не знаю тип <code>%v</code>.", get.Type))
-			if err != nil {
-				utils.ErrorReporting(err, m)
-				return
-			}
+			return context.Reply(fmt.Sprintf("Ошибка при определении типа гета, я не знаю тип <code>%v</code>.", get.Type))
 		}
 	} else {
-		_, err := utils.Bot.Reply(m, fmt.Sprintf("Гет <code>%v</code> не найден.", text[1]))
-		if err != nil {
-			utils.ErrorReporting(err, m)
-			return
-		}
+		return context.Reply(fmt.Sprintf("Гет <code>%v</code> не найден.", text[1]))
 	}
+	return err
 }

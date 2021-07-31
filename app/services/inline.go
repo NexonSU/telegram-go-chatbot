@@ -6,73 +6,73 @@ import (
 	"strconv"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	tb "gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Answer on inline query
-func OnInline(q *tb.Query) {
+func OnInline(q *telebot.Query) {
 	var count int64
 	gets := utils.DB.Limit(50).Model(utils.Get{}).Where("name LIKE ?", "%"+q.Text+"%").Count(&count)
 	get_rows, err := gets.Rows()
 	if err != nil {
 		log.Println(err.Error())
-		return
+		return err
 	}
 	if count > 50 {
 		count = 50
 	}
-	results := make(tb.Results, count)
+	results := make(telebot.Results, count)
 	var i int
 	for get_rows.Next() {
 		var get utils.Get
 		err := utils.DB.ScanRows(get_rows, &get)
 		if err != nil {
 			log.Println(err.Error())
-			return
+			return err
 		}
 		switch {
 		case get.Type == "Animation":
-			results[i] = &tb.GifResult{
+			results[i] = &telebot.GifResult{
 				Title:   get.Name,
 				Caption: get.Caption,
 				Cache:   get.Data,
 			}
 		case get.Type == "Audio":
-			results[i] = &tb.AudioResult{
+			results[i] = &telebot.AudioResult{
 				Title:   get.Name,
 				Caption: get.Caption,
 				Cache:   get.Data,
 			}
 		case get.Type == "Photo":
-			results[i] = &tb.PhotoResult{
+			results[i] = &telebot.PhotoResult{
 				Title:   get.Name,
 				Caption: get.Caption,
 				Cache:   get.Data,
 			}
 		case get.Type == "Video":
-			results[i] = &tb.VideoResult{
+			results[i] = &telebot.VideoResult{
 				Title:   get.Name,
 				Caption: get.Caption,
 				Cache:   get.Data,
 			}
 		case get.Type == "Voice":
-			results[i] = &tb.VoiceResult{
+			results[i] = &telebot.VoiceResult{
 				Title:   get.Name,
 				Caption: get.Caption,
 				Cache:   get.Data,
 			}
 		case get.Type == "Document":
-			results[i] = &tb.DocumentResult{
+			results[i] = &telebot.DocumentResult{
 				Title:   get.Name,
 				Caption: get.Caption,
 				Cache:   get.Data,
 			}
 		case get.Type == "Text":
-			results[i] = &tb.ArticleResult{
+			results[i] = &telebot.ArticleResult{
 				Title:       get.Name,
 				Description: get.Data,
 			}
-			results[i].SetContent(tb.InputMessageContent(&tb.InputTextMessageContent{
+			results[i].SetContent(telebot.InputMessageContent(&telebot.InputTextMessageContent{
 				Text:      fmt.Sprintf("<b>%v</b>\n%v", get.Name, get.Data),
 				ParseMode: "HTML",
 			}))
@@ -85,7 +85,7 @@ func OnInline(q *tb.Query) {
 		i++
 	}
 
-	err = utils.Bot.Answer(q, &tb.QueryResponse{
+	err = utils.Bot.Answer(q, &telebot.QueryResponse{
 		Results:   results,
 		CacheTime: 0,
 	})
@@ -93,4 +93,5 @@ func OnInline(q *tb.Query) {
 	if err != nil {
 		log.Println(err.Error())
 	}
+	return err
 }
