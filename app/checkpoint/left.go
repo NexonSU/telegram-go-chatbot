@@ -1,4 +1,4 @@
-package welcome
+package checkpoint
 
 import (
 	"time"

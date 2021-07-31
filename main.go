@@ -1,12 +1,12 @@
 package main
 
 import (
+	"github.com/NexonSU/telegram-go-chatbot/app/checkpoint"
 	"github.com/NexonSU/telegram-go-chatbot/app/commands"
+	"github.com/NexonSU/telegram-go-chatbot/app/duel"
 	"github.com/NexonSU/telegram-go-chatbot/app/middleware"
-	"github.com/NexonSU/telegram-go-chatbot/app/roulette"
 	"github.com/NexonSU/telegram-go-chatbot/app/services"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	"github.com/NexonSU/telegram-go-chatbot/app/welcome"
 	"gopkg.in/tucnak/telebot.v3"
 )
 
@@ -53,30 +53,31 @@ func main() {
 	utils.Bot.Handle("/pidor", commands.Pidor, middleware.ChatLevel)
 	utils.Bot.Handle("/blessing", commands.Blessing, middleware.ChatLevel)
 	utils.Bot.Handle("/suicide", commands.Blessing, middleware.ChatLevel)
-	utils.Bot.Handle("/duelstats", commands.Duelstats, middleware.ChatLevel)
 
 	//Inline
 	utils.Bot.Handle(telebot.OnQuery, services.OnInline, middleware.ChatLevel)
 
-	//Russian Roulette game
-	utils.Bot.Handle("/russianroulette", roulette.Request, middleware.ChatOnly)
-	utils.Bot.Handle(&roulette.AcceptButton, roulette.Accept, middleware.ChatOnly)
-	utils.Bot.Handle(&roulette.DenyButton, roulette.Deny, middleware.ChatOnly)
+	//Russian Roulette duels
+	utils.Bot.Handle("/russianroulette", duel.Request, middleware.ChatOnly)
+	utils.Bot.Handle("/duel", duel.Request, middleware.ChatOnly)
+	utils.Bot.Handle("/duelstats", commands.Duelstats, middleware.ChatLevel)
+	utils.Bot.Handle(&duel.AcceptButton, duel.Accept, middleware.ChatOnly)
+	utils.Bot.Handle(&duel.DenyButton, duel.Deny, middleware.ChatOnly)
 
 	//Repost channel post to chat
 	utils.Bot.Handle(telebot.OnChannelPost, utils.Repost, middleware.ChannelOnly)
 
 	//User join
-	utils.Bot.Handle(telebot.OnUserJoined, welcome.OnJoin, middleware.ChatOnly)
-	utils.Bot.Handle(telebot.OnUserLeft, welcome.OnLeft, middleware.ChatOnly)
-	utils.Bot.Handle(&welcome.CorrectButton, welcome.OnClickCorrectButton, middleware.ChatOnly)
-	utils.Bot.Handle(&welcome.FirstWrongButton, welcome.OnClickWrongButton, middleware.ChatOnly)
-	utils.Bot.Handle(&welcome.SecondWrongButton, welcome.OnClickWrongButton, middleware.ChatOnly)
-	utils.Bot.Handle(&welcome.ThirdWrongButton, welcome.OnClickWrongButton, middleware.ChatOnly)
+	utils.Bot.Handle(telebot.OnUserJoined, checkpoint.OnJoin, middleware.ChatOnly)
+	utils.Bot.Handle(telebot.OnUserLeft, checkpoint.OnLeft, middleware.ChatOnly)
+	utils.Bot.Handle(&checkpoint.CorrectButton, checkpoint.OnClickCorrectButton, middleware.ChatOnly)
+	utils.Bot.Handle(&checkpoint.FirstWrongButton, checkpoint.OnClickWrongButton, middleware.ChatOnly)
+	utils.Bot.Handle(&checkpoint.SecondWrongButton, checkpoint.OnClickWrongButton, middleware.ChatOnly)
+	utils.Bot.Handle(&checkpoint.ThirdWrongButton, checkpoint.OnClickWrongButton, middleware.ChatOnly)
 
-	//Services
+	//Cron
 	go services.ZavtraStreamCheckService()
-	go welcome.JoinMessageUpdateService()
+	go checkpoint.JoinMessageUpdateService()
 
 	utils.Bot.Start()
 }

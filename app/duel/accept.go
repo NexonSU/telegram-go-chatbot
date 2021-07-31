@@ -1,4 +1,4 @@
-package roulette
+package duel
 
 import (
 	"fmt"
