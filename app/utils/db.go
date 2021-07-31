@@ -15,6 +15,7 @@ type Get struct {
 	Type    string
 	Data    string
 	Caption string
+	Creator int64
 }
 
 type PidorStats struct {

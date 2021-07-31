@@ -47,6 +47,7 @@ func Set(context telebot.Context) error {
 			return context.Reply("Не удалось распознать файл в сообщении, возможно, он не поддерживается.")
 		}
 	}
+	get.Creator = context.Sender().ID
 	result := utils.DB.Clauses(clause.OnConflict{
 		UpdateAll: true,
 	}).Create(get)
