@@ -56,23 +56,23 @@ func main() {
 	utils.Bot.Handle("/duelstats", commands.Duelstats, middleware.ChatLevel)
 
 	//Inline
-	utils.Bot.Handle(telebot.OnQuery, services.OnInline)
+	utils.Bot.Handle(telebot.OnQuery, services.OnInline, middleware.ChatLevel)
 
 	//Russian Roulette game
-	utils.Bot.Handle("/russianroulette", roulette.Request)
-	utils.Bot.Handle(&roulette.AcceptButton, roulette.Accept)
-	utils.Bot.Handle(&roulette.DenyButton, roulette.Deny)
+	utils.Bot.Handle("/russianroulette", roulette.Request, middleware.ChatOnly)
+	utils.Bot.Handle(&roulette.AcceptButton, roulette.Accept, middleware.ChatOnly)
+	utils.Bot.Handle(&roulette.DenyButton, roulette.Deny, middleware.ChatOnly)
 
 	//Repost channel post to chat
-	utils.Bot.Handle(telebot.OnChannelPost, services.OnPost)
+	utils.Bot.Handle(telebot.OnChannelPost, services.OnPost, middleware.ChannelOnly)
 
 	//User join
-	utils.Bot.Handle(telebot.OnUserJoined, welcome.OnJoin)
-	utils.Bot.Handle(telebot.OnUserLeft, welcome.OnLeft)
-	utils.Bot.Handle(&welcome.CorrectButton, welcome.OnClickCorrectButton)
-	utils.Bot.Handle(&welcome.FirstWrongButton, welcome.OnClickWrongButton)
-	utils.Bot.Handle(&welcome.SecondWrongButton, welcome.OnClickWrongButton)
-	utils.Bot.Handle(&welcome.ThirdWrongButton, welcome.OnClickWrongButton)
+	utils.Bot.Handle(telebot.OnUserJoined, welcome.OnJoin, middleware.ChatOnly)
+	utils.Bot.Handle(telebot.OnUserLeft, welcome.OnLeft, middleware.ChatOnly)
+	utils.Bot.Handle(&welcome.CorrectButton, welcome.OnClickCorrectButton, middleware.ChatOnly)
+	utils.Bot.Handle(&welcome.FirstWrongButton, welcome.OnClickWrongButton, middleware.ChatOnly)
+	utils.Bot.Handle(&welcome.SecondWrongButton, welcome.OnClickWrongButton, middleware.ChatOnly)
+	utils.Bot.Handle(&welcome.ThirdWrongButton, welcome.OnClickWrongButton, middleware.ChatOnly)
 
 	//Services
 	go services.ZavtraStreamCheckService()

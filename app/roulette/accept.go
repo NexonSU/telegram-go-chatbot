@@ -10,15 +10,14 @@ import (
 )
 
 func Accept(context telebot.Context) error {
-	var err error
-	err = utils.Bot.Respond(context.Callback(), &telebot.CallbackResponse{})
-	if err != nil {
-		return err
-	}
 	message := context.Message()
 	victim := message.Entities[0].User
 	if victim.ID != context.Sender().ID {
 		return context.Respond(&telebot.CallbackResponse{})
+	}
+	err := utils.Bot.Respond(context.Callback(), &telebot.CallbackResponse{})
+	if err != nil {
+		return err
 	}
 	player := message.Entities[1].User
 	busy["russianroulette"] = false
@@ -175,7 +174,7 @@ func Accept(context telebot.Context) error {
 		UpdateAll: true,
 	}).Create(PlayerDuelist)
 	if result.Error != nil {
-		return err
+		return result.Error
 	}
 	return err
 }
