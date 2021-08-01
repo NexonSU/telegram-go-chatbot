@@ -11,12 +11,12 @@ func SysLevel(next telebot.HandlerFunc) telebot.HandlerFunc {
 			return next(context)
 		}
 		for _, b := range utils.Config.Telegram.Admins {
-			if b == context.Chat().Username {
+			if b == context.Sender().Username {
 				return context.Reply(&telebot.Animation{File: telebot.File{FileID: "CgACAgIAAx0CQvXPNQABHGrDYIBIvDLiVV6ZMPypWMi_NVDkoFQAAq4LAAIwqQlIQT82LRwIpmoeBA"}})
 			}
 		}
 		for _, b := range utils.Config.Telegram.Moders {
-			if b == context.Chat().Username {
+			if b == context.Sender().Username {
 				return context.Reply(&telebot.Animation{File: telebot.File{FileID: "CgACAgIAAx0CQvXPNQABHGrDYIBIvDLiVV6ZMPypWMi_NVDkoFQAAq4LAAIwqQlIQT82LRwIpmoeBA"}})
 			}
 		}
@@ -33,12 +33,12 @@ func AdminLevel(next telebot.HandlerFunc) telebot.HandlerFunc {
 			return next(context)
 		}
 		for _, b := range utils.Config.Telegram.Admins {
-			if b == context.Chat().Username {
+			if b == context.Sender().Username {
 				return next(context)
 			}
 		}
 		for _, b := range utils.Config.Telegram.Moders {
-			if b == context.Chat().Username {
+			if b == context.Sender().Username {
 				return context.Reply(&telebot.Animation{File: telebot.File{FileID: "CgACAgIAAx0CQvXPNQABHGrDYIBIvDLiVV6ZMPypWMi_NVDkoFQAAq4LAAIwqQlIQT82LRwIpmoeBA"}})
 			}
 		}
@@ -55,12 +55,12 @@ func ModerLevel(next telebot.HandlerFunc) telebot.HandlerFunc {
 			return next(context)
 		}
 		for _, b := range utils.Config.Telegram.Admins {
-			if b == context.Chat().Username {
+			if b == context.Sender().Username {
 				return next(context)
 			}
 		}
 		for _, b := range utils.Config.Telegram.Moders {
-			if b == context.Chat().Username {
+			if b == context.Sender().Username {
 				return next(context)
 			}
 		}
