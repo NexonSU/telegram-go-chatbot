@@ -28,7 +28,7 @@ type Configuration struct {
 		ApiKey        string `json:"api_key"`
 		ChannelName   string `json:"channel_name"`
 		ChannelID     string `json:"channel_id"`
-		StreamChannel string `json:"stream_channel"`
+		StreamChannel int64  `json:"stream_channel"`
 	}
 	CurrencyKey string `json:"currency_key"`
 	ReleasesUrl string `json:"releases_url"`
