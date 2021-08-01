@@ -23,6 +23,9 @@ func AddNope(context telebot.Context) error {
 			return context.Reply("Я не смог найти текст в указанном сообщении.")
 		}
 	}
+	if len([]rune(nope.Text)) > 50 {
+		return context.Reply("Nope не может быть длиннее 50 символов.")
+	}
 	result := utils.DB.Create(nope)
 	if result.Error != nil {
 		return context.Reply(fmt.Sprintf("Не удалось добавить nope, ошибка:\n<code>%v</code>", result.Error.Error()))
