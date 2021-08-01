@@ -11,10 +11,6 @@ import (
 
 //Kill user on /blessing, /suicide
 func Blessing(context telebot.Context) error {
-	err := utils.Bot.Delete(context.Message())
-	if err != nil {
-		return err
-	}
 	ChatMember, err := utils.Bot.ChatMemberOf(context.Chat(), context.Sender())
 	if err != nil {
 		return err
@@ -41,5 +37,9 @@ func Blessing(context telebot.Context) error {
 	if err != nil {
 		return err
 	}
-	return context.Send(fmt.Sprintf("<code>💥 %v выбрал лёгкий путь.\nРеспавн через %v0 минут.</code>", utils.UserFullName(context.Sender()), duelist.Deaths))
+	err = context.Send(fmt.Sprintf("<code>💥 %v выбрал лёгкий путь.\nРеспавн через %v0 минут.</code>", utils.UserFullName(context.Sender()), duelist.Deaths))
+	if err != nil {
+		return err
+	}
+	return utils.Bot.Delete(context.Message())
 }
