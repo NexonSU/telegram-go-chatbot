@@ -17,7 +17,7 @@ import (
 func ZavtraStreamCheckService() {
 	for {
 		delay := 240
-		if time.Now().Hour() < 2 && time.Now().Hour() >= 20 {
+		if time.Now().Hour() < 2 || time.Now().Hour() >= 20 {
 			delay = 30
 		}
 		err := zavtraStreamCheck("youtube")
@@ -56,7 +56,7 @@ func zavtraStreamCheck(service string) error {
 			if stream.VideoID != videoId {
 				thumbnail := fmt.Sprintf("https://i.ytimg.com/vi/%v/maxresdefault_live.jpg", videoId)
 				caption := fmt.Sprintf("Стрим \"%v\" начался.\nhttps://youtube.com/%v/live", title, utils.Config.Youtube.ChannelName)
-				chat, err := utils.Bot.ChatByID("@" + utils.Config.Youtube.StreamChannel)
+				chat, err := utils.Bot.ChatByID(utils.Config.Youtube.StreamChannel)
 				if err != nil {
 					return err
 				}
