@@ -28,6 +28,7 @@ func main() {
 	utils.Bot.Handle("/pidordel", commands.Pidordel, middleware.ModerLevel)
 	utils.Bot.Handle("/pidorlist", commands.Pidorlist, middleware.ModerLevel)
 	utils.Bot.Handle("/kill", commands.Kill, middleware.ModerLevel)
+	utils.Bot.Handle("/addnope", commands.AddNope, middleware.ModerLevel)
 	utils.Bot.Handle("/setgetowner", commands.SetGetOwner, middleware.ModerLevel)
 	utils.Bot.Handle("/admin", commands.Admin, middleware.ChatLevel)
 	utils.Bot.Handle("/get", commands.Get, middleware.ChatLevel)

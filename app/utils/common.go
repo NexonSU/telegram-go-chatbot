@@ -266,4 +266,8 @@ func Remove(context telebot.Context) error {
 	return context.Delete()
 }
 
-var Nopes = []string{"неа", "не", "нет", "не то", "фигушки", "нееееееееееееееееееееет", "уйди", "это не твоя кнопка", "42", "Сервер занят.", "Зайдите позже.", "ОШИБКА 00000000", "/get камаз", "лучше бы Боряна дали погладить", "иксбокс лучшая консоль", "котег котек", "обратись к уточке", "всё, я устал..."}
+func GetNope() string {
+	var nope Nope
+	DB.Model(Nope{}).Order("RANDOM()").First(&nope)
+	return nope.Text
+}

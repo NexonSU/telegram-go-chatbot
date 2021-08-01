@@ -43,6 +43,10 @@ type ZavtraStream struct {
 	VideoID   string
 }
 
+type Nope struct {
+	Text string `gorm:"primaryKey"`
+}
+
 func DataBaseInit(file string) gorm.DB {
 	database, err := gorm.Open(
 		sqlite.Open(file),
@@ -55,7 +59,7 @@ func DataBaseInit(file string) gorm.DB {
 	}
 
 	//Create tables, if they not exists in DB
-	err = database.AutoMigrate(telebot.User{}, Get{}, Warn{}, PidorStats{}, PidorList{}, Duelist{}, ZavtraStream{})
+	err = database.AutoMigrate(telebot.User{}, Get{}, Warn{}, PidorStats{}, PidorList{}, Duelist{}, ZavtraStream{}, Nope{})
 	if err != nil {
 		log.Println(err)
 	}
