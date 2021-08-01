@@ -12,7 +12,7 @@ import (
 func AddNope(context telebot.Context) error {
 	var nope utils.Nope
 	if (context.Message().ReplyTo == nil && len(context.Args()) == 0) || (context.Message().ReplyTo != nil && len(context.Args()) != 0) {
-		return context.Reply("Пример использования: <code>/addnope {текст}</code>\nИли отправь в ответ на какое-либо с текстом <code>/addnope</code>")
+		return context.Reply("Пример использования: <code>/addnope {текст}</code>\nИли отправь в ответ на сообщение с текстом <code>/addnope</code>")
 	}
 	if context.Message().ReplyTo == nil {
 		nope.Text = strings.ToLower(context.Data())
