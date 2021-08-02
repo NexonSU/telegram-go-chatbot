@@ -80,5 +80,8 @@ func main() {
 	go services.ZavtraStreamCheckService()
 	go checkpoint.JoinMessageUpdateService()
 
+	//Generate /cur map
+	commands.GenerateMaps()
+
 	utils.Bot.Start()
 }

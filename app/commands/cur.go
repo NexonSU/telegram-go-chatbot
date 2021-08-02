@@ -2,8 +2,8 @@ package commands
 
 import (
 	"fmt"
+	"log"
 	"math"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -11,6 +11,58 @@ import (
 	cmc "github.com/miguelmota/go-coinmarketcap/pro/v1"
 	"gopkg.in/tucnak/telebot.v3"
 )
+
+var CryptoMap []*cmc.MapListing
+var FiatMap []*cmc.FiatMapListing
+
+func GenerateMaps() {
+	if utils.Config.CurrencyKey == "" {
+		return
+	}
+	var err error
+	client := cmc.NewClient(&cmc.Config{ProAPIKey: utils.Config.CurrencyKey})
+	CryptoMap, err = client.Cryptocurrency.Map(&cmc.MapOptions{ListingStatus: "active,untracked"})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	FiatMap, err = client.Fiat.Map(&cmc.FiatMapOptions{IncludeMetals: true})
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
+func GetSymbolId(symbol string) (string, error) {
+	symbol = strings.ToUpper(symbol)
+	if symbol == "BYR" {
+		symbol = "BYN"
+	}
+	for _, fiat := range FiatMap {
+		if fiat.Symbol == symbol {
+			return fmt.Sprintf("%v", int(fiat.ID)), nil
+		}
+	}
+	for _, crypto := range CryptoMap {
+		if crypto.Symbol == symbol {
+			return fmt.Sprintf("%v", int(crypto.ID)), nil
+		}
+	}
+	return "", fmt.Errorf("не удалось распознать валюту <code>%v</code>", symbol)
+}
+
+func GetIdName(ID string) string {
+	ID_int, _ := strconv.Atoi(ID)
+	for _, fiat := range FiatMap {
+		if int(fiat.ID) == ID_int {
+			return fiat.Name
+		}
+	}
+	for _, crypto := range CryptoMap {
+		if int(crypto.ID) == ID_int {
+			return crypto.Name
+		}
+	}
+	return ""
+}
 
 //Reply currency "cur"
 func Cur(context telebot.Context) error {
@@ -24,18 +76,18 @@ func Cur(context telebot.Context) error {
 	if err != nil {
 		return context.Reply(fmt.Sprintf("Ошибка определения количества:\n<code>%v</code>", err))
 	}
-	var symbol = strings.ToUpper(context.Args()[1])
-	if !regexp.MustCompile(`^[A-Z$]{3,5}$`).MatchString(symbol) {
-		return context.Reply("Имя валюты должно состоять из 3-5 латинских символов.")
+	symbol, err := GetSymbolId(context.Args()[1])
+	if err != nil {
+		return context.Reply(err.Error())
 	}
-	var convert = strings.ToUpper(context.Args()[2])
-	if !regexp.MustCompile(`^[A-Z$]{3,5}$`).MatchString(convert) {
-		return context.Reply("Имя валюты должно состоять из 3-5 латинских символов.")
+	convert, err := GetSymbolId(context.Args()[2])
+	if err != nil {
+		return context.Reply(err.Error())
 	}
 	client := cmc.NewClient(&cmc.Config{ProAPIKey: utils.Config.CurrencyKey})
-	conversion, err := client.Tools.PriceConversion(&cmc.ConvertOptions{Amount: amount, Symbol: symbol, Convert: convert})
+	conversion, err := client.Tools.PriceConversion(&cmc.ConvertOptions{Amount: amount, ID: symbol, ConvertID: convert})
 	if err != nil {
-		return context.Reply("Ошибка при запросе. Возможно, одна из валют не найдена.\nОнлайн-версия: https://coinmarketcap.com/ru/converter/", &telebot.SendOptions{DisableWebPagePreview: true})
+		return context.Reply(fmt.Sprintf("Ошибка при запросе: %v\nОнлайн-версия: https://coinmarketcap.com/ru/converter/", err.Error()), &telebot.SendOptions{DisableWebPagePreview: true})
 	}
-	return context.Send(fmt.Sprintf("%v %v = %v %v", conversion.Amount, conversion.Name, math.Round(conversion.Quote[convert].Price*100)/100, convert), &telebot.SendOptions{ReplyTo: context.Message().ReplyTo, AllowWithoutReply: true})
+	return context.Send(fmt.Sprintf("%v %v = %v %v", conversion.Amount, conversion.Name, math.Round(conversion.Quote[convert].Price*100)/100, GetIdName(convert)), &telebot.SendOptions{ReplyTo: context.Message().ReplyTo, AllowWithoutReply: true})
 }
