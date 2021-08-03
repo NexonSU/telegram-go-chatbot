@@ -3,6 +3,7 @@ module github.com/NexonSU/telegram-go-chatbot
 go 1.16
 
 require (
+	github.com/NexonSU/go-coinmarketcap v0.1.8-0.20210803132930-cb8861dfe286 // indirect
 	github.com/arran4/golang-ical v0.0.0-20210720004158-ffffad53d7ed
 	github.com/chai2010/webp v1.1.0
 	github.com/fogleman/gg v1.3.0

@@ -1,3 +1,5 @@
+github.com/NexonSU/go-coinmarketcap v0.1.8-0.20210803132930-cb8861dfe286 h1:x+OeF2ZSdaYBmH9+kOYsU0t+Yj9HSxE0agrlxT5L2Us=
+github.com/NexonSU/go-coinmarketcap v0.1.8-0.20210803132930-cb8861dfe286/go.mod h1:o42/tErlnaA3C0nyNJKAzu85nxrAmY7XEpGSPtDCvbA=
 github.com/anaskhan96/soup v1.0.1/go.mod h1:pT5vs4HXDwA5y4KQCsKvnkpQd3D+joP7IqpiGskfWW0=
 github.com/arran4/golang-ical v0.0.0-20210720004158-ffffad53d7ed h1:huiKPvuNYyKmCFacYru8KEsHaD15d8lvw3F03aoXJy0=
 github.com/arran4/golang-ical v0.0.0-20210720004158-ffffad53d7ed/go.mod h1:3Fo6aCavD4wY7KNzi6z9D6e20a6FdqD/tIaHlU7GnMI=
