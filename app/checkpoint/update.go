@@ -43,6 +43,7 @@ var CorrectButton = Selector.Data("", "")
 var FirstWrongButton = Selector.Data("", "")
 var SecondWrongButton = Selector.Data("", "")
 var ThirdWrongButton = Selector.Data("", "")
+var question = ""
 
 func GetQuestionWithButtons() (string, []telebot.Btn) {
 	questions := [][]string{
@@ -110,7 +111,6 @@ func JoinMessageUpdate() error {
 			accepted = append(accepted, user)
 		}
 	}
-	var question string
 	if Border.NeedCreate {
 		var buttons []telebot.Btn
 		question, buttons = GetQuestionWithButtons()
