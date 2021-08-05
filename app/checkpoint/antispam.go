@@ -66,6 +66,19 @@ func AddToBlackList(context telebot.Context) error {
 	return context.Reply(fmt.Sprintf("URL <code>%v</code> добавлен в черный список.", link.URL))
 }
 
+func DelAntispamLink(context telebot.Context) error {
+	if context.Data() == "" {
+		return context.Reply("Нужно указать URL или его часть.")
+	}
+	var link utils.AntiSpamLink
+	link.URL = context.Data()
+	result := utils.DB.Delete(link)
+	if result.Error != nil {
+		return context.Reply(fmt.Sprintf("Ошибка запроса: <code>%v</code>", result.Error.Error()))
+	}
+	return context.Reply(fmt.Sprintf("URL <code>%v</code> удалён.", link.URL))
+}
+
 func ListAntispamLinks(context telebot.Context) error {
 	var list = "Список URL фильтров:\n\n"
 	result, err := utils.DB.Model(utils.AntiSpamLink{}).Rows()
