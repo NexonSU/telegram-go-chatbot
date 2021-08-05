@@ -47,14 +47,14 @@ func GetSpamChance(user telebot.User) int {
 		res, _ := http.Get(fmt.Sprintf("https://t.me/%v", user.Username))
 		data := new(MetaData)
 		if m.Metabolize(res.Body, data) == nil {
-			if data.Description[:15] == "You can contact" {
+			if len(data.Description) > 15 && data.Description[:15] == "You can contact" {
 				spamchance += 10
 				log.Printf("%v - no bio - %v", user.FirstName, spamchance)
 			} else {
 				spamchance -= 10
 				log.Printf("%v - has bio - %v", user.FirstName, spamchance)
 				if strings.Contains(data.Description, "http") {
-					spamchance += 20
+					spamchance += 40
 				}
 			}
 		}
