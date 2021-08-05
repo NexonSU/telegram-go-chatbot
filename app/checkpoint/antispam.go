@@ -41,8 +41,8 @@ func GetSpamChance(user telebot.User) int {
 	if photoCount > 5 {
 		photoCount = 5
 	}
-	spamchance -= len(photos)*10 - 20
-	log.Printf("%v - %v photos - %v", user.FirstName, len(photos), spamchance)
+	spamchance -= photoCount*10 - 20
+	log.Printf("%v - %v photos - %v", user.FirstName, photoCount, spamchance)
 	//ID
 	spamchance += int(float64(user.ID)/float64(MaximumIdFromDB)*100) - 50
 	log.Printf("%v - id %v - %v", user.FirstName, user.ID, spamchance)
