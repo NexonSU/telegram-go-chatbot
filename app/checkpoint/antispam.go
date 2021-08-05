@@ -26,9 +26,15 @@ func GetMaximumIdFromDB() int64 {
 }
 
 func CommandGetSpamChance(context telebot.Context) error {
-	user, _, err := utils.FindUserInMessage(context)
-	if err != nil {
-		return context.Reply(err.Error())
+	var user telebot.User
+	var err error
+	if len(context.Args()) == 0 {
+		user = *context.Sender()
+	} else {
+		user, _, err = utils.FindUserInMessage(context)
+		if err != nil {
+			return context.Reply(err.Error())
+		}
 	}
 	spamchance := GetSpamChance(user)
 	return context.Reply(fmt.Sprintf("%v спамер на %v процентов.", utils.UserFullName(&user), spamchance))
