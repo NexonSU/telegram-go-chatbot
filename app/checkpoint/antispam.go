@@ -47,7 +47,7 @@ func AddToWhiteList(context telebot.Context) error {
 	if result.Error != nil {
 		return context.Reply(fmt.Sprintf("Ошибка запроса: <code>%v</code>", result.Error.Error()))
 	}
-	return context.Reply(fmt.Sprintf("URL <code>%v</code> добавлен в белый список.", result.Error.Error()))
+	return context.Reply(fmt.Sprintf("URL <code>%v</code> добавлен в белый список.", link.URL))
 }
 
 func AddToBlackList(context telebot.Context) error {
@@ -63,7 +63,7 @@ func AddToBlackList(context telebot.Context) error {
 	if result.Error != nil {
 		return context.Reply(fmt.Sprintf("Ошибка запроса: <code>%v</code>", result.Error.Error()))
 	}
-	return context.Reply(fmt.Sprintf("URL <code>%v</code> добавлен в черный список.", result.Error.Error()))
+	return context.Reply(fmt.Sprintf("URL <code>%v</code> добавлен в черный список.", link.URL))
 }
 
 func ListAntispamLinks(context telebot.Context) error {
