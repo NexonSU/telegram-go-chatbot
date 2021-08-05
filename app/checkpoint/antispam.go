@@ -68,7 +68,7 @@ func AddToBlackList(context telebot.Context) error {
 
 func ListAntispamLinks(context telebot.Context) error {
 	var list = "Список URL фильтров:\n\n"
-	result, err := utils.DB.Find(utils.AntiSpamLink{}).Rows()
+	result, err := utils.DB.Model(utils.AntiSpamLink{}).Rows()
 	if err != nil {
 		return err
 	}
