@@ -80,7 +80,7 @@ func ListAntispamLinks(context telebot.Context) error {
 		}
 		list += fmt.Sprintf("%v - %v\n", link.URL, link.Type)
 	}
-	return context.Reply(list)
+	return context.Reply(list, telebot.SendOptions{DisableWebPagePreview: true})
 }
 
 func GetSpamChance(user telebot.User) int {
