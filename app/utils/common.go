@@ -11,6 +11,7 @@ import (
 	"runtime"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"gopkg.in/tucnak/telebot.v3"
@@ -136,7 +137,7 @@ func GetUserFromDB(findstring string) (telebot.User, error) {
 	} else {
 		user.ID, err = strconv.ParseInt(findstring, 10, 64)
 	}
-	result := DB.Where(&user).First(&user)
+	result := DB.Where("lower(username) = ? OR id = ?", strings.ToLower(user.Username), user.ID).First(&user)
 	if result.Error != nil {
 		err = result.Error
 	}

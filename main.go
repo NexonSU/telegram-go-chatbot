@@ -30,6 +30,7 @@ func main() {
 	utils.Bot.Handle("/kill", commands.Kill, middleware.ModerLevel)
 	utils.Bot.Handle("/addnope", commands.AddNope, middleware.ModerLevel)
 	utils.Bot.Handle("/setgetowner", commands.SetGetOwner, middleware.ModerLevel)
+	utils.Bot.Handle("/getspamchance", checkpoint.CommandGetSpamChance, middleware.ModerLevel)
 	utils.Bot.Handle("/admin", commands.Admin, middleware.ChatLevel)
 	utils.Bot.Handle("/get", commands.Get, middleware.ChatLevel)
 	utils.Bot.Handle("/getall", commands.Getall, middleware.ChatLevel)

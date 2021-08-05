@@ -22,3 +22,12 @@ func ChannelOnly(next telebot.HandlerFunc) telebot.HandlerFunc {
 		return nil
 	}
 }
+
+func CommentChatOnly(next telebot.HandlerFunc) telebot.HandlerFunc {
+	return func(context telebot.Context) error {
+		if utils.Config.Telegram.CommentChat == context.Chat().ID {
+			return next(context)
+		}
+		return nil
+	}
+}

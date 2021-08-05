@@ -12,6 +12,7 @@ type Configuration struct {
 		//your token
 		Token          string   `json:"token"`
 		Chat           string   `json:"chat"` //your main chat
+		CommentChat    int64    `json:"comment_chat"`
 		Channel        string   `json:"channel"`
 		BotApiUrl      string   `json:"bot_api_url"`
 		Admins         []string `json:"admins"`
