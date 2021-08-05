@@ -142,7 +142,7 @@ func UrlFilter(context telebot.Context) error {
 			if result.Error != nil {
 				return nil
 			}
-			if GetSpamChance(*context.Sender()) > 50 && result.RowsAffected == 0 && link.Type == "blacklist" {
+			if result.RowsAffected != 0 && GetSpamChance(*context.Sender()) > 50 && link.Type == "blacklist" {
 				return context.Delete()
 			}
 		}
