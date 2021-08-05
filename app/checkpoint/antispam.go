@@ -138,7 +138,7 @@ func UrlFilter(context telebot.Context) error {
 			var link utils.AntiSpamLink
 			runes := []rune(context.Message().Text)
 			url := string(runes[entity.Offset : entity.Offset+entity.Length])
-			result := utils.DB.Where("url LIKE ?", url).First(&link)
+			result := utils.DB.Where("instr(?, lower(url)) > 1", strings.ToLower(url)).First(&link)
 			if result.Error != nil {
 				return nil
 			}
