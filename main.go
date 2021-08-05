@@ -30,7 +30,10 @@ func main() {
 	utils.Bot.Handle("/kill", commands.Kill, middleware.ModerLevel)
 	utils.Bot.Handle("/addnope", commands.AddNope, middleware.ModerLevel)
 	utils.Bot.Handle("/setgetowner", commands.SetGetOwner, middleware.ModerLevel)
-	utils.Bot.Handle("/getspamchance", checkpoint.CommandGetSpamChance, middleware.ModerLevel)
+	utils.Bot.Handle("/addtowhitelist", checkpoint.AddToWhiteList, middleware.ModerLevel)
+	utils.Bot.Handle("/addtoblacklist", checkpoint.AddToBlackList, middleware.ModerLevel)
+	utils.Bot.Handle("/listantispamlinks", checkpoint.ListAntispamLinks, middleware.ModerLevel)
+	utils.Bot.Handle("/getspamchance", checkpoint.CommandGetSpamChance, middleware.ChatLevel)
 	utils.Bot.Handle("/admin", commands.Admin, middleware.ChatLevel)
 	utils.Bot.Handle("/get", commands.Get, middleware.ChatLevel)
 	utils.Bot.Handle("/getall", commands.Getall, middleware.ChatLevel)
@@ -70,6 +73,9 @@ func main() {
 	//Repost channel post to chat
 	utils.Bot.Handle(telebot.OnChannelPost, utils.Repost, middleware.ChannelOnly)
 	utils.Bot.Handle(telebot.OnEditedChannelPost, utils.EditRepost, middleware.ChannelOnly)
+
+	//Filter URL in comment chat
+	utils.Bot.Handle(telebot.OnText, checkpoint.UrlFilter, middleware.CommentChatOnly)
 
 	//User join
 	utils.Bot.Handle(telebot.OnChatMember, checkpoint.ChatMemberUpdate, middleware.ChatOnly)

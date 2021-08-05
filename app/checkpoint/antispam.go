@@ -9,6 +9,7 @@ import (
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	m "github.com/keighl/metabolize"
 	"gopkg.in/tucnak/telebot.v3"
+	"gorm.io/gorm/clause"
 )
 
 type MetaData struct {
@@ -30,7 +31,56 @@ func CommandGetSpamChance(context telebot.Context) error {
 		return context.Reply(err.Error())
 	}
 	spamchance := GetSpamChance(user)
-	return context.Reply(fmt.Sprintf("%v", spamchance))
+	return context.Reply(fmt.Sprintf("%v спамер на %v процентов.", utils.UserFullName(&user), spamchance))
+}
+
+func AddToWhiteList(context telebot.Context) error {
+	if context.Data() == "" {
+		return context.Reply("Нужно указать URL или его часть.")
+	}
+	var link utils.AntiSpamLink
+	link.URL = context.Data()
+	link.Type = "whitelist"
+	result := utils.DB.Clauses(clause.OnConflict{
+		UpdateAll: true,
+	}).Create(link)
+	if result.Error != nil {
+		return context.Reply(fmt.Sprintf("Ошибка запроса: <code>%v</code>", result.Error.Error()))
+	}
+	return context.Reply(fmt.Sprintf("URL <code>%v</code> добавлен в белый список.", result.Error.Error()))
+}
+
+func AddToBlackList(context telebot.Context) error {
+	if context.Data() == "" {
+		return context.Reply("Нужно указать URL или его часть.")
+	}
+	var link utils.AntiSpamLink
+	link.URL = context.Data()
+	link.Type = "blacklist"
+	result := utils.DB.Clauses(clause.OnConflict{
+		UpdateAll: true,
+	}).Create(link)
+	if result.Error != nil {
+		return context.Reply(fmt.Sprintf("Ошибка запроса: <code>%v</code>", result.Error.Error()))
+	}
+	return context.Reply(fmt.Sprintf("URL <code>%v</code> добавлен в черный список.", result.Error.Error()))
+}
+
+func ListAntispamLinks(context telebot.Context) error {
+	var list = "Список URL фильтров:\n\n"
+	result, err := utils.DB.Find(utils.AntiSpamLink{}).Rows()
+	if err != nil {
+		return err
+	}
+	for result.Next() {
+		var link utils.AntiSpamLink
+		err := utils.DB.ScanRows(result, &link)
+		if err != nil {
+			return err
+		}
+		list += fmt.Sprintf("%v - %v\n", link.URL, link.Type)
+	}
+	return context.Reply(list)
 }
 
 func GetSpamChance(user telebot.User) int {
@@ -67,4 +117,25 @@ func GetSpamChance(user telebot.User) int {
 		log.Printf("%v - no username - %v", user.FirstName, spamchance)
 	}
 	return spamchance
+}
+
+func UrlFilter(context telebot.Context) error {
+	for _, entity := range context.Message().Entities {
+		if entity.Type == "url" {
+			var link utils.AntiSpamLink
+			runes := []rune(context.Message().Text)
+			url := string(runes[entity.Offset : entity.Offset+entity.Length])
+			result := utils.DB.Where("url LIKE ?", url).First(&link)
+			if result.Error != nil {
+				return nil
+			}
+			if link.Type == "blacklist" {
+				return context.Delete()
+			}
+			if GetSpamChance(*context.Sender()) > 50 && result.RowsAffected == 0 {
+				return context.Delete()
+			}
+		}
+	}
+	return nil
 }
