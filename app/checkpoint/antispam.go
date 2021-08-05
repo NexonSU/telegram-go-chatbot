@@ -43,7 +43,7 @@ func AddToWhiteList(context telebot.Context) error {
 	link.Type = "whitelist"
 	result := utils.DB.Clauses(clause.OnConflict{
 		UpdateAll: true,
-	}).Create(link)
+	}).Create(&link)
 	if result.Error != nil {
 		return context.Reply(fmt.Sprintf("Ошибка запроса: <code>%v</code>", result.Error.Error()))
 	}
@@ -59,7 +59,7 @@ func AddToBlackList(context telebot.Context) error {
 	link.Type = "blacklist"
 	result := utils.DB.Clauses(clause.OnConflict{
 		UpdateAll: true,
-	}).Create(link)
+	}).Create(&link)
 	if result.Error != nil {
 		return context.Reply(fmt.Sprintf("Ошибка запроса: <code>%v</code>", result.Error.Error()))
 	}
