@@ -2,12 +2,15 @@ package checkpoint
 
 import (
 	"fmt"
-	"log"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	m "github.com/keighl/metabolize"
+	"github.com/valyala/fastjson"
 	"gopkg.in/tucnak/telebot.v3"
 	"gorm.io/gorm/clause"
 )
@@ -111,10 +114,8 @@ func GetSpamChance(user telebot.User) int {
 		photoCount = 5
 	}
 	spamchance -= photoCount*10 - 20
-	log.Printf("%v - %v photos - %v", user.FirstName, photoCount, spamchance)
 	//ID
 	spamchance += int(float64(user.ID)/float64(MaximumIdFromDB)*100) - 50
-	log.Printf("%v - id %v - %v", user.FirstName, user.ID, spamchance)
 	//Bio
 	if user.Username != "" {
 		res, _ := http.Get(fmt.Sprintf("https://t.me/%v", user.Username))
@@ -122,10 +123,8 @@ func GetSpamChance(user telebot.User) int {
 		if m.Metabolize(res.Body, data) == nil {
 			if len(data.Description) > 15 && data.Description[:15] == "You can contact" {
 				spamchance += 10
-				log.Printf("%v - no bio - %v", user.FirstName, spamchance)
 			} else {
 				spamchance -= 10
-				log.Printf("%v - has bio - %v", user.FirstName, spamchance)
 				if strings.Contains(data.Description, "http") {
 					spamchance += 40
 				}
@@ -133,12 +132,20 @@ func GetSpamChance(user telebot.User) int {
 		}
 	} else {
 		spamchance += 10
-		log.Printf("%v - no username - %v", user.FirstName, spamchance)
 	}
 	return spamchance
 }
 
 func UrlFilter(context telebot.Context) error {
+	httpClient := &http.Client{Timeout: 10 * time.Second}
+	httpResponse, _ := httpClient.Get(fmt.Sprintf("https://api.cas.chat/check?user_id=%v", context.Sender().ID))
+	defer func(Body io.ReadCloser) {
+		Body.Close()
+	}(httpResponse.Body)
+	jsonBytes, _ := ioutil.ReadAll(httpResponse.Body)
+	if fastjson.GetBool(jsonBytes, "ok") {
+		return context.Delete()
+	}
 	for _, entity := range context.Message().Entities {
 		if entity.Type == "url" {
 			var link utils.AntiSpamLink
