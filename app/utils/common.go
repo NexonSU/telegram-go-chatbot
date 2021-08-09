@@ -105,9 +105,16 @@ func FindUserInMessage(context telebot.Context) (telebot.User, int64, error) {
 			err = errors.New("пользователь не найден")
 			return user, untildate, err
 		}
-		user, err = GetUserFromDB(context.Args()[0])
-		if err != nil {
-			return user, untildate, err
+		for _, entity := range context.Message().Entities {
+			if entity.Type == telebot.EntityTMention {
+				user = *entity.User
+			}
+		}
+		if user.ID == 0 {
+			user, err = GetUserFromDB(context.Args()[0])
+			if err != nil {
+				return user, untildate, err
+			}
 		}
 		if len(context.Args()) == 2 {
 			addtime, err := strconv.ParseInt(context.Args()[1], 10, 64)

@@ -31,7 +31,7 @@ func GetMaximumIdFromDB() int64 {
 func CommandGetSpamChance(context telebot.Context) error {
 	var user telebot.User
 	var err error
-	if len(context.Args()) == 0 {
+	if len(context.Args()) == 0 && context.Message().ReplyTo == nil {
 		user = *context.Sender()
 	} else {
 		user, _, err = utils.FindUserInMessage(context)
