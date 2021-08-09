@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	"gopkg.in/tucnak/telebot.v3"
 )
 
@@ -10,5 +11,5 @@ func Say(context telebot.Context) error {
 		return context.Reply("Укажите сообщение.")
 	}
 	context.Delete()
-	return context.Send(context.Data())
+	return context.Send(utils.GetHtmlText(*context.Message()))
 }
