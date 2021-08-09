@@ -74,7 +74,7 @@ func OnInline(context telebot.Context) error {
 			}
 			results[i].SetContent(telebot.InputMessageContent(&telebot.InputTextMessageContent{
 				Text:      fmt.Sprintf("<b>%v</b>\n%v", get.Name, get.Data),
-				ParseMode: "HTML",
+				ParseMode: telebot.ModeHTML,
 			}))
 		default:
 			log.Printf("Не удалось отправить гет %v через inline.", get.Name)
