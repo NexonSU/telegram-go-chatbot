@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf16"
 
 	"gopkg.in/tucnak/telebot.v3"
 	"gorm.io/gorm/clause"
@@ -215,23 +216,7 @@ func Repost(context telebot.Context) error {
 		return nil
 	}
 
-	var ChatMessage *telebot.Message
-	switch {
-	case context.Message().Animation != nil:
-		ChatMessage, err = Bot.Send(chat, &telebot.Animation{File: context.Message().Animation.File, Caption: context.Message().Caption})
-	case context.Message().Audio != nil:
-		ChatMessage, err = Bot.Send(chat, &telebot.Audio{File: context.Message().Audio.File, Caption: context.Message().Caption})
-	case context.Message().Photo != nil:
-		ChatMessage, err = Bot.Send(chat, &telebot.Photo{File: context.Message().Photo.File, Caption: context.Message().Caption})
-	case context.Message().Video != nil:
-		ChatMessage, err = Bot.Send(chat, &telebot.Video{File: context.Message().Video.File, Caption: context.Message().Caption})
-	case context.Message().Voice != nil:
-		ChatMessage, err = Bot.Send(chat, &telebot.Voice{File: context.Message().Voice.File, Caption: context.Message().Caption})
-	case context.Message().Document != nil:
-		ChatMessage, err = Bot.Send(chat, &telebot.Document{File: context.Message().Document.File, Caption: context.Message().Caption})
-	default:
-		ChatMessage, err = Bot.Send(chat, context.Message().Text)
-	}
+	ChatMessage, err := Bot.Copy(chat, context.Message())
 	Forward.ForwardedMesssages = append(Forward.ForwardedMesssages, ForwardedMesssage{context.Message(), *ChatMessage})
 	return err
 }
@@ -271,4 +256,62 @@ func GetNope() string {
 	var nope Nope
 	DB.Model(Nope{}).Order("RANDOM()").First(&nope)
 	return nope.Text
+}
+
+func GetHtmlText(message telebot.Message) string {
+	type entity struct {
+		s string
+		i int
+	}
+
+	entities := message.Entities
+	text := utf16.Encode([]rune(message.Text))
+
+	if len(message.Text) == 0 {
+		entities = message.CaptionEntities
+		text = utf16.Encode([]rune(message.Caption))
+	}
+
+	ents := make([]entity, 0, len(entities)*2)
+
+	for _, ent := range entities {
+		var a, b string
+
+		switch ent.Type {
+		case telebot.EntityBold, telebot.EntityItalic,
+			telebot.EntityUnderline, telebot.EntityStrikethrough:
+			a = fmt.Sprintf("<%c>", ent.Type[0])
+			b = a[:1] + "/" + a[1:]
+		case telebot.EntityCode, telebot.EntityCodeBlock:
+			a = fmt.Sprintf("<%s>", ent.Type)
+			b = a[:1] + "/" + a[1:]
+		case telebot.EntityTextLink:
+			a = fmt.Sprintf("<a href='%s'>", ent.URL)
+			b = "</a>"
+		case telebot.EntityTMention:
+			a = fmt.Sprintf("<a href='tg://user?id=%d'>", ent.User.ID)
+			b = "</a>"
+		default:
+			continue
+		}
+
+		ents = append(ents, entity{a, ent.Offset})
+		ents = append(ents, entity{b, ent.Offset + ent.Length})
+	}
+
+	// reverse entities
+	for i, j := 0, len(ents)-1; i < j; i, j = i+1, j-1 {
+		ents[i], ents[j] = ents[j], ents[i]
+	}
+
+	for _, ent := range ents {
+		r := utf16.Encode([]rune(ent.s))
+		text = append(text[:ent.i], append(r, text[ent.i:]...)...)
+	}
+
+	if len(message.Entities) != 0 && message.Entities[0].Type == telebot.EntityCommand {
+		text = text[message.Entities[0].Length+1:]
+	}
+
+	return string(utf16.Decode(text))
 }

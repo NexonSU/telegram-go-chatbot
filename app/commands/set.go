@@ -18,9 +18,9 @@ func Set(context telebot.Context) error {
 	get.Name = strings.ToLower(context.Args()[0])
 	if context.Message().ReplyTo == nil && len(context.Args()) > 1 {
 		get.Type = "Text"
-		get.Data = strings.Join(context.Args()[1:], " ")
+		get.Data = utils.GetHtmlText(*context.Message())
 	} else if context.Message().ReplyTo != nil && len(context.Args()) == 1 {
-		get.Caption = context.Message().ReplyTo.Caption
+		get.Caption = utils.GetHtmlText(*context.Message().ReplyTo)
 		switch {
 		case context.Message().ReplyTo.Animation != nil:
 			get.Type = "Animation"
