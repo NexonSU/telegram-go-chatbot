@@ -224,7 +224,23 @@ func Repost(context telebot.Context) error {
 		return nil
 	}
 
-	ChatMessage, err := Bot.Copy(chat, context.Message())
+	var ChatMessage *telebot.Message
+	switch {
+	case context.Message().Animation != nil:
+		ChatMessage, err = Bot.Send(chat, &telebot.Animation{File: context.Message().Animation.File, Caption: context.Message().Caption})
+	case context.Message().Audio != nil:
+		ChatMessage, err = Bot.Send(chat, &telebot.Audio{File: context.Message().Audio.File, Caption: context.Message().Caption})
+	case context.Message().Photo != nil:
+		ChatMessage, err = Bot.Send(chat, &telebot.Photo{File: context.Message().Photo.File, Caption: GetHtmlText(*context.Message()), ParseMode: telebot.ModeHTML})
+	case context.Message().Video != nil:
+		ChatMessage, err = Bot.Send(chat, &telebot.Video{File: context.Message().Video.File, Caption: context.Message().Caption})
+	case context.Message().Voice != nil:
+		ChatMessage, err = Bot.Send(chat, &telebot.Voice{File: context.Message().Voice.File, Caption: context.Message().Caption})
+	case context.Message().Document != nil:
+		ChatMessage, err = Bot.Send(chat, &telebot.Document{File: context.Message().Document.File, Caption: context.Message().Caption})
+	default:
+		ChatMessage, err = Bot.Send(chat, GetHtmlText(*context.Message()))
+	}
 	Forward.ForwardedMesssages = append(Forward.ForwardedMesssages, ForwardedMesssage{context.Message(), *ChatMessage})
 	return err
 }
@@ -236,17 +252,17 @@ func EditRepost(context telebot.Context) error {
 		if ForwardedMesssage.ChannelMessage.ID == context.Message().ID {
 			switch {
 			case context.Message().Animation != nil:
-				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Animation{File: context.Message().Animation.File, Caption: GetHtmlText(*context.Message())})
+				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Animation{File: context.Message().Animation.File, Caption: context.Message().Caption})
 			case context.Message().Audio != nil:
-				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Audio{File: context.Message().Audio.File, Caption: GetHtmlText(*context.Message())})
+				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Audio{File: context.Message().Audio.File, Caption: context.Message().Caption})
 			case context.Message().Photo != nil:
-				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Photo{File: context.Message().Photo.File, Caption: GetHtmlText(*context.Message())})
+				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Photo{File: context.Message().Photo.File, Caption: context.Message().Caption})
 			case context.Message().Video != nil:
-				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Video{File: context.Message().Video.File, Caption: GetHtmlText(*context.Message())})
+				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Video{File: context.Message().Video.File, Caption: context.Message().Caption})
 			case context.Message().Voice != nil:
-				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Voice{File: context.Message().Voice.File, Caption: GetHtmlText(*context.Message())})
+				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Voice{File: context.Message().Voice.File, Caption: context.Message().Caption})
 			case context.Message().Document != nil:
-				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Document{File: context.Message().Document.File, Caption: GetHtmlText(*context.Message())})
+				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Document{File: context.Message().Document.File, Caption: context.Message().Caption})
 			default:
 				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, GetHtmlText(*context.Message()))
 			}
