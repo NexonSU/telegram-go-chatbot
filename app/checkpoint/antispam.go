@@ -40,7 +40,10 @@ func CommandGetSpamChance(context telebot.Context) error {
 		}
 	}
 	spamchance := GetSpamChance(user)
-	return context.Reply(fmt.Sprintf("%v спамер на %v процентов.", utils.UserFullName(&user), spamchance))
+	if spamchance < 0 {
+		spamchance = 0
+	}
+	return context.Reply(fmt.Sprintf("%v спамер на %v%%.", utils.UserFullName(&user), spamchance))
 }
 
 func AddToWhiteList(context telebot.Context) error {
