@@ -80,10 +80,10 @@ func RestrictionTimeMessage(seconds int64) string {
 
 func ErrorReporting(err error, context telebot.Context) {
 	_, fn, line, _ := runtime.Caller(1)
-	log.Printf("[%s:%d] %v at MessageID \"%v\" in Chat \"%v\"", fn, line, err, context.Message().ID, context.Chat().Username)
-	MarshalledMessage, _ := json.MarshalIndent(context.Message(), "", "    ")
+	log.Printf("[%s:%d] %v", fn, line, err)
+	MarshalledMessage, _ := json.MarshalIndent(context, "", "    ")
 	JsonMessage := html.EscapeString(string(MarshalledMessage))
-	text := fmt.Sprintf("An exception was raised while handling an update\n<pre>%v</pre>\n\nMessage:\n<pre>%v</pre>", err, JsonMessage)
+	text := fmt.Sprintf("[%s:%d] %v\nContext:\n<pre>%v</pre>", fn, line, err, JsonMessage)
 	Bot.Send(telebot.ChatID(Config.Telegram.SysAdmin), text)
 }
 
