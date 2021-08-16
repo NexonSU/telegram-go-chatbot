@@ -62,7 +62,7 @@ func main() {
 	utils.Bot.Handle("/suicide", commands.Blessing, middleware.ChatLevel)
 
 	//Inline
-	utils.Bot.Handle(telebot.OnQuery, services.OnInline, middleware.ChatLevel)
+	utils.Bot.Handle(telebot.OnQuery, services.OnInline)
 
 	//Russian Roulette duels
 	utils.Bot.Handle("/russianroulette", duel.Request, middleware.ChatOnly)
