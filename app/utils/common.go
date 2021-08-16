@@ -2,10 +2,8 @@ package utils
 
 import (
 	"crypto/rand"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"html"
 	"log"
 	"math/big"
 	"runtime"
@@ -81,9 +79,7 @@ func RestrictionTimeMessage(seconds int64) string {
 func ErrorReporting(err error, context telebot.Context) {
 	_, fn, line, _ := runtime.Caller(1)
 	log.Printf("[%s:%d] %v", fn, line, err)
-	MarshalledMessage, _ := json.MarshalIndent(context, "", "    ")
-	JsonMessage := html.EscapeString(string(MarshalledMessage))
-	text := fmt.Sprintf("[%s:%d] %v\nContext:\n<pre>%v</pre>", fn, line, err, JsonMessage)
+	text := fmt.Sprintf("<pre>[%s:%d]\n%v</pre>", fn, line, err)
 	Bot.Send(telebot.ChatID(Config.Telegram.SysAdmin), text)
 }
 
