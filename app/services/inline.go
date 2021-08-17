@@ -12,14 +12,18 @@ import (
 //Answer on inline query
 func OnInline(context telebot.Context) error {
 	var count int64
-	gets := utils.DB.Limit(50).Model(utils.Get{}).Where("name LIKE ?", "%"+context.Data()+"%").Count(&count)
+	query := context.Query().Text
+	if query == "" {
+		return context.Answer(&telebot.QueryResponse{})
+	}
+	gets := utils.DB.Limit(10).Model(utils.Get{}).Where("name LIKE ?", query+"%").Count(&count)
 	get_rows, err := gets.Rows()
 	if err != nil {
 		log.Println(err.Error())
 		return err
 	}
-	if count > 50 {
-		count = 50
+	if count > 10 {
+		count = 10
 	}
 	results := make(telebot.Results, count)
 	var i int
@@ -38,7 +42,7 @@ func OnInline(context telebot.Context) error {
 				Cache:   get.Data,
 			}
 		case get.Type == "Audio":
-			results[i] = &telebot.AudioResult{
+			results[i] = &telebot.DocumentResult{
 				Title:   get.Name,
 				Caption: get.Caption,
 				Cache:   get.Data,
@@ -83,6 +87,9 @@ func OnInline(context telebot.Context) error {
 		results[i].SetResultID(strconv.Itoa(i))
 
 		i++
+		if i >= int(count) {
+			continue
+		}
 	}
 
 	return context.Answer(&telebot.QueryResponse{
