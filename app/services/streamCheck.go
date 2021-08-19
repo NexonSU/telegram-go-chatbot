@@ -36,7 +36,7 @@ func zavtraStreamCheck(service string) error {
 		}
 		var stream utils.ZavtraStream
 		var httpClient = &http.Client{Timeout: 10 * time.Second}
-		r, err := httpClient.Get(fmt.Sprintf("https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=%v&type=video&eventType=live&key=%v", utils.Config.Youtube.ChannelID, utils.Config.Youtube.ApiKey))
+		r, err := httpClient.Get(fmt.Sprintf("https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=%v&type=video&eventType=live&key=%v&%v", utils.Config.Youtube.ChannelID, utils.Config.Youtube.ApiKey, time.Now().Unix()))
 		if err != nil {
 			return err
 		}
