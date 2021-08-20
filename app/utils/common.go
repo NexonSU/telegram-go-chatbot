@@ -285,12 +285,16 @@ func GetHtmlText(message telebot.Message) string {
 	}
 
 	entities := message.Entities
-	text := utf16.Encode([]rune(message.Text))
+	textString := message.Text
 
 	if len(message.Text) == 0 {
 		entities = message.CaptionEntities
-		text = utf16.Encode([]rune(message.Caption))
+		textString = message.Caption
 	}
+
+	textString = strings.ReplaceAll(textString, "<", "˂")
+	textString = strings.ReplaceAll(textString, ">", "˃")
+	text := utf16.Encode([]rune(textString))
 
 	ents := make([]entity, 0, len(entities)*2)
 
