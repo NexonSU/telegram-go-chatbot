@@ -333,9 +333,15 @@ func GetHtmlText(message telebot.Message) string {
 		text = append(text[:ent.i], append(r, text[ent.i:]...)...)
 	}
 
+	textString = string(utf16.Decode(text))
+
 	if len(message.Entities) != 0 && message.Entities[0].Type == telebot.EntityCommand {
-		text = text[message.Entities[0].Length+1:]
+		if textString[1:4] == "set" {
+			textString = strings.Join(strings.Split(textString, " ")[2:], " ")
+		} else {
+			textString = textString[message.Entities[0].Length+1:]
+		}
 	}
 
-	return string(utf16.Decode(text))
+	return textString
 }
