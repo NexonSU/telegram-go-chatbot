@@ -20,6 +20,9 @@ func Pidorstats(context telebot.Context) error {
 		if err != nil {
 			return context.Reply("Ошибка определения года.\nУкажите год с 2019.")
 		}
+		if argYear == 2077 {
+			return context.Reply(&telebot.Video{File: telebot.File{FileID: "BAACAgIAAx0CRXO-MQADWWB4LQABzrOqWPkq-JXIi4TIixY4dwACPw4AArBgwUt5sRu-_fDR5x4E"}})
+		}
 		if argYear < year && argYear > 2018 {
 			year = argYear
 		}
