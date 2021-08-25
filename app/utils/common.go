@@ -87,12 +87,25 @@ func FindUserInMessage(context telebot.Context) (telebot.User, int64, error) {
 	var user telebot.User
 	var err error = nil
 	var untildate = time.Now().Unix()
+	for _, entity := range context.Message().Entities {
+		if entity.Type == telebot.EntityTMention {
+			user = *entity.User
+			if len(context.Args()) == 2 {
+				addtime, err := strconv.ParseInt(context.Args()[1], 10, 64)
+				if err != nil {
+					return user, untildate, err
+				}
+				untildate += addtime
+			}
+			return user, untildate, err
+		}
+	}
 	if context.Message().ReplyTo != nil {
 		user = *context.Message().ReplyTo.Sender
 		if len(context.Args()) == 1 {
 			addtime, err := strconv.ParseInt(context.Args()[0], 10, 64)
 			if err != nil {
-				return user, untildate, err
+				return user, untildate, errors.New("время указано неверно")
 			}
 			untildate += addtime
 		}
@@ -100,11 +113,6 @@ func FindUserInMessage(context telebot.Context) (telebot.User, int64, error) {
 		if len(context.Args()) == 0 {
 			err = errors.New("пользователь не найден")
 			return user, untildate, err
-		}
-		for _, entity := range context.Message().Entities {
-			if entity.Type == telebot.EntityTMention {
-				user = *entity.User
-			}
 		}
 		if user.ID == 0 {
 			user, err = GetUserFromDB(context.Args()[0])
@@ -115,7 +123,7 @@ func FindUserInMessage(context telebot.Context) (telebot.User, int64, error) {
 		if len(context.Args()) == 2 {
 			addtime, err := strconv.ParseInt(context.Args()[1], 10, 64)
 			if err != nil {
-				return user, untildate, err
+				return user, untildate, errors.New("время указано неверно")
 			}
 			untildate += addtime
 		}
