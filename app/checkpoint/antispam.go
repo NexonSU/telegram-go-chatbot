@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"unicode/utf16"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	m "github.com/keighl/metabolize"
@@ -150,19 +151,24 @@ func UrlFilter(context telebot.Context) error {
 	}(httpResponse.Body)
 	jsonBytes, _ := ioutil.ReadAll(httpResponse.Body)
 	if fastjson.GetBool(jsonBytes, "ok") {
+		text := fmt.Sprintf("Сообщение пользователя %v было удалено, т.к. он забанен CAS:\n<pre>%v</pre>", utils.MentionUser(context.Sender()), context.Message().Text)
+		utils.Bot.Send(telebot.ChatID(utils.Config.Telegram.SysAdmin), text)
 		return context.Delete()
 	}
+	if GetSpamChance(*context.Sender()) < 50 {
+		return nil
+	}
+	var blacklist []utils.AntiSpamLink
+	utils.DB.Where(&utils.AntiSpamLink{Type: "blacklist"}).Find(&blacklist)
 	for _, entity := range context.Message().Entities {
 		if entity.Type == "url" {
-			var link utils.AntiSpamLink
-			runes := []rune(context.Message().Text)
-			url := string(runes[entity.Offset : entity.Offset+entity.Length])
-			result := utils.DB.Where("instr(?, lower(url)) > 1", strings.ToLower(url)).First(&link)
-			if result.Error != nil {
-				return nil
-			}
-			if result.RowsAffected != 0 && GetSpamChance(*context.Sender()) > 50 && link.Type == "blacklist" {
-				return context.Delete()
+			for _, forbiddenUrl := range blacklist {
+				url := string(utf16.Decode(utf16.Encode([]rune(context.Message().Text))[entity.Offset : entity.Offset+entity.Length]))
+				if strings.Contains(url, forbiddenUrl.URL) {
+					text := fmt.Sprintf("Сообщение пользователя %v было удалено, т.к. URL запрещен:\n<pre>%v</pre>", utils.MentionUser(context.Sender()), context.Message().Text)
+					utils.Bot.Send(telebot.ChatID(utils.Config.Telegram.SysAdmin), text)
+					return context.Delete()
+				}
 			}
 		}
 	}
