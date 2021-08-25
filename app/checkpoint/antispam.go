@@ -140,6 +140,9 @@ func GetSpamChance(user telebot.User) int {
 }
 
 func UrlFilter(context telebot.Context) error {
+	if context.Sender().ID == 777000 {
+		return nil
+	}
 	httpClient := &http.Client{Timeout: 10 * time.Second}
 	httpResponse, _ := httpClient.Get(fmt.Sprintf("https://api.cas.chat/check?user_id=%v", context.Sender().ID))
 	defer func(Body io.ReadCloser) {
