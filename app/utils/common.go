@@ -2,8 +2,10 @@ package utils
 
 import (
 	"crypto/rand"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"html"
 	"log"
 	"math/big"
 	"runtime"
@@ -80,6 +82,11 @@ func ErrorReporting(err error, context telebot.Context) {
 	_, fn, line, _ := runtime.Caller(1)
 	log.Printf("[%s:%d] %v", fn, line, err)
 	text := fmt.Sprintf("<pre>[%s:%d]\n%v</pre>", fn, line, err)
+	if context.Message() != nil {
+		MarshalledMessage, _ := json.MarshalIndent(context.Message(), "", "    ")
+		JsonMessage := html.EscapeString(string(MarshalledMessage))
+		text += fmt.Sprintf("\n\nMessage:\n<pre>%v</pre>", JsonMessage)
+	}
 	Bot.Send(telebot.ChatID(Config.Telegram.SysAdmin), text)
 }
 
