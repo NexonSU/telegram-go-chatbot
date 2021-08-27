@@ -155,7 +155,7 @@ func UrlFilter(context telebot.Context) error {
 		utils.Bot.Send(telebot.ChatID(utils.Config.Telegram.SysAdmin), text)
 		return context.Delete()
 	}
-	if GetSpamChance(*context.Sender()) < 50 {
+	if GetSpamChance(*context.Sender()) < 10 {
 		return nil
 	}
 	var blacklist []utils.AntiSpamLink
