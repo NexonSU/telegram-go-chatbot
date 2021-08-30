@@ -93,7 +93,7 @@ func ErrorReporting(err error, context telebot.Context) {
 func FindUserInMessage(context telebot.Context) (telebot.User, int64, error) {
 	var user telebot.User
 	var err error = nil
-	var untildate = time.Now().Unix()
+	var untildate = time.Now().Unix() + 86400
 	for _, entity := range context.Message().Entities {
 		if entity.Type == telebot.EntityTMention {
 			user = *entity.User
@@ -102,7 +102,7 @@ func FindUserInMessage(context telebot.Context) (telebot.User, int64, error) {
 				if err != nil {
 					return user, untildate, err
 				}
-				untildate += addtime
+				untildate += addtime - 86400
 			}
 			return user, untildate, err
 		}
@@ -114,7 +114,7 @@ func FindUserInMessage(context telebot.Context) (telebot.User, int64, error) {
 			if err != nil {
 				return user, untildate, errors.New("время указано неверно")
 			}
-			untildate += addtime
+			untildate += addtime - 86400
 		}
 	} else {
 		if len(context.Args()) == 0 {
@@ -132,7 +132,7 @@ func FindUserInMessage(context telebot.Context) (telebot.User, int64, error) {
 			if err != nil {
 				return user, untildate, errors.New("время указано неверно")
 			}
-			untildate += addtime
+			untildate += addtime - 86400
 		}
 	}
 	return user, untildate, err
