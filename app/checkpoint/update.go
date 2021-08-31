@@ -145,7 +145,7 @@ func JoinMessageUpdate() error {
 	}
 	if len(pending) != 0 {
 		text += fmt.Sprintf("Добро пожаловать(%d): ", len(pending))
-		for i, user := range LastNElements(pending, 50) {
+		for i, user := range LastNElements(pending, 30) {
 			if i != 0 {
 				text += ", "
 			}
@@ -158,7 +158,7 @@ func JoinMessageUpdate() error {
 	}
 	if len(accepted) != 0 {
 		text += fmt.Sprintf("Новые подтвержденные пользователи(%d): ", len(accepted))
-		for i, user := range LastNElements(accepted, 50) {
+		for i, user := range LastNElements(accepted, 30) {
 			if i != 0 {
 				text += ", "
 			}
@@ -168,7 +168,7 @@ func JoinMessageUpdate() error {
 	}
 	if len(banned) != 0 {
 		text += fmt.Sprintf("Заблокированные пользователи(%n): ", len(banned))
-		for i, user := range LastNElements(banned, 50) {
+		for i, user := range LastNElements(banned, 30) {
 			if i != 0 {
 				text += ", "
 			}
