@@ -167,7 +167,7 @@ func JoinMessageUpdate() error {
 		text += ".\n"
 	}
 	if len(banned) != 0 {
-		text += fmt.Sprintf("Заблокированные пользователи(%n): ", len(banned))
+		text += fmt.Sprintf("Заблокированные пользователи(%d): ", len(banned))
 		for i, user := range LastNElements(banned, 30) {
 			if i != 0 {
 				text += ", "
