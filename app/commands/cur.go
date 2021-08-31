@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	cmc "github.com/NexonSU/go-coinmarketcap/pro/v1"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	cmc "github.com/miguelmota/go-coinmarketcap/pro/v1"
 	"gopkg.in/tucnak/telebot.v3"
 )
 
