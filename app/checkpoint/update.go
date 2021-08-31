@@ -111,6 +111,13 @@ func JoinMessageUpdateService() {
 	}
 }
 
+func LastNElements(arr []BorderUser, n int) []BorderUser {
+	if len(arr) > n {
+		return arr[len(arr)-n:]
+	}
+	return arr
+}
+
 func JoinMessageUpdate() error {
 	var pending []BorderUser
 	var banned []BorderUser
@@ -137,8 +144,8 @@ func JoinMessageUpdate() error {
 		)
 	}
 	if len(pending) != 0 {
-		text += "Добро пожаловать: "
-		for i, user := range pending {
+		text += fmt.Sprintf("Добро пожаловать(%d): ", len(pending))
+		for i, user := range LastNElements(pending, 50) {
 			if i != 0 {
 				text += ", "
 			}
@@ -150,8 +157,8 @@ func JoinMessageUpdate() error {
 		Selector = telebot.ReplyMarkup{}
 	}
 	if len(accepted) != 0 {
-		text += "Новые подтвержденные пользователи: "
-		for i, user := range accepted {
+		text += fmt.Sprintf("Новые подтвержденные пользователи(%d): ", len(accepted))
+		for i, user := range LastNElements(accepted, 50) {
 			if i != 0 {
 				text += ", "
 			}
@@ -160,8 +167,8 @@ func JoinMessageUpdate() error {
 		text += ".\n"
 	}
 	if len(banned) != 0 {
-		text += "Заблокированные пользователи: "
-		for i, user := range banned {
+		text += fmt.Sprintf("Заблокированные пользователи(%n): ", len(banned))
+		for i, user := range LastNElements(banned, 50) {
 			if i != 0 {
 				text += ", "
 			}
