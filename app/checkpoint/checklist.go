@@ -50,11 +50,17 @@ func Check(User BorderUser) BorderUser {
 		return User
 	}
 	httpClient := &http.Client{Timeout: 10 * time.Second}
-	httpResponse, _ := httpClient.Get(fmt.Sprintf("https://api.cas.chat/check?user_id=%v", User.User.ID))
+	httpResponse, err := httpClient.Get(fmt.Sprintf("https://api.cas.chat/check?user_id=%v", User.User.ID))
+	if err != nil {
+		return User
+	}
 	defer func(Body io.ReadCloser) {
 		Body.Close()
 	}(httpResponse.Body)
-	jsonBytes, _ := ioutil.ReadAll(httpResponse.Body)
+	jsonBytes, err := ioutil.ReadAll(httpResponse.Body)
+	if err != nil {
+		return User
+	}
 	if fastjson.GetBool(jsonBytes, "ok") {
 		err := utils.Bot.Ban(Border.Chat, &telebot.ChatMember{User: User.User})
 		if err != nil {
