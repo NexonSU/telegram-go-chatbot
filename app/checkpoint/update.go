@@ -199,13 +199,8 @@ func JoinMessageUpdate() error {
 		Border.Message = newMessage
 		return err
 	}
-	if len(pending) == 0 && time.Now().Unix()-Border.Message.Time().Unix() > 60 {
+	if len(pending) == 0 && time.Now().Unix()-Border.Message.Time().Unix() > 180 {
 		Border.Users = []BorderUser{}
-		Border.Message = &telebot.Message{
-			ID:       0,
-			Unixtime: 0,
-			Chat:     &telebot.Chat{ID: 0},
-		}
 	}
 	return nil
 }
