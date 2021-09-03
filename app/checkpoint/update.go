@@ -173,7 +173,9 @@ func JoinMessageUpdate() error {
 				text += ", "
 			}
 			text += utils.MentionUser(user.User)
-			text += " (" + user.Reason + ")"
+			if len(banned) < 10 {
+				text += " (" + user.Reason + ")"
+			}
 		}
 		text += ".\n"
 	}
