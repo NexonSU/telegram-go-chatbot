@@ -34,7 +34,7 @@ func main() {
 	utils.Bot.Handle("/addtoblacklist", checkpoint.AddToBlackList, middleware.ModerLevel)
 	utils.Bot.Handle("/listantispamlinks", checkpoint.ListAntispamLinks, middleware.ModerLevel)
 	utils.Bot.Handle("/delantispamlink", checkpoint.DelAntispamLink, middleware.ModerLevel)
-	utils.Bot.Handle("/getspamchance", checkpoint.CommandGetSpamChance, middleware.ChatLevel)
+	utils.Bot.Handle("/getspamchance", checkpoint.CommandGetSpamChance, middleware.ModerLevel)
 	utils.Bot.Handle("/admin", commands.Admin, middleware.ChatLevel)
 	utils.Bot.Handle("/get", commands.Get, middleware.ChatLevel)
 	utils.Bot.Handle("/getall", commands.Getall, middleware.ChatLevel)
