@@ -179,10 +179,6 @@ func JoinMessageUpdate() error {
 		}
 		text += ".\n"
 	}
-	if len(Border.Users) > 10 && Border.NeedCreate {
-		Border.NeedCreate = false
-		Border.NeedUpdate = true
-	}
 	if Border.NeedUpdate && !Border.NeedCreate {
 		Border.NeedUpdate = false
 		_, err := utils.Bot.Edit(Border.Message, text, &Selector)
@@ -199,8 +195,13 @@ func JoinMessageUpdate() error {
 		Border.Message = newMessage
 		return err
 	}
-	if len(pending) == 0 && time.Now().Unix()-Border.Message.Time().Unix() > 180 {
+	if len(pending) == 0 && time.Now().Unix()-Border.Message.Time().Unix() > 300 {
 		Border.Users = []BorderUser{}
+		Border.Message = &telebot.Message{
+			ID:       0,
+			Unixtime: 0,
+			Chat:     &telebot.Chat{ID: 0},
+		}
 	}
 	return nil
 }
