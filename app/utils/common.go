@@ -284,7 +284,10 @@ func EditRepost(context telebot.Context) error {
 
 //Remove message
 func Remove(context telebot.Context) error {
-	return context.Delete()
+	context.Delete()
+	time.Sleep(1 * time.Second)
+	context.Delete()
+	return nil
 }
 
 func GetNope() string {
