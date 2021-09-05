@@ -179,7 +179,7 @@ func JoinMessageUpdate() error {
 		}
 		text += ".\n"
 	}
-	if len(Border.Users) > 10 && Border.NeedCreate {
+	if len(Border.Users) > 10 && Border.NeedCreate && time.Now().Unix()-Border.Message.Time().Unix() < 120 {
 		Border.NeedCreate = false
 		Border.NeedUpdate = true
 	}
