@@ -15,6 +15,10 @@ import (
 var CryptoMap []*cmc.MapListing
 var FiatMap []*cmc.FiatMapListing
 
+func Round(x, unit float64) float64 {
+	return float64(int64(x/unit+0.5)) * unit
+}
+
 func GenerateMaps() {
 	if utils.Config.CurrencyKey == "" {
 		return
@@ -35,6 +39,9 @@ func GetSymbolId(symbol string) (string, error) {
 	symbol = strings.ToUpper(symbol)
 	if symbol == "BYR" {
 		symbol = "BYN"
+	}
+	if symbol == "COC" {
+		symbol = "RUB"
 	}
 	for _, fiat := range FiatMap {
 		if fiat.Symbol == symbol {
@@ -84,10 +91,26 @@ func Cur(context telebot.Context) error {
 	if err != nil {
 		return context.Reply(err.Error())
 	}
+	//COC
+	if strings.ToUpper(context.Args()[1]) == "COC" {
+		amount = amount * 300
+	}
 	client := cmc.NewClient(&cmc.Config{ProAPIKey: utils.Config.CurrencyKey})
 	conversion, err := client.Tools.PriceConversion(&cmc.ConvertOptions{Amount: amount, ID: symbol, ConvertID: convert})
 	if err != nil {
 		return context.Reply(fmt.Sprintf("Ошибка при запросе: %v\nОнлайн-версия: https://coinmarketcap.com/ru/converter/", err.Error()), &telebot.SendOptions{DisableWebPagePreview: true})
 	}
-	return context.Send(fmt.Sprintf("%v %v = %v %v", conversion.Amount, conversion.Name, math.Round(conversion.Quote[convert].Price*100)/100, GetIdName(convert)), &telebot.SendOptions{ReplyTo: context.Message().ReplyTo, AllowWithoutReply: true})
+	resultAmount := math.Round(conversion.Quote[convert].Price*100) / 100
+	resultName := GetIdName(convert)
+	//COC
+	if strings.ToUpper(context.Args()[1]) == "COC" {
+		conversion.Amount = conversion.Amount / 300
+		conversion.Name = "Cup Of Coffee"
+	}
+	if strings.ToUpper(context.Args()[2]) == "COC" {
+		resultAmount = resultAmount / 300
+		resultAmount = Round(resultAmount, 0.05)
+		resultName = "Cup Of Coffee"
+	}
+	return context.Send(fmt.Sprintf("%v %v = %v %v", conversion.Amount, conversion.Name, resultAmount, resultName), &telebot.SendOptions{ReplyTo: context.Message().ReplyTo, AllowWithoutReply: true})
 }
