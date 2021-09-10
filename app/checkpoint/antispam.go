@@ -174,14 +174,14 @@ func SpamFilter(context telebot.Context) error {
 		return nil
 	}
 	var AntiSpam []utils.AntiSpam
-	utils.DB.Where(&utils.AntiSpam{}).Find(&AntiSpam)
-	if context.Message().ReplyTo != nil && context.Message().ReplyTo.Sticker != nil {
+	utils.DB.Find(&AntiSpam)
+	if context.Message() != nil && context.Message().Sticker != nil {
 		for _, AntiSpamEntry := range AntiSpam {
-			if AntiSpamEntry.Type == "StickerPack" && context.Message().ReplyTo.Sticker.SetName == AntiSpamEntry.Text {
+			if AntiSpamEntry.Type == "StickerPack" && context.Message().Sticker.SetName == AntiSpamEntry.Text {
 				text := fmt.Sprintf("Стикер пользователя %v был удален, т.к. стикерпак запрещен:", utils.MentionUser(context.Sender()))
 				utils.Bot.Send(telebot.ChatID(utils.Config.Telegram.SysAdmin), text)
 				utils.Bot.Send(telebot.ChatID(utils.Config.Telegram.SysAdmin), &telebot.Voice{
-					File: telebot.File{FileID: context.Message().ReplyTo.Sticker.FileID},
+					File: telebot.File{FileID: context.Message().Sticker.FileID},
 				})
 				return context.Delete()
 			}
