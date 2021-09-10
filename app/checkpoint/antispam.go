@@ -192,7 +192,7 @@ func SpamFilter(context telebot.Context) error {
 		if entity.Type == "url" {
 			url := string(utf16.Decode(utf16.Encode([]rune(context.Message().Text))[entity.Offset : entity.Offset+entity.Length]))
 			for _, AntiSpamEntry := range AntiSpam {
-				if AntiSpamEntry.Type == "URL" && strings.Contains(url, AntiSpamEntry.Text) {
+				if AntiSpamEntry.Type == "URL" && strings.Contains(strings.ToLower(url), strings.ToLower(AntiSpamEntry.Text)) {
 					text := fmt.Sprintf("Сообщение пользователя %v было удалено, т.к. URL запрещен:\n<pre>%v</pre>", utils.MentionUser(context.Sender()), context.Message().Text)
 					utils.Bot.Send(telebot.ChatID(utils.Config.Telegram.SysAdmin), text)
 					return context.Delete()
@@ -202,7 +202,7 @@ func SpamFilter(context telebot.Context) error {
 	}
 	if context.Text() != "" {
 		for _, AntiSpamEntry := range AntiSpam {
-			if AntiSpamEntry.Type == "Text" && strings.Contains(context.Text(), AntiSpamEntry.Text) {
+			if AntiSpamEntry.Type == "Text" && strings.Contains(strings.ToLower(context.Text()), strings.ToLower(AntiSpamEntry.Text)) {
 				text := fmt.Sprintf("Сообщение пользователя %v было удалено, т.к. содержит запрещенный текст:\n<pre>%v</pre>", utils.MentionUser(context.Sender()), context.Text())
 				utils.Bot.Send(telebot.ChatID(utils.Config.Telegram.SysAdmin), text)
 				return context.Delete()
