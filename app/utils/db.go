@@ -18,8 +18,8 @@ type Get struct {
 	Creator int64
 }
 
-type AntiSpamLink struct {
-	URL  string `gorm:"primaryKey"`
+type AntiSpam struct {
+	Text string `gorm:"primaryKey"`
 	Type string
 }
 
@@ -64,7 +64,7 @@ func DataBaseInit(file string) gorm.DB {
 	}
 
 	//Create tables, if they not exists in DB
-	err = database.AutoMigrate(telebot.User{}, Get{}, Warn{}, PidorStats{}, PidorList{}, Duelist{}, ZavtraStream{}, Nope{}, AntiSpamLink{})
+	err = database.AutoMigrate(telebot.User{}, Get{}, Warn{}, PidorStats{}, PidorList{}, Duelist{}, ZavtraStream{}, Nope{}, AntiSpam{})
 	if err != nil {
 		log.Println(err)
 	}

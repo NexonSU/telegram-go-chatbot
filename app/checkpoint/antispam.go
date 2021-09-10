@@ -14,6 +14,7 @@ import (
 	"github.com/valyala/fastjson"
 	"gopkg.in/tucnak/telebot.v3"
 	"gorm.io/gorm/clause"
+	"mvdan.cc/xurls/v2"
 )
 
 type MetaData struct {
@@ -47,68 +48,6 @@ func CommandGetSpamChance(context telebot.Context) error {
 	return context.Reply(fmt.Sprintf("%v спамер на %v%%.", utils.UserFullName(&user), spamchance))
 }
 
-func AddToWhiteList(context telebot.Context) error {
-	if context.Data() == "" {
-		return context.Reply("Нужно указать URL или его часть.")
-	}
-	var link utils.AntiSpamLink
-	link.URL = context.Data()
-	link.Type = "whitelist"
-	result := utils.DB.Clauses(clause.OnConflict{
-		UpdateAll: true,
-	}).Create(&link)
-	if result.Error != nil {
-		return context.Reply(fmt.Sprintf("Ошибка запроса: <code>%v</code>", result.Error.Error()))
-	}
-	return context.Reply(fmt.Sprintf("URL <code>%v</code> добавлен в белый список.", link.URL))
-}
-
-func AddToBlackList(context telebot.Context) error {
-	if context.Data() == "" {
-		return context.Reply("Нужно указать URL или его часть.")
-	}
-	var link utils.AntiSpamLink
-	link.URL = context.Data()
-	link.Type = "blacklist"
-	result := utils.DB.Clauses(clause.OnConflict{
-		UpdateAll: true,
-	}).Create(&link)
-	if result.Error != nil {
-		return context.Reply(fmt.Sprintf("Ошибка запроса: <code>%v</code>", result.Error.Error()))
-	}
-	return context.Reply(fmt.Sprintf("URL <code>%v</code> добавлен в черный список.", link.URL))
-}
-
-func DelAntispamLink(context telebot.Context) error {
-	if context.Data() == "" {
-		return context.Reply("Нужно указать URL или его часть.")
-	}
-	var link utils.AntiSpamLink
-	link.URL = context.Data()
-	result := utils.DB.Delete(link)
-	if result.Error != nil {
-		return context.Reply(fmt.Sprintf("Ошибка запроса: <code>%v</code>", result.Error.Error()))
-	}
-	return context.Reply(fmt.Sprintf("URL <code>%v</code> удалён.", link.URL))
-}
-
-func ListAntispamLinks(context telebot.Context) error {
-	var list = "Список URL фильтров:\n\n"
-	result, err := utils.DB.Model(utils.AntiSpamLink{}).Rows()
-	if err != nil {
-		return err
-	}
-	for result.Next() {
-		var link utils.AntiSpamLink
-		err := utils.DB.ScanRows(result, &link)
-		if err != nil {
-			return err
-		}
-		list += fmt.Sprintf("%v - %v\n", link.URL, link.Type)
-	}
-	return context.Reply(list, &telebot.SendOptions{DisableWebPagePreview: true})
-}
-
 func GetSpamChance(user telebot.User) int {
 	spamchance := 0
 	//photos
@@ -140,16 +79,92 @@ func GetSpamChance(user telebot.User) int {
 	return spamchance
 }
 
-func UrlFilter(context telebot.Context) error {
+func AddAntispam(context telebot.Context) error {
+	var AntiSpam utils.AntiSpam
+	if AntiSpam.Type == "" && xurls.Relaxed().FindString(context.Data()) != "" {
+		AntiSpam.Text = xurls.Relaxed().FindString(context.Data())
+		AntiSpam.Type = "URL"
+	}
+	if AntiSpam.Type == "" && context.Message().ReplyTo != nil && context.Message().ReplyTo.Sticker != nil {
+		AntiSpam.Text = context.Message().ReplyTo.Sticker.SetName
+		AntiSpam.Type = "StickerPack"
+	}
+	if AntiSpam.Type == "" && context.Data() != "" {
+		AntiSpam.Text = context.Data()
+		AntiSpam.Type = "Text"
+	}
+	if AntiSpam.Type == "" {
+		return context.Reply("Нужно указать URL, текст или какое-либо сообщение.")
+	}
+	result := utils.DB.Clauses(clause.OnConflict{
+		UpdateAll: true,
+	}).Create(&AntiSpam)
+	if result.Error != nil {
+		return context.Reply(fmt.Sprintf("Ошибка запроса: <code>%v</code>", result.Error.Error()))
+	}
+	return context.Reply(fmt.Sprintf("%v <code>%v</code> добавлен в антиспам.", AntiSpam.Type, AntiSpam.Text))
+}
+
+func DelAntispam(context telebot.Context) error {
+	var AntiSpam utils.AntiSpam
+	if AntiSpam.Type == "" && xurls.Relaxed().FindString(context.Data()) != "" {
+		AntiSpam.Text = xurls.Relaxed().FindString(context.Data())
+		AntiSpam.Type = "URL"
+	}
+	if AntiSpam.Type == "" && context.Message().ReplyTo != nil && context.Message().ReplyTo.Sticker != nil {
+		AntiSpam.Text = context.Message().ReplyTo.Sticker.SetName
+		AntiSpam.Type = "StickerPack"
+	}
+	if AntiSpam.Type == "" && context.Data() != "" {
+		AntiSpam.Text = context.Data()
+		AntiSpam.Type = "Text"
+	}
+	if AntiSpam.Type == "" {
+		return context.Reply("Нужно указать URL, текст или какое-либо сообщение.")
+	}
+	result := utils.DB.Delete(AntiSpam)
+	if result.Error != nil {
+		return context.Reply(fmt.Sprintf("Ошибка запроса: <code>%v</code>", result.Error.Error()))
+	}
+	if result.RowsAffected == 0 {
+		return context.Reply("Ошибка: значение не найдено.")
+	}
+	return context.Reply(fmt.Sprintf("%v <code>%v</code> удалён из антиспама.", AntiSpam.Type, AntiSpam.Text))
+}
+
+func ListAntispam(context telebot.Context) error {
+	var list = "Список фильтров:\n\n"
+	result, err := utils.DB.Model(utils.AntiSpam{}).Rows()
+	if err != nil {
+		return err
+	}
+	for result.Next() {
+		var AntiSpam utils.AntiSpam
+		err := utils.DB.ScanRows(result, &AntiSpam)
+		if err != nil {
+			return err
+		}
+		list += fmt.Sprintf("%v - %v\n", AntiSpam.Text, AntiSpam.Type)
+	}
+	return context.Reply(list, &telebot.SendOptions{DisableWebPagePreview: true})
+}
+
+func SpamFilter(context telebot.Context) error {
 	if context.Sender().ID == 777000 {
 		return nil
 	}
 	httpClient := &http.Client{Timeout: 10 * time.Second}
-	httpResponse, _ := httpClient.Get(fmt.Sprintf("https://api.cas.chat/check?user_id=%v", context.Sender().ID))
+	httpResponse, err := httpClient.Get(fmt.Sprintf("https://api.cas.chat/check?user_id=%v", context.Sender().ID))
+	if err != nil {
+		return err
+	}
 	defer func(Body io.ReadCloser) {
 		Body.Close()
 	}(httpResponse.Body)
-	jsonBytes, _ := ioutil.ReadAll(httpResponse.Body)
+	jsonBytes, err := ioutil.ReadAll(httpResponse.Body)
+	if err != nil {
+		return err
+	}
 	if fastjson.GetBool(jsonBytes, "ok") {
 		text := fmt.Sprintf("Сообщение пользователя %v было удалено, т.к. он забанен CAS:\n<pre>%v</pre>", utils.MentionUser(context.Sender()), context.Message().Text)
 		utils.Bot.Send(telebot.ChatID(utils.Config.Telegram.SysAdmin), text)
@@ -158,17 +173,39 @@ func UrlFilter(context telebot.Context) error {
 	if GetSpamChance(*context.Sender()) < 10 {
 		return nil
 	}
-	var blacklist []utils.AntiSpamLink
-	utils.DB.Where(&utils.AntiSpamLink{Type: "blacklist"}).Find(&blacklist)
+	var AntiSpam []utils.AntiSpam
+	utils.DB.Where(&utils.AntiSpam{}).Find(&AntiSpam)
+	if context.Message().ReplyTo != nil && context.Message().ReplyTo.Sticker != nil {
+		for _, AntiSpamEntry := range AntiSpam {
+			if AntiSpamEntry.Type == "StickerPack" && context.Message().ReplyTo.Sticker.SetName == AntiSpamEntry.Text {
+				text := fmt.Sprintf("Стикер пользователя %v был удален, т.к. стикерпак запрещен:", utils.MentionUser(context.Sender()))
+				utils.Bot.Send(telebot.ChatID(utils.Config.Telegram.SysAdmin), text)
+				utils.Bot.Send(telebot.ChatID(utils.Config.Telegram.SysAdmin), &telebot.Voice{
+					File: telebot.File{FileID: context.Message().ReplyTo.Sticker.FileID},
+				})
+				return context.Delete()
+			}
+		}
+		return nil
+	}
 	for _, entity := range context.Message().Entities {
 		if entity.Type == "url" {
-			for _, forbiddenUrl := range blacklist {
-				url := string(utf16.Decode(utf16.Encode([]rune(context.Message().Text))[entity.Offset : entity.Offset+entity.Length]))
-				if strings.Contains(url, forbiddenUrl.URL) {
+			url := string(utf16.Decode(utf16.Encode([]rune(context.Message().Text))[entity.Offset : entity.Offset+entity.Length]))
+			for _, AntiSpamEntry := range AntiSpam {
+				if AntiSpamEntry.Type == "URL" && strings.Contains(url, AntiSpamEntry.Text) {
 					text := fmt.Sprintf("Сообщение пользователя %v было удалено, т.к. URL запрещен:\n<pre>%v</pre>", utils.MentionUser(context.Sender()), context.Message().Text)
 					utils.Bot.Send(telebot.ChatID(utils.Config.Telegram.SysAdmin), text)
 					return context.Delete()
 				}
+			}
+		}
+	}
+	if context.Text() != "" {
+		for _, AntiSpamEntry := range AntiSpam {
+			if AntiSpamEntry.Type == "Text" && strings.Contains(context.Text(), AntiSpamEntry.Text) {
+				text := fmt.Sprintf("Сообщение пользователя %v было удалено, т.к. содержит запрещенный текст:\n<pre>%v</pre>", utils.MentionUser(context.Sender()), context.Text())
+				utils.Bot.Send(telebot.ChatID(utils.Config.Telegram.SysAdmin), text)
+				return context.Delete()
 			}
 		}
 	}

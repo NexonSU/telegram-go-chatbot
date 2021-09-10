@@ -16,4 +16,5 @@ require (
 	gopkg.in/tucnak/telebot.v3 v3.0.0-20210804124518-7981009da5b5
 	gorm.io/driver/sqlite v1.1.4
 	gorm.io/gorm v1.21.12
+	mvdan.cc/xurls/v2 v2.3.0
 )
