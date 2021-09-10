@@ -76,6 +76,7 @@ func main() {
 
 	//Filter URL in comment chat
 	utils.Bot.Handle(telebot.OnText, checkpoint.SpamFilter, middleware.CommentChatOnly)
+	utils.Bot.Handle(telebot.OnSticker, checkpoint.SpamFilter, middleware.CommentChatOnly)
 
 	//User join
 	utils.Bot.Handle(telebot.OnChatMember, checkpoint.ChatMemberUpdate, middleware.ChatOnly)
