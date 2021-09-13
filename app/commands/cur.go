@@ -107,5 +107,9 @@ func Cur(context telebot.Context) error {
 		resultAmount = resultAmount / 300
 		resultName = "Cup Of Coffee"
 	}
-	return context.Send(fmt.Sprintf("%v %v = %v %v", conversion.Amount, conversion.Name, strings.Replace(humanize.CommafWithDigits(resultAmount, 2), ",", " ", -1), resultName), &telebot.SendOptions{ReplyTo: context.Message().ReplyTo, AllowWithoutReply: true})
+	resultAmount_s := strings.Replace(humanize.CommafWithDigits(resultAmount, 2), ",", " ", -1)
+	if resultAmount > 1000 {
+		resultAmount_s = strings.Replace(humanize.CommafWithDigits(resultAmount, 0), ",", " ", -1)
+	}
+	return context.Send(fmt.Sprintf("%v %v = %v %v", conversion.Amount, conversion.Name, resultAmount_s, resultName), &telebot.SendOptions{ReplyTo: context.Message().ReplyTo, AllowWithoutReply: true})
 }
