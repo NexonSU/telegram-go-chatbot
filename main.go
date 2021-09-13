@@ -59,6 +59,7 @@ func main() {
 	utils.Bot.Handle("/pidor", commands.Pidor, middleware.ChatLevel)
 	utils.Bot.Handle("/blessing", commands.Blessing, middleware.ChatLevel)
 	utils.Bot.Handle("/suicide", commands.Blessing, middleware.ChatLevel)
+	utils.Bot.Handle("/convert", commands.Convert, middleware.ChatLevel)
 
 	//Inline
 	utils.Bot.Handle(telebot.OnQuery, services.OnInline)
