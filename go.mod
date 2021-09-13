@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/arran4/golang-ical v0.0.0-20210807024147-770fa87aff1d
 	github.com/chai2010/webp v1.1.0
+	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/fogleman/gg v1.3.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/keighl/metabolize v0.0.0-20150915210303-97ab655d4034

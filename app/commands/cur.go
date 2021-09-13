@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"github.com/dustin/go-humanize"
 	cmc "github.com/miguelmota/go-coinmarketcap/pro/v1"
 	"gopkg.in/tucnak/telebot.v3"
 )
@@ -106,5 +107,5 @@ func Cur(context telebot.Context) error {
 		resultAmount = resultAmount / 300
 		resultName = "Cup Of Coffee"
 	}
-	return context.Send(fmt.Sprintf("%v %v = %.02f %v", conversion.Amount, conversion.Name, resultAmount, resultName), &telebot.SendOptions{ReplyTo: context.Message().ReplyTo, AllowWithoutReply: true})
+	return context.Send(fmt.Sprintf("%v %v = %v %v", conversion.Amount, conversion.Name, strings.Replace(humanize.CommafWithDigits(resultAmount, 2), ",", " ", -1), resultName), &telebot.SendOptions{ReplyTo: context.Message().ReplyTo, AllowWithoutReply: true})
 }
