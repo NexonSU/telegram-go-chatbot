@@ -15,6 +15,9 @@ func Get(context telebot.Context) error {
 		return context.Reply("Пример использования: <code>/get {гет}</code>")
 	}
 	result := utils.DB.Where(&utils.Get{Name: strings.ToLower(context.Data())}).First(&get)
+	if get.Caption == "" {
+		get.Caption = get.Name
+	}
 	if result.RowsAffected != 0 {
 		switch {
 		case get.Type == "Animation":

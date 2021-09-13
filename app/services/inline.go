@@ -34,6 +34,9 @@ func OnInline(context telebot.Context) error {
 			log.Println(err.Error())
 			return err
 		}
+		if get.Caption == "" {
+			get.Caption = get.Name
+		}
 		switch {
 		case get.Type == "Animation":
 			results[i] = &telebot.GifResult{
