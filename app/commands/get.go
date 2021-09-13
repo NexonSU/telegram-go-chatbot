@@ -39,7 +39,8 @@ func Get(context telebot.Context) error {
 			})
 		case get.Type == "Voice":
 			return context.Reply(&telebot.Voice{
-				File: telebot.File{FileID: get.Data},
+				File:    telebot.File{FileID: get.Data},
+				Caption: get.Caption,
 			})
 		case get.Type == "Document":
 			return context.Reply(&telebot.Document{
