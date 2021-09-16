@@ -34,6 +34,7 @@ func main() {
 	utils.Bot.Handle("/listantispam", checkpoint.ListAntispam, middleware.ModerLevel)
 	utils.Bot.Handle("/delantispam", checkpoint.DelAntispam, middleware.ModerLevel)
 	utils.Bot.Handle("/getspamchance", checkpoint.CommandGetSpamChance, middleware.ModerLevel)
+	utils.Bot.Handle("/convert", commands.Convert, middleware.ModerLevel)
 	utils.Bot.Handle("/admin", commands.Admin, middleware.ChatLevel)
 	utils.Bot.Handle("/get", commands.Get, middleware.ChatLevel)
 	utils.Bot.Handle("/getall", commands.Getall, middleware.ChatLevel)
@@ -59,7 +60,6 @@ func main() {
 	utils.Bot.Handle("/pidor", commands.Pidor, middleware.ChatLevel)
 	utils.Bot.Handle("/blessing", commands.Blessing, middleware.ChatLevel)
 	utils.Bot.Handle("/suicide", commands.Blessing, middleware.ChatLevel)
-	utils.Bot.Handle("/convert", commands.Convert, middleware.ChatLevel)
 
 	//Inline
 	utils.Bot.Handle(telebot.OnQuery, services.OnInline)

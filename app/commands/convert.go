@@ -13,19 +13,20 @@ import (
 
 //Convert given file
 func Convert(context telebot.Context) error {
-	if context.Message().ReplyTo.Video == nil && context.Message().ReplyTo.Audio == nil && context.Message().ReplyTo.Voice == nil {
-		return context.Reply("Пример использования: /convert в ответ на какое-либо сообщение с медиа.", &telebot.SendOptions{AllowWithoutReply: true})
-	}
 	var InputFilePath string
 	var OutputFilePath string
 	var err error
 	var KwArgs map[string]interface{}
-	var Caption string
-	var Duration int
 	var FileName string
 	var Title string
 	var Performer string
 	var Extension string
+	var Width int
+	var Height int
+	var Caption string
+	var Duration int
+	var Thumbnail *telebot.Photo
+	var SupportsStreaming bool
 	TempName := time.Now().UnixNano()
 	utils.Bot.URL = "https://api.telegram.org"
 	switch {
@@ -47,10 +48,33 @@ func Convert(context telebot.Context) error {
 			Extension = "ogg"
 			KwArgs = ffmpeg.KwArgs{"c:a": "libopus", "timelimit": 60}
 		}
+	case context.Message().ReplyTo.Document != nil && context.Message().ReplyTo.Document.MIME[0:5] == "video":
+		context.Notify(telebot.RecordingVideo)
+		Caption = context.Message().ReplyTo.Document.Caption
+		FileName = context.Message().ReplyTo.Document.FileName
+		Extension = "mp4"
+		InputFilePath = fmt.Sprintf("%v/convert_input_%v%v", os.TempDir(), TempName, filepath.Ext(context.Message().ReplyTo.Document.FileName))
+		err = utils.Bot.Download(&context.Message().ReplyTo.Document.File, InputFilePath)
+		if err != nil {
+			return err
+		}
+		KwArgs = ffmpeg.KwArgs{"c:v": "libx264", "preset": "fast", "crf": 26, "timelimit": 900, "movflags": "+faststart", "c:a": "aac"}
+		if len(context.Args()) == 1 && context.Args()[0] == "gif" {
+			KwArgs = ffmpeg.KwArgs{"c:v": "libx264", "an": "", "preset": "fast", "crf": 26, "timelimit": 900, "movflags": "+faststart", "c:a": "aac"}
+		}
+		if len(context.Args()) == 1 && context.Args()[0] == "mp3" {
+			context.Notify(telebot.RecordingAudio)
+			Extension = "mp3"
+			KwArgs = ffmpeg.KwArgs{"c:a": "libmp3lame", "vn": ""}
+		}
 	case context.Message().ReplyTo.Video != nil:
 		context.Notify(telebot.RecordingVideo)
+		Width = context.Message().ReplyTo.Video.Width
+		Height = context.Message().ReplyTo.Video.Height
 		Caption = context.Message().ReplyTo.Video.Caption
 		Duration = context.Message().ReplyTo.Video.Duration
+		Thumbnail = context.Message().ReplyTo.Video.Thumbnail
+		SupportsStreaming = context.Message().ReplyTo.Video.SupportsStreaming
 		FileName = context.Message().ReplyTo.Video.FileName
 		Extension = "mp4"
 		InputFilePath = fmt.Sprintf("%v/convert_input_%v%v", os.TempDir(), TempName, filepath.Ext(context.Message().ReplyTo.Video.FileName))
@@ -115,12 +139,12 @@ func Convert(context telebot.Context) error {
 	if Extension == "mp4" {
 		context.Reply(&telebot.Video{
 			File:              telebot.FromDisk(OutputFilePath),
-			Width:             context.Message().ReplyTo.Video.Width,
-			Height:            context.Message().ReplyTo.Video.Height,
+			Width:             Width,
+			Height:            Height,
 			Duration:          Duration,
 			Caption:           Caption,
-			Thumbnail:         context.Message().ReplyTo.Video.Thumbnail,
-			SupportsStreaming: context.Message().ReplyTo.Video.SupportsStreaming,
+			Thumbnail:         Thumbnail,
+			SupportsStreaming: SupportsStreaming,
 			MIME:              "video/mp4",
 			FileName:          FileNameWOExt + ".mp4",
 		}, &telebot.SendOptions{AllowWithoutReply: true})
