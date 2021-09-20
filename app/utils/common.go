@@ -239,18 +239,39 @@ func Repost(context telebot.Context) error {
 	switch {
 	case context.Message().Animation != nil:
 		ChatMessage, err = Bot.Send(chat, &telebot.Animation{File: context.Message().Animation.File, Caption: context.Message().Caption})
+		if Config.Youtube.StreamChannel != 0 && strings.Contains(context.Message().Caption, "zavtracast/live") {
+			Bot.Send(&telebot.Chat{ID: Config.Youtube.StreamChannel}, &telebot.Animation{File: context.Message().Animation.File, Caption: context.Message().Caption})
+		}
 	case context.Message().Audio != nil:
 		ChatMessage, err = Bot.Send(chat, &telebot.Audio{File: context.Message().Audio.File, Caption: context.Message().Caption})
+		if Config.Youtube.StreamChannel != 0 && strings.Contains(context.Message().Caption, "zavtracast/live") {
+			Bot.Send(&telebot.Chat{ID: Config.Youtube.StreamChannel}, &telebot.Audio{File: context.Message().Audio.File, Caption: context.Message().Caption})
+		}
 	case context.Message().Photo != nil:
 		ChatMessage, err = Bot.Send(chat, &telebot.Photo{File: context.Message().Photo.File, Caption: GetHtmlText(*context.Message()), ParseMode: telebot.ModeHTML})
+		if Config.Youtube.StreamChannel != 0 && strings.Contains(context.Message().Caption, "zavtracast/live") {
+			Bot.Send(&telebot.Chat{ID: Config.Youtube.StreamChannel}, &telebot.Photo{File: context.Message().Photo.File, Caption: GetHtmlText(*context.Message()), ParseMode: telebot.ModeHTML})
+		}
 	case context.Message().Video != nil:
 		ChatMessage, err = Bot.Send(chat, &telebot.Video{File: context.Message().Video.File, Caption: context.Message().Caption})
+		if Config.Youtube.StreamChannel != 0 && strings.Contains(context.Message().Caption, "zavtracast/live") {
+			Bot.Send(&telebot.Chat{ID: Config.Youtube.StreamChannel}, &telebot.Video{File: context.Message().Video.File, Caption: context.Message().Caption})
+		}
 	case context.Message().Voice != nil:
 		ChatMessage, err = Bot.Send(chat, &telebot.Voice{File: context.Message().Voice.File, Caption: context.Message().Caption})
+		if Config.Youtube.StreamChannel != 0 && strings.Contains(context.Message().Caption, "zavtracast/live") {
+			Bot.Send(&telebot.Chat{ID: Config.Youtube.StreamChannel}, &telebot.Voice{File: context.Message().Voice.File, Caption: context.Message().Caption})
+		}
 	case context.Message().Document != nil:
 		ChatMessage, err = Bot.Send(chat, &telebot.Document{File: context.Message().Document.File, Caption: context.Message().Caption})
+		if Config.Youtube.StreamChannel != 0 && strings.Contains(context.Message().Caption, "zavtracast/live") {
+			Bot.Send(&telebot.Chat{ID: Config.Youtube.StreamChannel}, &telebot.Document{File: context.Message().Document.File, Caption: context.Message().Caption})
+		}
 	default:
 		ChatMessage, err = Bot.Send(chat, GetHtmlText(*context.Message()))
+		if Config.Youtube.StreamChannel != 0 && strings.Contains(context.Message().Text, "zavtracast/live") {
+			Bot.Send(&telebot.Chat{ID: Config.Youtube.StreamChannel}, GetHtmlText(*context.Message()))
+		}
 	}
 	Forward.ForwardedMesssages = append(Forward.ForwardedMesssages, ForwardedMesssage{context.Message(), *ChatMessage})
 	return err
