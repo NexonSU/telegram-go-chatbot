@@ -47,6 +47,6 @@ func ButtonCallback(context telebot.Context) error {
 		}
 		return context.Respond(&telebot.CallbackResponse{Text: utils.GetNope()})
 	}
-	time.Sleep(100 * time.Microsecond)
+	time.Sleep(2000 * time.Microsecond)
 	return context.Respond(&telebot.CallbackResponse{Text: utils.GetNope()})
 }
