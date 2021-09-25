@@ -85,8 +85,7 @@ func main() {
 	utils.Bot.Handle(telebot.OnUserLeft, utils.Remove, middleware.ChatOnly)
 	utils.Bot.Handle(telebot.OnCallback, checkpoint.ButtonCallback, middleware.ChatOnly)
 
-	//Cron
-	go services.ZavtraStreamCheckService()
+	//Checkpoint service
 	go checkpoint.JoinMessageUpdateService()
 
 	//Generate /cur map
