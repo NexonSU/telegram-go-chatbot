@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
-	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Convert given file

@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	"gopkg.in/tucnak/telebot.v3"
 )
 
 type BorderUser struct {

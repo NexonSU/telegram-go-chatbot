@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"gopkg.in/tucnak/telebot.v3"
+	"github.com/NexonSU/telebot"
 )
 
 //Send shrug in chat on /shrug

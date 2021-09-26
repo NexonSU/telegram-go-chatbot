@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"gopkg.in/tucnak/telebot.v3"
+	"github.com/NexonSU/telebot"
 )
 
 //Reply "Polo!" on "marco"

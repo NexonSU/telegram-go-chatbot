@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf16"
 
-	"gopkg.in/tucnak/telebot.v3"
+	"github.com/NexonSU/telebot"
 	"gorm.io/gorm/clause"
 )
 

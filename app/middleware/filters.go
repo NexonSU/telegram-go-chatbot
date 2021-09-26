@@ -1,8 +1,8 @@
 package middleware
 
 import (
+	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	"gopkg.in/tucnak/telebot.v3"
 )
 
 func ChatOnly(next telebot.HandlerFunc) telebot.HandlerFunc {

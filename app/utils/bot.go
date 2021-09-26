@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"gopkg.in/tucnak/telebot.v3"
+	"github.com/NexonSU/telebot"
 )
 
 func BotInit() telebot.Bot {

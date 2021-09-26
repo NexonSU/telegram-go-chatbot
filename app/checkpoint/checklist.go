@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	"github.com/valyala/fastjson"
-	"gopkg.in/tucnak/telebot.v3"
 )
 
 func Check(User BorderUser) BorderUser {

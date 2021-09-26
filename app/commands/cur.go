@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	"github.com/dustin/go-humanize"
 	cmc "github.com/miguelmota/go-coinmarketcap/pro/v1"
-	"gopkg.in/tucnak/telebot.v3"
 )
 
 var CryptoMap []*cmc.MapListing

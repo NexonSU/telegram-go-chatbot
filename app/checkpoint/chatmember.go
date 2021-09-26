@@ -1,7 +1,7 @@
 package checkpoint
 
 import (
-	"gopkg.in/tucnak/telebot.v3"
+	"github.com/NexonSU/telebot"
 )
 
 func ChatMemberUpdate(context telebot.Context) error {

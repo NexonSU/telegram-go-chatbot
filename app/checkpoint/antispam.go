@@ -9,10 +9,10 @@ import (
 	"time"
 	"unicode/utf16"
 
+	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	m "github.com/keighl/metabolize"
 	"github.com/valyala/fastjson"
-	"gopkg.in/tucnak/telebot.v3"
 	"gorm.io/gorm/clause"
 	"mvdan.cc/xurls/v2"
 )

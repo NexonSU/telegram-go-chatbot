@@ -1,3 +1,5 @@
+github.com/NexonSU/telebot v0.0.0-20210926050543-ea8fbacdfe5b h1:Pet+XGhOrYI1fDeBcojVhVVRSIrdhZ2m32vNlCk932k=
+github.com/NexonSU/telebot v0.0.0-20210926050543-ea8fbacdfe5b/go.mod h1:Kg9dpwAkR0Tcwki48ruMtrcGw2h3EPIIxF6BrCqFErs=
 github.com/anaskhan96/soup v1.0.1/go.mod h1:pT5vs4HXDwA5y4KQCsKvnkpQd3D+joP7IqpiGskfWW0=
 github.com/arran4/golang-ical v0.0.0-20210825232153-efac1f4cb8ac h1:O/TDwS98y/3RCIpZKpZyFEnzV1Uc46ZXgrMxpL33b+s=
 github.com/arran4/golang-ical v0.0.0-20210825232153-efac1f4cb8ac/go.mod h1:BSTTrYHuM12oAL8jDdcmPdw02SBThKYWNFHQlvEG6b0=
@@ -109,8 +111,6 @@ gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8
 gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/errgo.v2 v2.1.0/go.mod h1:hNsd1EY+bozCKY1Ytp96fpM3vjJbqLJn88ws8XvfDNI=
-gopkg.in/tucnak/telebot.v3 v3.0.0-20210913074324-90e7deaa7aa6 h1:/Gky1Jq99LT0s1Q8BP6dnttUFzJCdREh0SNwWkiGpYs=
-gopkg.in/tucnak/telebot.v3 v3.0.0-20210913074324-90e7deaa7aa6/go.mod h1:1XHg/CpPZtstsm3WY57h1T4X/EQquwOgllQl/TjjgqI=
 gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.2.8 h1:obN1ZagJSUGI0Ek/LBmuj4SNLPfIny3KsKFopxRdj10=
 gopkg.in/yaml.v2 v2.2.8/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=

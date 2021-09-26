@@ -3,8 +3,8 @@ package commands
 import (
 	"os"
 
+	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Restart bot on /restart

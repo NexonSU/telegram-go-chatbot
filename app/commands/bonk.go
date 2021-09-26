@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	"github.com/chai2010/webp"
 	"github.com/fogleman/gg"
-	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Write username on bonk picture and send to target
