@@ -118,12 +118,70 @@ func FindUserInMessage(context telebot.Context) (telebot.User, int64, error) {
 	return user, untildate, err
 }
 
-func GatherData(user *telebot.User) error {
-	result := DB.Clauses(clause.OnConflict{
+func GatherData(update *telebot.Update) error {
+	if update.Message == nil || update.Message.Sender == nil {
+		return nil
+	}
+	//User update
+	UserResult := DB.Clauses(clause.OnConflict{
 		UpdateAll: true,
-	}).Create(user)
-	if result.Error != nil {
-		return result.Error
+	}).Create(update.Message.Sender)
+	if UserResult.Error != nil {
+		return UserResult.Error
+	}
+	if update.Message.Sender.IsBot {
+		return nil
+	}
+	//Message insert
+	var Message Message
+	Message.ID = update.Message.ID
+	Message.UserID = update.Message.Sender.ID
+	Message.Date = time.Unix(update.Message.Unixtime, 0)
+	Message.ChatID = update.Message.Chat.ID
+	if update.Message.ReplyTo != nil {
+		Message.ReplyTo = update.Message.ReplyTo.ID
+	}
+	Message.Text = update.Message.Text
+	switch {
+	case update.Message.Animation != nil:
+		Message.FileType = "Animation"
+		Message.FileID = update.Message.Animation.FileID
+		Message.Text = update.Message.Caption
+	case update.Message.Audio != nil:
+		Message.FileType = "Audio"
+		Message.FileID = update.Message.Audio.FileID
+		Message.Text = update.Message.Caption
+	case update.Message.Photo != nil:
+		Message.FileType = "Photo"
+		Message.FileID = update.Message.Photo.FileID
+		Message.Text = update.Message.Caption
+	case update.Message.Video != nil:
+		Message.FileType = "Video"
+		Message.FileID = update.Message.Video.FileID
+		Message.Text = update.Message.Caption
+	case update.Message.Voice != nil:
+		Message.FileType = "Voice"
+		Message.FileID = update.Message.Voice.FileID
+		Message.Text = update.Message.Caption
+	case update.Message.Document != nil:
+		Message.FileType = "Document"
+		Message.FileID = update.Message.Document.FileID
+		Message.Text = update.Message.Caption
+	}
+	MessageResult := DB.Create(&Message)
+	if MessageResult.Error != nil {
+		return MessageResult.Error
+	}
+	//Words insert
+	var Word Word
+	Word.ChatID = Message.ChatID
+	Word.UserID = Message.UserID
+	Word.Date = Message.Date
+	for _, Word.Text = range strings.Fields(Message.Text) {
+		WordResult := DB.Create(&Word)
+		if WordResult.Error != nil {
+			return WordResult.Error
+		}
 	}
 	return nil
 }

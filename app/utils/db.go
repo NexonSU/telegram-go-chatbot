@@ -42,14 +42,26 @@ type Warn struct {
 	LastWarn time.Time
 }
 
-type ZavtraStream struct {
-	Service   string `gorm:"primaryKey"`
-	LastCheck time.Time
-	VideoID   string
-}
-
 type Nope struct {
 	Text string `gorm:"primaryKey"`
+}
+
+type Message struct {
+	ID       int   `gorm:"primaryKey"`
+	ChatID   int64 `gorm:"primaryKey"`
+	UserID   int64
+	Date     time.Time
+	ReplyTo  int
+	Text     string
+	FileType string
+	FileID   string
+}
+
+type Word struct {
+	ChatID int64
+	UserID int64
+	Date   time.Time
+	Text   string
 }
 
 func DataBaseInit(file string) gorm.DB {
@@ -64,7 +76,7 @@ func DataBaseInit(file string) gorm.DB {
 	}
 
 	//Create tables, if they not exists in DB
-	err = database.AutoMigrate(telebot.User{}, Get{}, Warn{}, PidorStats{}, PidorList{}, Duelist{}, ZavtraStream{}, Nope{}, AntiSpam{})
+	err = database.AutoMigrate(telebot.User{}, Message{}, Word{}, Get{}, Warn{}, PidorStats{}, PidorList{}, Duelist{}, Nope{}, AntiSpam{})
 	if err != nil {
 		log.Println(err)
 	}

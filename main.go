@@ -1,20 +1,24 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/checkpoint"
 	"github.com/NexonSU/telegram-go-chatbot/app/commands"
 	"github.com/NexonSU/telegram-go-chatbot/app/duel"
 	"github.com/NexonSU/telegram-go-chatbot/app/pidor"
+	"github.com/NexonSU/telegram-go-chatbot/app/stats"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 )
 
 func main() {
+	//ErrorReporting handler
 	utils.Bot.OnError = utils.ErrorReporting
+
+	//Admin commands
 	utils.Bot.Handle("/restart", commands.Restart, utils.AdminLevel)
 	utils.Bot.Handle("/update", commands.Update, utils.AdminLevel)
+
+	//Moder commands
 	utils.Bot.Handle("/debug", commands.Debug, utils.ModerLevel)
 	utils.Bot.Handle("/say", commands.Say, utils.ModerLevel)
 	utils.Bot.Handle("/getid", commands.Getid, utils.ModerLevel)
@@ -34,6 +38,8 @@ func main() {
 	utils.Bot.Handle("/delantispam", checkpoint.DelAntispam, utils.ModerLevel)
 	utils.Bot.Handle("/getspamchance", checkpoint.CommandGetSpamChance, utils.ModerLevel)
 	utils.Bot.Handle("/convert", commands.Convert, utils.ModerLevel)
+
+	//Chat commands
 	utils.Bot.Handle("/admin", commands.Admin, utils.ChatLevel)
 	utils.Bot.Handle("/get", commands.Get, utils.ChatLevel)
 	utils.Bot.Handle(telebot.OnQuery, commands.GetInline)
@@ -54,6 +60,9 @@ func main() {
 	utils.Bot.Handle("/mywarns", commands.Mywarns, utils.ChatLevel)
 	utils.Bot.Handle("/blessing", commands.Blessing, utils.ChatLevel)
 	utils.Bot.Handle("/suicide", commands.Blessing, utils.ChatLevel)
+
+	//Stats commands
+	utils.Bot.Handle("/popwords", stats.PopWords, utils.ChatOnly)
 
 	//Pidor of the day
 	utils.Bot.Handle("/pidor", pidor.Pidor, utils.ChatLevel)
@@ -85,8 +94,6 @@ func main() {
 	utils.Bot.Handle(telebot.OnUserJoined, utils.Remove, utils.ChatOnly)
 	utils.Bot.Handle(telebot.OnUserLeft, utils.Remove, utils.ChatOnly)
 	utils.Bot.Handle(telebot.OnCallback, checkpoint.ButtonCallback, utils.ChatOnly)
-
-	utils.Bot.Send(telebot.ChatID(utils.Config.SysAdmin), fmt.Sprintf("%v has finished starting up.", utils.Bot.Me.MentionHTML()))
 
 	utils.Bot.Start()
 }

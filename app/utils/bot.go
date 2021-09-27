@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -39,9 +40,7 @@ func BotInit() telebot.Bot {
 		}
 	}
 	settings.Poller = telebot.NewMiddlewarePoller(settings.Poller, func(upd *telebot.Update) bool {
-		if upd.Message != nil && upd.Message.Sender != nil {
-			GatherData(upd.Message.Sender)
-		}
+		GatherData(upd)
 
 		return true
 	})
@@ -49,6 +48,9 @@ func BotInit() telebot.Bot {
 	if err != nil {
 		log.Println(Config.BotApiUrl)
 		log.Fatal(err)
+	}
+	if Config.SysAdmin != 0 {
+		Bot.Send(telebot.ChatID(Config.SysAdmin), fmt.Sprintf("%v has finished starting up.", Bot.Me.MentionHTML()))
 	}
 	return *Bot
 }
