@@ -44,6 +44,7 @@ var FirstWrongButton = Selector.Data("", "")
 var SecondWrongButton = Selector.Data("", "")
 var ThirdWrongButton = Selector.Data("", "")
 var question = ""
+var _ = JoinMessageUpdateService(true)
 
 func GetQuestionWithButtons() (string, []telebot.Btn) {
 	var questions [][]string
@@ -88,7 +89,11 @@ func GetQuestionWithButtons() (string, []telebot.Btn) {
 	return questions[i][0], array
 }
 
-func JoinMessageUpdateService() {
+func JoinMessageUpdateService(init bool) error {
+	if init {
+		go JoinMessageUpdateService(false)
+		return nil
+	}
 	Border.Message = &telebot.Message{
 		ID:       0,
 		Unixtime: 0,

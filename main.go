@@ -83,9 +83,6 @@ func main() {
 	utils.Bot.Handle(telebot.OnUserLeft, utils.Remove, utils.ChatOnly)
 	utils.Bot.Handle(telebot.OnCallback, checkpoint.ButtonCallback, utils.ChatOnly)
 
-	//Checkpoint service
-	go checkpoint.JoinMessageUpdateService()
-
 	utils.Bot.Send(telebot.ChatID(utils.Config.SysAdmin), fmt.Sprintf("%v has finished starting up.", utils.Bot.Me.MentionHTML()))
 
 	utils.Bot.Start()
