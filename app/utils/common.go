@@ -129,7 +129,7 @@ func GatherData(update *telebot.Update) error {
 	if UserResult.Error != nil {
 		return UserResult.Error
 	}
-	if update.Message.Sender.IsBot {
+	if update.Message.Sender.IsBot || update.Message.Chat.Username != Config.Chat {
 		return nil
 	}
 	//Message insert
