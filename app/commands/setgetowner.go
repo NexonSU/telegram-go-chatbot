@@ -21,7 +21,7 @@ func SetGetOwner(context telebot.Context) error {
 		if result.Error != nil {
 			return context.Reply(fmt.Sprintf("Не удалось сохранить гет <code>%v</code>.", get.Name))
 		}
-		return context.Reply(fmt.Sprintf("Владелец гета <code>%v</code> изменён на %v.", get.Name, utils.MentionUser(context.Message().ReplyTo.Sender)))
+		return context.Reply(fmt.Sprintf("Владелец гета <code>%v</code> изменён на %v.", get.Name, context.Message().ReplyTo.Sender.MentionHTML()))
 	} else {
 		return context.Reply(fmt.Sprintf("Гет <code>%v</code> не найден.", context.Data()))
 	}

@@ -25,5 +25,5 @@ func Ban(context telebot.Context) error {
 	if err != nil {
 		return context.Reply(fmt.Sprintf("Ошибка бана пользователя:\n<code>%v</code>", err.Error()))
 	}
-	return context.Reply(fmt.Sprintf("Пользователь <a href=\"tg://user?id=%v\">%v</a> забанен%v.", target.ID, utils.UserFullName(&target), utils.RestrictionTimeMessage(untildate)))
+	return context.Reply(fmt.Sprintf("Пользователь <a href=\"tg://user?id=%v\">%v</a> забанен%v.", target.ID, target.FullName(), utils.RestrictionTimeMessage(untildate)))
 }

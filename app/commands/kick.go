@@ -30,5 +30,5 @@ func Kick(context telebot.Context) error {
 	if err != nil {
 		return context.Reply(fmt.Sprintf("Ошибка исключения пользователя:\n<code>%v</code>", err.Error()))
 	}
-	return context.Reply(fmt.Sprintf("Пользователь <a href=\"tg://user?id=%v\">%v</a> исключен.", target.ID, utils.UserFullName(&target)))
+	return context.Reply(fmt.Sprintf("Пользователь <a href=\"tg://user?id=%v\">%v</a> исключен.", target.ID, target.FullName()))
 }

@@ -13,5 +13,5 @@ func Me(context telebot.Context) error {
 		return context.Reply("Пример использования:\n<code>/me {делает что-то}</code>")
 	}
 	utils.Bot.Delete(context.Message())
-	return context.Send(fmt.Sprintf("<code>%v %v</code>", utils.UserFullName(context.Sender()), context.Data()))
+	return context.Send(fmt.Sprintf("<code>%v %v</code>", context.Sender().FullName(), context.Data()))
 }

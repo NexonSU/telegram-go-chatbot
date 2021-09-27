@@ -149,7 +149,7 @@ func JoinMessageUpdate() error {
 			if i != 0 {
 				text += ", "
 			}
-			text += utils.MentionUser(user.User)
+			text += user.User.MentionHTML()
 		}
 		text += "!\nОтветь на вопрос, чтобы получить доступ в чат, иначе бан.\n"
 		text += "<b>" + question + "</b>\n"
@@ -162,7 +162,7 @@ func JoinMessageUpdate() error {
 			if i != 0 {
 				text += ", "
 			}
-			text += utils.MentionUser(user.User)
+			text += user.User.MentionHTML()
 		}
 		text += ".\n"
 	}
@@ -172,7 +172,7 @@ func JoinMessageUpdate() error {
 			if i != 0 {
 				text += ", "
 			}
-			text += utils.MentionUser(user.User)
+			text += user.User.MentionHTML()
 			if len(banned) < 10 {
 				text += " (" + user.Reason + ")"
 			}

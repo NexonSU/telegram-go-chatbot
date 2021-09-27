@@ -19,26 +19,6 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func UserFullName(user *telebot.User) string {
-	fullname := user.FirstName
-	if user.LastName != "" {
-		fullname = fmt.Sprintf("%v %v", user.FirstName, user.LastName)
-	}
-	return fullname
-}
-
-func UserName(user *telebot.User) string {
-	username := user.Username
-	if user.Username == "" {
-		username = UserFullName(user)
-	}
-	return username
-}
-
-func MentionUser(user *telebot.User) string {
-	return fmt.Sprintf("<a href=\"tg://user?id=%v\">%v</a>", user.ID, UserFullName(user))
-}
-
 func RandInt(min int, max int) int {
 	b, err := rand.Int(rand.Reader, big.NewInt(int64(max)))
 	if err != nil {

@@ -19,5 +19,5 @@ func Deny(context telebot.Context) error {
 	busy["russianroulette"] = false
 	busy["russianroulettePending"] = false
 	busy["russianrouletteInProgress"] = false
-	return context.Edit(fmt.Sprintf("%v отказался от дуэли.", utils.UserFullName(context.Sender())))
+	return context.Edit(fmt.Sprintf("%v отказался от дуэли.", context.Sender().FullName()))
 }

@@ -6,7 +6,6 @@ import (
 	"runtime"
 
 	"github.com/NexonSU/telebot"
-	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	"github.com/chai2010/webp"
 	"github.com/fogleman/gg"
 )
@@ -31,7 +30,7 @@ func Bonk(context telebot.Context) error {
 		return err
 	}
 	dc.SetRGB(1, 1, 1)
-	s := utils.UserFullName(context.Sender())
+	s := context.Sender().FullName()
 	n := 4
 	for dy := -n; dy <= n; dy++ {
 		for dx := -n; dx <= n; dx++ {

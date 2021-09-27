@@ -29,7 +29,7 @@ func Check(User BorderUser) BorderUser {
 	if User.Checked {
 		return User
 	}
-	if arabicSymbols.MatchString(utils.UserFullName(User.User)) {
+	if arabicSymbols.MatchString(User.User.FullName()) {
 		err := utils.Bot.Ban(Border.Chat, &telebot.ChatMember{User: User.User})
 		if err != nil {
 			return User

@@ -37,7 +37,7 @@ func GetFilterCreator(next telebot.HandlerFunc) telebot.HandlerFunc {
 				if err != nil {
 					return err
 				}
-				return context.Reply(fmt.Sprintf("Данный гет могут изменять либо администраторы, либо %v.", utils.UserFullName(&creator)))
+				return context.Reply(fmt.Sprintf("Данный гет могут изменять либо администраторы, либо %v.", creator.FullName()))
 			}
 			return next(context)
 		}

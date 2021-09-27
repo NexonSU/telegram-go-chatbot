@@ -18,5 +18,5 @@ func Slap(context telebot.Context) error {
 	if err != nil {
 		return context.Reply(fmt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
 	}
-	return context.Send(fmt.Sprintf("👋 <b>%v</b> %v %v", utils.UserFullName(context.Sender()), action, utils.MentionUser(&target)))
+	return context.Send(fmt.Sprintf("👋 <b>%v</b> %v %v", context.Sender().FullName(), action, target.MentionHTML()))
 }
