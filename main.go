@@ -87,9 +87,6 @@ func main() {
 	//Checkpoint service
 	go checkpoint.JoinMessageUpdateService()
 
-	//Generate /cur map
-	commands.GenerateMaps()
-
 	utils.Bot.Send(telebot.ChatID(utils.Config.SysAdmin), fmt.Sprintf("%v has finished starting up.", utils.Bot.Me.MentionHTML()))
 
 	utils.Bot.Start()

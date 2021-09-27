@@ -14,10 +14,11 @@ import (
 
 var CryptoMap []*cmc.MapListing
 var FiatMap []*cmc.FiatMapListing
+var _ = GenerateMaps()
 
-func GenerateMaps() {
+func GenerateMaps() error {
 	if utils.Config.CurrencyKey == "" {
-		return
+		return nil
 	}
 	var err error
 	client := cmc.NewClient(&cmc.Config{ProAPIKey: utils.Config.CurrencyKey})
@@ -29,6 +30,7 @@ func GenerateMaps() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	return nil
 }
 
 func GetSymbolId(symbol string) (string, error) {
