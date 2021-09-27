@@ -10,20 +10,20 @@ import (
 
 func GetFilterCreator(next telebot.HandlerFunc) telebot.HandlerFunc {
 	return func(context telebot.Context) error {
-		if utils.Config.Telegram.SysAdmin == context.Sender().ID {
+		if utils.Config.SysAdmin == context.Sender().ID {
 			return next(context)
 		}
-		for _, b := range utils.Config.Telegram.Admins {
+		for _, b := range utils.Config.Admins {
 			if b == context.Sender().Username {
 				return next(context)
 			}
 		}
-		for _, b := range utils.Config.Telegram.Moders {
+		for _, b := range utils.Config.Moders {
 			if b == context.Sender().Username {
 				return next(context)
 			}
 		}
-		if utils.Config.Telegram.Chat == context.Chat().Username {
+		if utils.Config.Chat == context.Chat().Username {
 			var get utils.Get
 			if context.Message().ReplyTo == nil && len(context.Args()) == 0 {
 				return next(context)

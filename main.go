@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/checkpoint"
 	"github.com/NexonSU/telegram-go-chatbot/app/commands"
@@ -90,6 +92,8 @@ func main() {
 
 	//Generate /cur map
 	commands.GenerateMaps()
+
+	utils.Bot.Send(telebot.ChatID(utils.Config.SysAdmin), fmt.Sprintf("%v has finished starting up.", utils.Bot.Me.MentionHTML()))
 
 	utils.Bot.Start()
 }

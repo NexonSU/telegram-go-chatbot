@@ -167,7 +167,7 @@ func SpamFilter(context telebot.Context) error {
 	}
 	if fastjson.GetBool(jsonBytes, "ok") {
 		text := fmt.Sprintf("Сообщение пользователя %v было удалено, т.к. он забанен CAS:\n<pre>%v</pre>", context.Sender().MentionHTML(), context.Message().Text)
-		utils.Bot.Send(telebot.ChatID(utils.Config.Telegram.SysAdmin), text)
+		utils.Bot.Send(telebot.ChatID(utils.Config.SysAdmin), text)
 		return context.Delete()
 	}
 	if GetSpamChance(*context.Sender()) < 10 {
@@ -179,8 +179,8 @@ func SpamFilter(context telebot.Context) error {
 		for _, AntiSpamEntry := range AntiSpam {
 			if AntiSpamEntry.Type == "StickerPack" && context.Message().Sticker.SetName == AntiSpamEntry.Text {
 				text := fmt.Sprintf("Стикер пользователя %v был удален, т.к. стикерпак %v запрещен:", context.Sender().MentionHTML(), AntiSpamEntry.Text)
-				utils.Bot.Send(telebot.ChatID(utils.Config.Telegram.SysAdmin), text)
-				utils.Bot.Send(telebot.ChatID(utils.Config.Telegram.SysAdmin), &telebot.Sticker{
+				utils.Bot.Send(telebot.ChatID(utils.Config.SysAdmin), text)
+				utils.Bot.Send(telebot.ChatID(utils.Config.SysAdmin), &telebot.Sticker{
 					File: telebot.File{FileID: context.Message().Sticker.FileID},
 				})
 				return context.Delete()
@@ -194,7 +194,7 @@ func SpamFilter(context telebot.Context) error {
 			for _, AntiSpamEntry := range AntiSpam {
 				if AntiSpamEntry.Type == "URL" && strings.Contains(strings.ToLower(url), strings.ToLower(AntiSpamEntry.Text)) {
 					text := fmt.Sprintf("Сообщение пользователя %v было удалено, т.к. URL запрещен:\n<pre>%v</pre>", context.Sender().MentionHTML(), context.Text())
-					utils.Bot.Send(telebot.ChatID(utils.Config.Telegram.SysAdmin), text)
+					utils.Bot.Send(telebot.ChatID(utils.Config.SysAdmin), text)
 					return context.Delete()
 				}
 			}
@@ -204,7 +204,7 @@ func SpamFilter(context telebot.Context) error {
 		for _, AntiSpamEntry := range AntiSpam {
 			if AntiSpamEntry.Type == "Text" && strings.Contains(strings.ToLower(context.Text()), strings.ToLower(AntiSpamEntry.Text)) {
 				text := fmt.Sprintf("Сообщение пользователя %v было удалено, т.к. содержит запрещенный текст:\n<pre>%v</pre>", context.Sender().MentionHTML(), context.Text())
-				utils.Bot.Send(telebot.ChatID(utils.Config.Telegram.SysAdmin), text)
+				utils.Bot.Send(telebot.ChatID(utils.Config.SysAdmin), text)
 				return context.Delete()
 			}
 		}
