@@ -62,7 +62,8 @@ func main() {
 	utils.Bot.Handle("/suicide", commands.Blessing, utils.ChatLevel)
 
 	//Stats commands
-	utils.Bot.Handle("/popwords", stats.PopWords, utils.ChatOnly)
+	utils.Bot.Handle("/popwords", stats.PopWords, utils.ChatLevel)
+	utils.Bot.Handle("/removeword", stats.RemoveWord, utils.ModerLevel)
 
 	//Pidor of the day
 	utils.Bot.Handle("/pidor", pidor.Pidor, utils.ChatLevel)
