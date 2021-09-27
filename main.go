@@ -65,7 +65,7 @@ func main() {
 	//Russian Roulette duels
 	utils.Bot.Handle("/russianroulette", duel.Request, utils.ChatOnly)
 	utils.Bot.Handle("/duel", duel.Request, utils.ChatOnly)
-	utils.Bot.Handle("/duelstats", commands.Duelstats, utils.ChatLevel)
+	utils.Bot.Handle("/duelstats", duel.Duelstats, utils.ChatLevel)
 	utils.Bot.Handle(&duel.AcceptButton, duel.Accept, utils.ChatOnly)
 	utils.Bot.Handle(&duel.DenyButton, duel.Deny, utils.ChatOnly)
 
@@ -73,7 +73,7 @@ func main() {
 	utils.Bot.Handle(telebot.OnChannelPost, utils.Repost, utils.ChannelOnly)
 	utils.Bot.Handle(telebot.OnEditedChannelPost, utils.EditRepost, utils.ChannelOnly)
 
-	//Filter URL in comment chat
+	//Filter messages in comment chat
 	utils.Bot.Handle(telebot.OnText, checkpoint.SpamFilter, utils.CommentChatOnly)
 	utils.Bot.Handle(telebot.OnSticker, checkpoint.SpamFilter, utils.CommentChatOnly)
 
