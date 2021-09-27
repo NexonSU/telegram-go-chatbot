@@ -26,8 +26,6 @@ func main() {
 	utils.Bot.Handle("/revive", commands.Revive, utils.ModerLevel)
 	utils.Bot.Handle("/resurrect", commands.Revive, utils.ModerLevel)
 	utils.Bot.Handle("/warn", commands.Warn, utils.ModerLevel)
-	utils.Bot.Handle("/pidordel", pidor.Pidordel, utils.ModerLevel)
-	utils.Bot.Handle("/pidorlist", pidor.Pidorlist, utils.ModerLevel)
 	utils.Bot.Handle("/kill", commands.Kill, utils.ModerLevel)
 	utils.Bot.Handle("/addnope", commands.AddNope, utils.ModerLevel)
 	utils.Bot.Handle("/setgetowner", commands.SetGetOwner, utils.ModerLevel)
@@ -54,14 +52,18 @@ func main() {
 	utils.Bot.Handle("/slap", commands.Slap, utils.ChatLevel)
 	utils.Bot.Handle("/releases", commands.Releases, utils.ChatLevel)
 	utils.Bot.Handle("/mywarns", commands.Mywarns, utils.ChatLevel)
-	utils.Bot.Handle("/pidorules", pidor.Pidorules, utils.ChatLevel)
+	utils.Bot.Handle("/blessing", commands.Blessing, utils.ChatLevel)
+	utils.Bot.Handle("/suicide", commands.Blessing, utils.ChatLevel)
+
+	//Pidor of the day
+	utils.Bot.Handle("/pidor", pidor.Pidor, utils.ChatLevel)
 	utils.Bot.Handle("/pidoreg", pidor.Pidoreg, utils.ChatLevel)
+	utils.Bot.Handle("/pidorules", pidor.Pidorules, utils.ChatLevel)
 	utils.Bot.Handle("/pidorme", pidor.Pidorme, utils.ChatLevel)
 	utils.Bot.Handle("/pidorall", pidor.Pidorall, utils.ChatLevel)
 	utils.Bot.Handle("/pidorstats", pidor.Pidorstats, utils.ChatLevel)
-	utils.Bot.Handle("/pidor", pidor.Pidor, utils.ChatLevel)
-	utils.Bot.Handle("/blessing", commands.Blessing, utils.ChatLevel)
-	utils.Bot.Handle("/suicide", commands.Blessing, utils.ChatLevel)
+	utils.Bot.Handle("/pidordel", pidor.Pidordel, utils.ModerLevel)
+	utils.Bot.Handle("/pidorlist", pidor.Pidorlist, utils.ModerLevel)
 
 	//Russian Roulette duels
 	utils.Bot.Handle("/russianroulette", duel.Request, utils.ChatOnly)
