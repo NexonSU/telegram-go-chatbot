@@ -8,7 +8,6 @@ import (
 	"github.com/NexonSU/telegram-go-chatbot/app/commands"
 	"github.com/NexonSU/telegram-go-chatbot/app/duel"
 	"github.com/NexonSU/telegram-go-chatbot/app/middleware"
-	"github.com/NexonSU/telegram-go-chatbot/app/services"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 )
 
@@ -39,6 +38,7 @@ func main() {
 	utils.Bot.Handle("/convert", commands.Convert, middleware.ModerLevel)
 	utils.Bot.Handle("/admin", commands.Admin, middleware.ChatLevel)
 	utils.Bot.Handle("/get", commands.Get, middleware.ChatLevel)
+	utils.Bot.Handle(telebot.OnQuery, commands.GetInline)
 	utils.Bot.Handle("/getall", commands.Getall, middleware.ChatLevel)
 	utils.Bot.Handle("/set", commands.Set, middleware.GetFilterCreator)
 	utils.Bot.Handle("/del", commands.Del, middleware.GetFilterCreator)
@@ -62,9 +62,6 @@ func main() {
 	utils.Bot.Handle("/pidor", commands.Pidor, middleware.ChatLevel)
 	utils.Bot.Handle("/blessing", commands.Blessing, middleware.ChatLevel)
 	utils.Bot.Handle("/suicide", commands.Blessing, middleware.ChatLevel)
-
-	//Inline
-	utils.Bot.Handle(telebot.OnQuery, services.OnInline)
 
 	//Russian Roulette duels
 	utils.Bot.Handle("/russianroulette", duel.Request, middleware.ChatOnly)
