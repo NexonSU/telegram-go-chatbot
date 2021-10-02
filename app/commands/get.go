@@ -65,7 +65,7 @@ func Get(context telebot.Context) error {
 //Answer on inline get query
 func GetInline(context telebot.Context) error {
 	var count int64
-	query := context.Query().Text
+	query := strings.ToLower(context.Query().Text)
 	if query == "" {
 		return context.Answer(&telebot.QueryResponse{})
 	}
@@ -99,21 +99,24 @@ func GetInline(context telebot.Context) error {
 			}
 		case get.Type == "Audio":
 			results[i] = &telebot.DocumentResult{
-				Title:   get.Name,
-				Caption: get.Caption,
-				Cache:   get.Data,
+				Title:       get.Name,
+				Caption:     get.Caption,
+				Cache:       get.Data,
+				Description: get.Caption,
 			}
 		case get.Type == "Photo":
 			results[i] = &telebot.PhotoResult{
-				Title:   get.Name,
-				Caption: get.Caption,
-				Cache:   get.Data,
+				Title:       get.Name,
+				Caption:     get.Caption,
+				Cache:       get.Data,
+				Description: get.Caption,
 			}
 		case get.Type == "Video":
 			results[i] = &telebot.VideoResult{
-				Title:   get.Name,
-				Caption: get.Caption,
-				Cache:   get.Data,
+				Title:       get.Name,
+				Caption:     get.Caption,
+				Cache:       get.Data,
+				Description: get.Caption,
 			}
 		case get.Type == "Voice":
 			results[i] = &telebot.VoiceResult{
@@ -123,9 +126,10 @@ func GetInline(context telebot.Context) error {
 			}
 		case get.Type == "Document":
 			results[i] = &telebot.DocumentResult{
-				Title:   get.Name,
-				Caption: get.Caption,
-				Cache:   get.Data,
+				Title:       get.Name,
+				Caption:     get.Caption,
+				Cache:       get.Data,
+				Description: get.Caption,
 			}
 		case get.Type == "Text":
 			results[i] = &telebot.ArticleResult{
