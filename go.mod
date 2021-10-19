@@ -19,6 +19,8 @@ require (
 
 require (
 	github.com/aws/aws-sdk-go v1.40.49 // indirect
+	github.com/go-echarts/go-echarts v1.0.0 // indirect
+	github.com/go-echarts/go-echarts/v2 v2.2.4 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.2 // indirect

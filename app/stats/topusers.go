@@ -1,43 +1,63 @@
 package stats
 
 import (
-	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"github.com/go-echarts/go-echarts/v2/charts"
+	"github.com/go-echarts/go-echarts/v2/opts"
 )
 
-func TopUsers(context telebot.Context) error {
-	days := 30
-	if len(context.Args()) == 1 {
-		var err error
-		days, err = strconv.Atoi(context.Data())
-		if err != nil {
-			return context.Reply("Ошибка определения дней.")
-		}
-		if days == 2077 {
-			return context.Reply(&telebot.Video{File: telebot.File{FileID: "BAACAgIAAx0CRXO-MQADWWB4LQABzrOqWPkq-JXIi4TIixY4dwACPw4AArBgwUt5sRu-_fDR5x4E"}})
-		}
-	}
-	days = days * -1
-	from := time.Now().AddDate(0, 0, days)
-	to := time.Now().Add(time.Hour * 24)
-	popwords := fmt.Sprintf("Самые активные юзеры c %v:\n", from.Format("02.01.2006"))
-	result, _ := utils.DB.Model(utils.Message{ChatID: context.Message().Chat.ID}).Select("user_id, COUNT(*) as count").Where("date BETWEEN ? AND ?", from, to).Group("user_id").Order("count DESC").Limit(10).Rows()
-	var UserID int
-	var count int
+func TopUsersBarChart(from time.Time, to time.Time, context telebot.Context) *charts.Bar {
+	result, _ := utils.DB.
+		Table("`messages`, `users`").
+		Select("`users`.first_name || ' ' || `users`.last_name AS FullName, COUNT(`messages`.`id`) as Messages").
+		Where("`messages`.`user_id`=`users`.`id`").
+		Where("`messages`.`chat_id`=?", -1001123405621).
+		Where("date BETWEEN ? AND ?", from, to).
+		Group("`users`.`id`").
+		Order("messages DESC").
+		Limit(20).
+		Rows()
+	var FullName string
+	var Messages int
+	var Users []string
+	var UsersData []opts.BarData
 	for result.Next() {
-		err := result.Scan(&UserID, &count)
+		err := result.Scan(&FullName, &Messages)
 		if err != nil {
-			return err
+			utils.ErrorReporting(err, context)
+			return nil
 		}
-		user, err := utils.GetUserFromDB(strconv.Itoa(UserID))
-		if err != nil {
-			return err
-		}
-		popwords += fmt.Sprintf("%v	-	%v\n", count, user.FullName())
+		Users = append(Users, FullName)
+		UsersData = append(UsersData, opts.BarData{Name: FullName, Value: Messages})
 	}
-	return context.Reply(popwords)
+
+	// create a new bar instance
+	bar := charts.NewBar()
+	// set some global options like Title/Legend/ToolTip or anything else
+	bar.SetGlobalOptions(
+		charts.WithTitleOpts(opts.Title{
+			Title: "Top users",
+		}),
+		charts.WithTooltipOpts(opts.Tooltip{
+			Show:    true,
+			Trigger: "axis",
+			AxisPointer: &opts.AxisPointer{
+				Type: "cross",
+				Snap: true,
+			},
+		}),
+		charts.WithXAxisOpts(opts.XAxis{
+			Type: "value",
+		}),
+		charts.WithYAxisOpts(opts.YAxis{
+			Type: "category",
+			Data: Users,
+		}),
+	)
+
+	bar.AddSeries("Messages", UsersData)
+	return bar
 }

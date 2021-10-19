@@ -1,39 +1,47 @@
 package stats
 
 import (
-	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"github.com/go-echarts/go-echarts/v2/charts"
+	"github.com/go-echarts/go-echarts/v2/opts"
 )
 
-func PopWords(context telebot.Context) error {
-	days := 30
-	if len(context.Args()) == 1 {
-		var err error
-		days, err = strconv.Atoi(context.Data())
-		if err != nil {
-			return context.Reply("Ошибка определения дней.")
-		}
-		if days == 2077 {
-			return context.Reply(&telebot.Video{File: telebot.File{FileID: "BAACAgIAAx0CRXO-MQADWWB4LQABzrOqWPkq-JXIi4TIixY4dwACPw4AArBgwUt5sRu-_fDR5x4E"}})
-		}
-	}
-	days = days * -1
-	from := time.Now().AddDate(0, 0, days)
-	to := time.Now().Add(time.Hour * 24)
-	popwords := fmt.Sprintf("Самые популярные слова c %v:\n", from.Format("02.01.2006"))
-	result, _ := utils.DB.Model(utils.Word{ChatID: context.Message().Chat.ID}).Select("text, COUNT(*) as count").Where("date BETWEEN ? AND ?", from, to).Group("text").Order("count DESC").Limit(10).Rows()
-	var word string
-	var count int
+func PopWordsWcChart(from time.Time, to time.Time, context telebot.Context) *charts.WordCloud {
+	result, _ := utils.DB.
+		Model(utils.Word{ChatID: -1001123405621}).
+		Select("text, COUNT(*) as count").
+		Where("date BETWEEN ? AND ?", from, to).
+		Group("text").
+		Order("count DESC").
+		Limit(100).
+		Rows()
+	var Word string
+	var Count int
+	var WCData []opts.WordCloudData
 	for result.Next() {
-		err := result.Scan(&word, &count)
+		err := result.Scan(&Word, &Count)
 		if err != nil {
-			return err
+			utils.ErrorReporting(err, context)
+			return nil
 		}
-		popwords += fmt.Sprintf("%v	-	%v\n", count, word)
+		WCData = append(WCData, opts.WordCloudData{Name: Word, Value: Count})
 	}
-	return context.Reply(popwords)
+
+	wc := charts.NewWordCloud()
+	wc.SetGlobalOptions(
+		charts.WithTitleOpts(opts.Title{
+			Title: "Popular words",
+		}))
+
+	wc.AddSeries("wordcloud", WCData).
+		SetSeriesOptions(
+			charts.WithWorldCloudChartOpts(
+				opts.WordCloudChart{
+					SizeRange: []float32{14, 80},
+				}),
+		)
+	return wc
 }
