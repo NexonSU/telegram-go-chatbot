@@ -32,6 +32,7 @@ func PopWordsWcChart(from time.Time, to time.Time, context telebot.Context) *cha
 
 	wc := charts.NewWordCloud()
 	wc.SetGlobalOptions(
+		charts.WithTooltipOpts(opts.Tooltip{Show: true}),
 		charts.WithTitleOpts(opts.Title{
 			Title: "Popular words",
 		}))
