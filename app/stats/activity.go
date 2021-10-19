@@ -47,6 +47,7 @@ func UserActivityLineChart(from time.Time, to time.Time, context telebot.Context
 	line := charts.NewLine()
 	// set some global options like Title/Legend/ToolTip or anything else
 	line.SetGlobalOptions(
+		charts.WithDataZoomOpts(opts.DataZoom{XAxisIndex: 0, Start: 0, End: 100, Type: "slider"}),
 		charts.WithLegendOpts(opts.Legend{Show: true}),
 		charts.WithInitializationOpts(opts.Initialization{PageTitle: context.Chat().Title + " Chat Activity", Theme: "shine"}),
 		charts.WithTitleOpts(opts.Title{
