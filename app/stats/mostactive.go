@@ -34,9 +34,10 @@ func MostActiveUsersTodayPieChart(from time.Time, to time.Time, context telebot.
 
 	pie := charts.NewPie()
 	pie.SetGlobalOptions(
+		charts.WithTooltipOpts(opts.Tooltip{Show: true}),
 		charts.WithTitleOpts(opts.Title{Title: "Most active users"}),
 	)
 
-	pie.AddSeries("Users", Users)
+	pie.AddSeries("Messages", Users)
 	return pie
 }
