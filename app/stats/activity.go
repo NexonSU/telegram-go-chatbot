@@ -8,7 +8,6 @@ import (
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
-	"github.com/go-echarts/go-echarts/v2/types"
 )
 
 func UserActivityLineChart(from time.Time, to time.Time, context telebot.Context) *charts.Line {
@@ -49,7 +48,7 @@ func UserActivityLineChart(from time.Time, to time.Time, context telebot.Context
 	// set some global options like Title/Legend/ToolTip or anything else
 	line.SetGlobalOptions(
 		charts.WithLegendOpts(opts.Legend{Show: true}),
-		charts.WithInitializationOpts(opts.Initialization{Theme: types.ThemeWesteros}),
+		charts.WithInitializationOpts(opts.Initialization{PageTitle: context.Chat().Title + " Chat Activity", Theme: "shine"}),
 		charts.WithTitleOpts(opts.Title{
 			Title: "User activity",
 		}),

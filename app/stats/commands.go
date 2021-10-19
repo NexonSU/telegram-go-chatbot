@@ -69,6 +69,8 @@ func Stats(context telebot.Context) error {
 	case "Stats":
 		page := components.NewPage()
 		page.SetLayout(components.PageFlexLayout)
+		page.PageTitle = context.Chat().Title + " Stats"
+		page.Theme = "shine"
 		page.AddCharts(
 			UserActivityLineChart(from, to, context),
 			MostActiveUsersTodayPieChart(from, to, context),
