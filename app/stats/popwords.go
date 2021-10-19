@@ -37,7 +37,7 @@ func PopWordsWcChart(from time.Time, to time.Time, context telebot.Context) *cha
 			Title: "Popular words",
 		}))
 
-	wc.AddSeries("wordcloud", WCData).
+	wc.AddSeries("Popular words", WCData).
 		SetSeriesOptions(
 			charts.WithWorldCloudChartOpts(
 				opts.WordCloudChart{
