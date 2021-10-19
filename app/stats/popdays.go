@@ -28,9 +28,32 @@ func PopDaysBarChart(from time.Time, to time.Time, context telebot.Context) *cha
 			utils.ErrorReporting(err, context)
 			return nil
 		}
+		switch Weekday {
+		case "0":
+			Weekday = "Вс"
+		case "1":
+			Weekday = "Пн"
+		case "2":
+			Weekday = "Вт"
+		case "3":
+			Weekday = "Ср"
+		case "4":
+			Weekday = "Чт"
+		case "5":
+			Weekday = "Пт"
+		case "6":
+			Weekday = "Сб"
+		default:
+			return nil
+		}
 		Weekdays = append(Weekdays, Weekday)
 		Messages = append(Messages, opts.BarData{Value: MessagesCount, Name: fmt.Sprintf("%v", MessagesCount)})
 	}
+
+	Weekdays = append(Weekdays, Weekdays[0])
+	Messages = append(Messages, Messages[0])
+	Weekdays = Weekdays[1:]
+	Messages = Messages[1:]
 
 	// create a new bar instance
 	bar := charts.NewBar()
