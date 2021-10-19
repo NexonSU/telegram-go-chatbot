@@ -12,7 +12,7 @@ import (
 
 func PopDaysBarChart(from time.Time, to time.Time, context telebot.Context) *charts.Bar {
 	result, _ := utils.DB.
-		Model(utils.Message{ChatID: -1001123405621}).
+		Model(utils.Message{ChatID: context.Chat().ID}).
 		Select("strftime('%w', `DATE`, 'localtime') AS Weekdays, COUNT(`id`) as Messages").
 		Where("date BETWEEN ? AND ?", from, to).
 		Group("Weekdays").

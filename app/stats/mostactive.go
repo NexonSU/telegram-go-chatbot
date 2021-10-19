@@ -14,7 +14,7 @@ func MostActiveUsersTodayPieChart(from time.Time, to time.Time, context telebot.
 		Table("`messages`, `users`").
 		Select("`users`.first_name || ' ' || `users`.last_name AS FullName, COUNT(`messages`.`id`) as Messages").
 		Where("`messages`.`user_id`=`users`.`id`").
-		Where("`messages`.`chat_id`=?", -1001123405621).
+		Where("`messages`.`chat_id`=?", context.Chat().ID).
 		Where("date BETWEEN ? AND ?", time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Local), time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 23, 59, 59, 0, time.Local)).
 		Group("`users`.`id`").
 		Order("messages DESC").

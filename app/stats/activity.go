@@ -12,7 +12,7 @@ import (
 
 func UserActivityLineChart(from time.Time, to time.Time, context telebot.Context) *charts.Line {
 	result, _ := utils.DB.
-		Model(utils.Message{ChatID: -1001123405621}).
+		Model(utils.Message{ChatID: context.Chat().ID}).
 		Select("strftime('%d.%m',`date`, 'localtime') as Day, COUNT(DISTINCT `user_id`) AS Users, COUNT(`id`) as Messages").
 		Where("date BETWEEN ? AND ?", from, to).
 		Group("Day").

@@ -11,7 +11,7 @@ import (
 
 func PopWordsWcChart(from time.Time, to time.Time, context telebot.Context) *charts.WordCloud {
 	result, _ := utils.DB.
-		Model(utils.Word{ChatID: -1001123405621}).
+		Model(utils.Word{ChatID: context.Chat().ID}).
 		Select("text, COUNT(*) as count").
 		Where("date BETWEEN ? AND ?", from, to).
 		Group("text").
