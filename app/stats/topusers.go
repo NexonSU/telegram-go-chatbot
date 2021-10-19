@@ -34,6 +34,11 @@ func TopUsersBarChart(from time.Time, to time.Time, context telebot.Context) *ch
 		UsersData = append(UsersData, opts.BarData{Name: FullName, Value: Messages})
 	}
 
+	for i, j := 0, len(Users)-1; i < j; i, j = i+1, j-1 {
+		Users[i], Users[j] = Users[j], Users[i]
+		UsersData[i], UsersData[j] = UsersData[j], UsersData[i]
+	}
+
 	// create a new bar instance
 	bar := charts.NewBar()
 	// set some global options like Title/Legend/ToolTip or anything else
