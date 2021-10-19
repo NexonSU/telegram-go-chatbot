@@ -25,8 +25,8 @@ func RemoveWord(context telebot.Context) error {
 }
 
 func Stats(context telebot.Context) error {
-	selected := "page"
-	graphs := []string{"activity", "mostactivetoday", "popdays", "pophours", "popwords", "topusers"}
+	selected := "Stats"
+	graphs := []string{"Activity", "MostActiveToday", "PopDays", "PopHours", "PopWords", "TopUsers"}
 	days := 30
 	if len(context.Args()) >= 1 {
 		var err error
@@ -40,11 +40,11 @@ func Stats(context telebot.Context) error {
 	}
 	if len(context.Args()) == 2 {
 		for _, graph := range graphs {
-			if graph == context.Args()[1] {
+			if strings.EqualFold(graph, context.Args()[1]) {
 				selected = graph
 			}
 		}
-		if selected == "page" {
+		if selected == "Stats" {
 			return context.Reply("Доступные графики:\n<pre>" + strings.Join(graphs, ", ") + "</pre>")
 		}
 	}
@@ -54,19 +54,19 @@ func Stats(context telebot.Context) error {
 	f := new(bytes.Buffer)
 
 	switch selected {
-	case "activity":
+	case "Activity":
 		UserActivityLineChart(from, to, context).Render(f)
-	case "mostactivetoday":
+	case "MostActiveToday":
 		MostActiveUsersTodayPieChart(from, to, context).Render(f)
-	case "popdays":
+	case "PopDays":
 		PopDaysBarChart(from, to, context).Render(f)
-	case "pophours":
+	case "PopHours":
 		PopHoursBarChart(from, to, context).Render(f)
-	case "popwords":
+	case "PopWords":
 		PopWordsWcChart(from, to, context).Render(f)
-	case "topusers":
+	case "TopUsers":
 		TopUsersBarChart(from, to, context).Render(f)
-	case "page":
+	case "Stats":
 		page := components.NewPage()
 		page.SetLayout(components.PageFlexLayout)
 		page.AddCharts(
@@ -85,6 +85,6 @@ func Stats(context telebot.Context) error {
 		File: telebot.File{
 			FileReader: f,
 		},
-		FileName: "Chart.html",
+		FileName: fmt.Sprintf("%v %v %v - %v.html", selected, context.Chat().Username, from.Format("02.01.2006"), time.Now().Format("02.01.2006")),
 	})
 }
