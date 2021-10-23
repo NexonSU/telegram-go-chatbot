@@ -15,6 +15,9 @@ func Pidor(context telebot.Context) error {
 	if context.Message().Private() {
 		return nil
 	}
+	if time.Now().Local().Hour() > 22 || time.Now().Local().Hour() < 8 {
+		return context.Reply("Команда /pidor доступна только с 8 часов утра до 22 часов вечера по МСК.")
+	}
 	if busy["pidor"] {
 		return context.Reply("Команда занята. Попробуйте позже.")
 	}
