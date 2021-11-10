@@ -14,12 +14,12 @@ type Configuration struct {
 	Listen            string   `json:"listen"`
 	EndpointPublicURL string   `json:"endpoint_public_url"`
 	MaxConnections    int      `json:"max_connections"`
-	Chat              string   `json:"chat"`
+	Chat              int64    `json:"chat"`
 	CommentChat       int64    `json:"comment_chat"`
 	StreamChannel     int64    `json:"stream_channel"`
-	Channel           string   `json:"channel"`
-	Admins            []string `json:"admins"`
-	Moders            []string `json:"moders"`
+	Channel           int64    `json:"channel"`
+	Admins            []int64  `json:"admins"`
+	Moders            []int64  `json:"moders"`
 	SysAdmin          int64    `json:"sysadmin"`
 	CurrencyKey       string   `json:"currency_key"`
 	ReleasesUrl       string   `json:"releases_url"`
@@ -37,8 +37,8 @@ func ConfigInit(file string) Configuration {
 			log.Fatal(err)
 		}
 	} else if os.IsNotExist(err) {
-		Config.Admins = []string{}
-		Config.Moders = []string{}
+		Config.Admins = []int64{}
+		Config.Moders = []int64{}
 		Config.BotApiUrl = "https://api.telegram.org"
 		Config.AllowedUpdates = []string{"message", "channel_post", "callback_query", "chat_member"}
 		jsonData, _ := json.MarshalIndent(Config, "", "\t")

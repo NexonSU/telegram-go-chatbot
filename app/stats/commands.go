@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	"github.com/go-echarts/go-echarts/v2/components"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 func RemoveWord(context telebot.Context) error {

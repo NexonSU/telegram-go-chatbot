@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Send Get to user on /get
@@ -21,7 +21,7 @@ func SetGetOwner(context telebot.Context) error {
 		if result.Error != nil {
 			return context.Reply(fmt.Sprintf("Не удалось сохранить гет <code>%v</code>.", get.Name))
 		}
-		return context.Reply(fmt.Sprintf("Владелец гета <code>%v</code> изменён на %v.", get.Name, context.Message().ReplyTo.Sender.MentionHTML()))
+		return context.Reply(fmt.Sprintf("Владелец гета <code>%v</code> изменён на %v.", get.Name, utils.MentionUser(context.Message().ReplyTo.Sender)))
 	} else {
 		return context.Reply(fmt.Sprintf("Гет <code>%v</code> не найден.", context.Data()))
 	}

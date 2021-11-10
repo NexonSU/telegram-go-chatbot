@@ -5,8 +5,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 var Message *telebot.Message
@@ -31,7 +31,7 @@ func Request(context telebot.Context) error {
 		busy["russianroulette"] = false
 		busy["russianroulettePending"] = false
 		busy["russianrouletteInProgress"] = false
-		return context.Edit(fmt.Sprintf("%v не пришел на дуэль.", Message.Entities[0].User.FullName()))
+		return context.Edit(fmt.Sprintf("%v не пришел на дуэль.", utils.UserFullName(Message.Entities[0].User)))
 	}
 	if busy["russianrouletteInProgress"] && time.Now().Unix()-Message.Time().Unix() > 120 {
 		busy["russianroulette"] = false
@@ -75,7 +75,7 @@ func Request(context telebot.Context) error {
 	Selector.Inline(
 		Selector.Row(AcceptButton, DenyButton),
 	)
-	Message, err = utils.Bot.Send(context.Chat(), fmt.Sprintf("%v! %v вызывает тебя на дуэль!", target.MentionHTML(), context.Sender().MentionHTML()), &Selector)
+	Message, err = utils.Bot.Send(context.Chat(), fmt.Sprintf("%v! %v вызывает тебя на дуэль!", utils.MentionUser(&target), utils.MentionUser(context.Sender())), &Selector)
 	if err != nil {
 		return err
 	}

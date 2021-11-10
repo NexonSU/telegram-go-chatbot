@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Send warning amount on /mywarns

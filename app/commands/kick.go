@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Kick user on /kick
@@ -30,5 +30,5 @@ func Kick(context telebot.Context) error {
 	if err != nil {
 		return context.Reply(fmt.Sprintf("Ошибка исключения пользователя:\n<code>%v</code>", err.Error()))
 	}
-	return context.Reply(fmt.Sprintf("Пользователь <a href=\"tg://user?id=%v\">%v</a> исключен.", target.ID, target.FullName()))
+	return context.Reply(fmt.Sprintf("Пользователь <a href=\"tg://user?id=%v\">%v</a> исключен.", target.ID, utils.UserFullName(&target)))
 }

@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 type BorderUser struct {
@@ -154,7 +154,7 @@ func JoinMessageUpdate() error {
 			if i != 0 {
 				text += ", "
 			}
-			text += user.User.MentionHTML()
+			text += utils.MentionUser(user.User)
 		}
 		text += "!\nОтветь на вопрос, чтобы получить доступ в чат, иначе бан.\n"
 		text += "<b>" + question + "</b>\n"
@@ -167,7 +167,7 @@ func JoinMessageUpdate() error {
 			if i != 0 {
 				text += ", "
 			}
-			text += user.User.MentionHTML()
+			text += utils.MentionUser(user.User)
 		}
 		text += ".\n"
 	}
@@ -177,7 +177,7 @@ func JoinMessageUpdate() error {
 			if i != 0 {
 				text += ", "
 			}
-			text += user.User.MentionHTML()
+			text += utils.MentionUser(user.User)
 			if len(banned) < 10 {
 				text += " (" + user.Reason + ")"
 			}

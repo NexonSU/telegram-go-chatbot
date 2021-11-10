@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 	"gorm.io/gorm/clause"
 )
 
@@ -27,7 +27,7 @@ func Accept(context telebot.Context) error {
 	success := []string{"%v остаётся в живых. Хм... может порох отсырел?", "В воздухе повисла тишина. %v остаётся в живых.", "%v сегодня заново родился.", "%v остаётся в живых. Хм... я ведь зарядил его?", "%v остаётся в живых. Прикольно, а давай проверим на ком-нибудь другом?"}
 	invincible := []string{"пуля отскочила от головы %v и улетела в другой чат.", "%v похмурил брови и отклеил расплющенную пулю со своей головы.", "но ничего не произошло. %v взглянул на револьвер, он был неисправен.", "пуля прошла навылет, но не оставила каких-либо следов на %v."}
 	fail := []string{"мозги %v разлетелись по чату!", "%v упал со стула и его кровь растеклась по месседжу.", "%v замер и спустя секунду упал на стол.", "пуля едва не задела кого-то из участников чата! А? Что? А, %v мёртв, да.", "и в воздухе повисла тишина. Все начали оглядываться, когда %v уже был мёртв."}
-	prefix := fmt.Sprintf("Дуэль! %v против %v!\n", player.MentionHTML(), victim.MentionHTML())
+	prefix := fmt.Sprintf("Дуэль! %v против %v!\n", utils.MentionUser(player), utils.MentionUser(victim))
 	_, err = utils.Bot.Edit(message, fmt.Sprintf("%vЗаряжаю один патрон в револьвер и прокручиваю барабан.", prefix), &telebot.SendOptions{ReplyMarkup: nil})
 	if err != nil {
 		return err
@@ -41,21 +41,21 @@ func Accept(context telebot.Context) error {
 	if utils.RandInt(1, 360)%2 == 0 {
 		player, victim = victim, player
 	}
-	_, err = utils.Bot.Edit(message, fmt.Sprintf("%vРевольвер останавливается на %v, первый ход за ним.", prefix, victim.MentionHTML()))
+	_, err = utils.Bot.Edit(message, fmt.Sprintf("%vРевольвер останавливается на %v, первый ход за ним.", prefix, utils.MentionUser(victim)))
 	if err != nil {
 		return err
 	}
 	bullet := utils.RandInt(1, 6)
 	for i := 1; i <= bullet; i++ {
 		time.Sleep(time.Second * 2)
-		prefix = fmt.Sprintf("Дуэль! %v против %v, раунд %v:\n%v берёт револьвер, приставляет его к голове и...\n", player.MentionHTML(), victim.MentionHTML(), i, victim.MentionHTML())
+		prefix = fmt.Sprintf("Дуэль! %v против %v, раунд %v:\n%v берёт револьвер, приставляет его к голове и...\n", utils.MentionUser(player), utils.MentionUser(victim), i, utils.MentionUser(victim))
 		_, err := utils.Bot.Edit(message, prefix)
 		if err != nil {
 			return err
 		}
 		if bullet != i {
 			time.Sleep(time.Second * 2)
-			_, err := utils.Bot.Edit(message, fmt.Sprintf("%v🍾 %v", prefix, fmt.Sprintf(success[utils.RandInt(0, len(success)-1)], victim.MentionHTML())))
+			_, err := utils.Bot.Edit(message, fmt.Sprintf("%v🍾 %v", prefix, fmt.Sprintf(success[utils.RandInt(0, len(success)-1)], utils.MentionUser(victim))))
 			if err != nil {
 				return err
 			}
@@ -72,25 +72,25 @@ func Accept(context telebot.Context) error {
 		return err
 	}
 	if (PlayerChatMember.Role == "creator" || PlayerChatMember.Role == "administrator") && (VictimChatMember.Role == "creator" || VictimChatMember.Role == "administrator") {
-		_, err = utils.Bot.Edit(message, fmt.Sprintf("%vПуля отскакивает от головы %v и летит в голову %v.", prefix, victim.MentionHTML(), player.MentionHTML()))
+		_, err = utils.Bot.Edit(message, fmt.Sprintf("%vПуля отскакивает от головы %v и летит в голову %v.", prefix, utils.MentionUser(victim), utils.MentionUser(player)))
 		if err != nil {
 			return err
 		}
 		time.Sleep(time.Second * 2)
-		_, err = utils.Bot.Edit(message, fmt.Sprintf("%vПуля отскакивает от головы %v и летит в голову %v.", prefix, player.MentionHTML(), victim.MentionHTML()))
+		_, err = utils.Bot.Edit(message, fmt.Sprintf("%vПуля отскакивает от головы %v и летит в голову %v.", prefix, utils.MentionUser(player), utils.MentionUser(victim)))
 		if err != nil {
 			return err
 		}
 		time.Sleep(time.Second * 2)
-		_, err = utils.Bot.Edit(message, fmt.Sprintf("%vПуля отскакивает от головы %v и летит в мою голову... блять.", prefix, victim.MentionHTML()))
+		_, err = utils.Bot.Edit(message, fmt.Sprintf("%vПуля отскакивает от головы %v и летит в мою голову... блять.", prefix, utils.MentionUser(victim)))
 		if err != nil {
 			return err
 		}
 		busy["bot_is_dead"] = true
 		return err
 	}
-	if utils.IsAdmin(victim.Username) {
-		_, err = utils.Bot.Edit(message, fmt.Sprintf("%v😈 Наводит револьвер на %v и стреляет.", prefix, player.MentionHTML()))
+	if utils.IsAdmin(victim.ID) {
+		_, err = utils.Bot.Edit(message, fmt.Sprintf("%v😈 Наводит револьвер на %v и стреляет.", prefix, utils.MentionUser(player)))
 		if err != nil {
 			return err
 		}
@@ -114,14 +114,14 @@ func Accept(context telebot.Context) error {
 		if err != nil {
 			return err
 		}
-		_, err = utils.Bot.Edit(message, fmt.Sprintf("%v😈 Наводит револьвер на %v и стреляет.\nЯ хз как это объяснить, но %v победитель!\n%v отправился на респавн на %v0 минут.", prefix, player.MentionHTML(), victim.MentionHTML(), player.MentionHTML(), duelist.Deaths))
+		_, err = utils.Bot.Edit(message, fmt.Sprintf("%v😈 Наводит револьвер на %v и стреляет.\nЯ хз как это объяснить, но %v победитель!\n%v отправился на респавн на %v0 минут.", prefix, utils.MentionUser(player), utils.MentionUser(victim), utils.MentionUser(player), duelist.Deaths))
 		if err != nil {
 			return err
 		}
 		return err
 	}
 	if VictimChatMember.Role == "creator" || VictimChatMember.Role == "administrator" {
-		prefix = fmt.Sprintf("%v💥 %v", prefix, fmt.Sprintf(invincible[utils.RandInt(0, len(invincible)-1)], victim.MentionHTML()))
+		prefix = fmt.Sprintf("%v💥 %v", prefix, fmt.Sprintf(invincible[utils.RandInt(0, len(invincible)-1)], utils.MentionUser(victim)))
 		_, err := utils.Bot.Edit(message, prefix)
 		if err != nil {
 			return err
@@ -133,7 +133,7 @@ func Accept(context telebot.Context) error {
 		}
 		return err
 	}
-	prefix = fmt.Sprintf("%v💥 %v", prefix, fmt.Sprintf(fail[utils.RandInt(0, len(fail)-1)], victim.MentionHTML()))
+	prefix = fmt.Sprintf("%v💥 %v", prefix, fmt.Sprintf(fail[utils.RandInt(0, len(fail)-1)], utils.MentionUser(victim)))
 	_, err = utils.Bot.Edit(message, prefix)
 	if err != nil {
 		return err
@@ -158,7 +158,7 @@ func Accept(context telebot.Context) error {
 	if err != nil {
 		return err
 	}
-	_, err = utils.Bot.Edit(message, fmt.Sprintf("%v\nПобедитель дуэли: %v.\n%v отправился на респавн на %v0 минут.", prefix, player.MentionHTML(), victim.MentionHTML(), VictimDuelist.Deaths))
+	_, err = utils.Bot.Edit(message, fmt.Sprintf("%v\nПобедитель дуэли: %v.\n%v отправился на респавн на %v0 минут.", prefix, utils.MentionUser(player), utils.MentionUser(victim), VictimDuelist.Deaths))
 	if err != nil {
 		return err
 	}

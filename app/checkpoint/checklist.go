@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	"github.com/valyala/fastjson"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 func Check(User BorderUser) BorderUser {
@@ -29,7 +29,7 @@ func Check(User BorderUser) BorderUser {
 	if User.Checked {
 		return User
 	}
-	if arabicSymbols.MatchString(User.User.FullName()) {
+	if arabicSymbols.MatchString(utils.UserFullName(User.User)) {
 		err := utils.Bot.Ban(Border.Chat, &telebot.ChatMember{User: User.User})
 		if err != nil {
 			return User

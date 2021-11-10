@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Unmute user on /unmute
@@ -31,5 +31,5 @@ func Revive(context telebot.Context) error {
 	if err != nil {
 		return context.Reply(fmt.Sprintf("Ошибка возрождения пользователя:\n<code>%v</code>", err.Error()))
 	}
-	return context.Reply(fmt.Sprintf("%v возродился в чате.", target.MentionHTML()))
+	return context.Reply(fmt.Sprintf("%v возродился в чате.", utils.MentionUser(&target)))
 }

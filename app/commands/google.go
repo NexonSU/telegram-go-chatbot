@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/NexonSU/telebot"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Reply google URL on "google"

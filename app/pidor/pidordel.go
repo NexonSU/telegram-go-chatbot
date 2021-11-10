@@ -3,8 +3,8 @@ package pidor
 import (
 	"fmt"
 
-	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Remove user in DB on /pidordel
@@ -17,7 +17,7 @@ func Pidordel(context telebot.Context) error {
 	pidor = utils.PidorList(user)
 	result := utils.DB.Delete(&pidor)
 	if result.RowsAffected != 0 {
-		return context.Reply(fmt.Sprintf("Пользователь %v удалён из игры <b>Пидор Дня</b>!", user.MentionHTML()))
+		return context.Reply(fmt.Sprintf("Пользователь %v удалён из игры <b>Пидор Дня</b>!", utils.MentionUser(&user)))
 	} else {
 		return context.Reply(fmt.Sprintf("Не удалось удалить пользователя:\n<code>%v</code>", result.Error.Error()))
 	}

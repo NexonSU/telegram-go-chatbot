@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 func ButtonCallback(context telebot.Context) error {
@@ -24,7 +24,7 @@ func ButtonCallback(context telebot.Context) error {
 				}
 				Border.Users[i].Status = "accepted"
 				Border.NeedUpdate = true
-				return context.Respond(&telebot.CallbackResponse{Text: fmt.Sprintf("Добро пожаловать, %v!\nТеперь у тебя есть доступ к чату.", context.Sender().FullName()), ShowAlert: true})
+				return context.Respond(&telebot.CallbackResponse{Text: fmt.Sprintf("Добро пожаловать, %v!\nТеперь у тебя есть доступ к чату.", utils.UserFullName(context.Sender())), ShowAlert: true})
 			}
 		}
 		return context.Respond(&telebot.CallbackResponse{Text: utils.GetNope()})

@@ -3,8 +3,8 @@ package commands
 import (
 	"fmt"
 
-	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Unban user on /unban
@@ -23,5 +23,5 @@ func Unban(context telebot.Context) error {
 	if err != nil {
 		return context.Reply(fmt.Sprintf("Ошибка разбана пользователя:\n<code>%v</code>", err.Error()))
 	}
-	return context.Reply(fmt.Sprintf("<a href=\"tg://user?id=%v\">%v</a> разбанен.", target.ID, target.FullName()))
+	return context.Reply(fmt.Sprintf("<a href=\"tg://user?id=%v\">%v</a> разбанен.", target.ID, utils.UserFullName(&target)))
 }

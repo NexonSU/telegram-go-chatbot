@@ -3,8 +3,8 @@ package commands
 import (
 	"fmt"
 
-	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Send formatted text on /me
@@ -13,5 +13,5 @@ func Me(context telebot.Context) error {
 		return context.Reply("Пример использования:\n<code>/me {делает что-то}</code>")
 	}
 	utils.Bot.Delete(context.Message())
-	return context.Send(fmt.Sprintf("<code>%v %v</code>", context.Sender().FullName(), context.Data()))
+	return context.Send(fmt.Sprintf("<code>%v %v</code>", utils.UserFullName(context.Sender()), context.Data()))
 }

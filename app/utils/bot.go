@@ -5,14 +5,14 @@ import (
 	"log"
 	"time"
 
-	"github.com/NexonSU/telebot"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 func BotInit() telebot.Bot {
 	if Config.Token == "" {
 		log.Fatal("Telegram Bot token not found in config.json")
 	}
-	if Config.Chat == "" {
+	if Config.Chat == 0 {
 		log.Fatal("Chat username not found in config.json")
 	}
 	settings := telebot.Settings{
@@ -50,7 +50,7 @@ func BotInit() telebot.Bot {
 		log.Fatal(err)
 	}
 	if Config.SysAdmin != 0 {
-		Bot.Send(telebot.ChatID(Config.SysAdmin), fmt.Sprintf("%v has finished starting up.", Bot.Me.MentionHTML()))
+		Bot.Send(telebot.ChatID(Config.SysAdmin), fmt.Sprintf("%v has finished starting up.", MentionUser(Bot.Me)))
 	}
 	return *Bot
 }

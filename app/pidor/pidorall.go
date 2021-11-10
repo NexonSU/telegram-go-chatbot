@@ -3,8 +3,8 @@ package pidor
 import (
 	"fmt"
 
-	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Send top 10 pidors of all time on /pidorall

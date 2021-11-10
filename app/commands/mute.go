@@ -3,8 +3,8 @@ package commands
 import (
 	"fmt"
 
-	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Mute user on /mute
@@ -25,5 +25,5 @@ func Mute(context telebot.Context) error {
 	if utils.Bot.Restrict(context.Chat(), TargetChatMember) != nil {
 		return context.Reply(fmt.Sprintf("Ошибка ограничения пользователя:\n<code>%v</code>", err.Error()))
 	}
-	return context.Reply(fmt.Sprintf("Пользователь <a href=\"tg://user?id=%v\">%v</a> больше не может отправлять сообщения%v.", target.ID, target.FullName(), utils.RestrictionTimeMessage(untildate)))
+	return context.Reply(fmt.Sprintf("Пользователь <a href=\"tg://user?id=%v\">%v</a> больше не может отправлять сообщения%v.", target.ID, utils.UserFullName(&target), utils.RestrictionTimeMessage(untildate)))
 }

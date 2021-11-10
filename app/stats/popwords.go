@@ -3,10 +3,10 @@ package stats
 import (
 	"time"
 
-	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 func PopWordsWcChart(from time.Time, to time.Time, context telebot.Context) *charts.WordCloud {

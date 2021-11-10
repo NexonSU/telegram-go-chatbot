@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 	"gorm.io/gorm/clause"
 )
 
@@ -41,5 +41,5 @@ func Kill(context telebot.Context) error {
 	if err != nil {
 		return err
 	}
-	return context.Send(fmt.Sprintf("💥 %v пристрелил %v.\n%v отправился на респавн на %v0 минут.", context.Sender().FullName(), target.FullName(), target.FullName(), duelist.Deaths))
+	return context.Send(fmt.Sprintf("💥 %v пристрелил %v.\n%v отправился на респавн на %v0 минут.", utils.UserFullName(context.Sender()), utils.UserFullName(&target), utils.UserFullName(&target), duelist.Deaths))
 }

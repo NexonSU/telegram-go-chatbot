@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 	"gorm.io/gorm/clause"
 )
 
@@ -38,10 +38,10 @@ func Warn(context telebot.Context) error {
 		return context.Reply(fmt.Sprintf("Не удалось выдать предупреждение:\n<code>%v</code>.", result.Error))
 	}
 	if warn.Amount == 1 {
-		return context.Send(fmt.Sprintf("%v, у тебя 1 предупреждение.\nЕсль получишь 3 предупреждения за 2 недели, то будешь исключен из чата.", target.MentionHTML()))
+		return context.Send(fmt.Sprintf("%v, у тебя 1 предупреждение.\nЕсль получишь 3 предупреждения за 2 недели, то будешь исключен из чата.", utils.UserFullName(&target)))
 	}
 	if warn.Amount == 2 {
-		return context.Send(fmt.Sprintf("%v, у тебя 2 предупреждения.\nЕсли в течении недели получишь ещё одно, то будешь исключен из чата.", target.MentionHTML()))
+		return context.Send(fmt.Sprintf("%v, у тебя 2 предупреждения.\nЕсли в течении недели получишь ещё одно, то будешь исключен из чата.", utils.UserFullName(&target)))
 	}
 	if warn.Amount == 3 {
 		untildate := time.Now().AddDate(0, 0, 7).Unix()
@@ -54,7 +54,7 @@ func Warn(context telebot.Context) error {
 		if err != nil {
 			return context.Reply(fmt.Sprintf("Ошибка бана пользователя:\n<code>%v</code>", err.Error()))
 		}
-		return context.Reply(fmt.Sprintf("Пользователь <a href=\"tg://user?id=%v\">%v</a> забанен%v, т.к. набрал 3 предупреждения.", target.ID, target.FullName(), utils.RestrictionTimeMessage(untildate)))
+		return context.Reply(fmt.Sprintf("Пользователь <a href=\"tg://user?id=%v\">%v</a> забанен%v, т.к. набрал 3 предупреждения.", target.ID, utils.UserFullName(&target), utils.RestrictionTimeMessage(untildate)))
 	}
 	return err
 }

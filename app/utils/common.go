@@ -15,9 +15,29 @@ import (
 	"time"
 	"unicode/utf16"
 
-	"github.com/NexonSU/telebot"
+	"gopkg.in/tucnak/telebot.v3"
 	"gorm.io/gorm/clause"
 )
+
+func UserFullName(user *telebot.User) string {
+	fullname := user.FirstName
+	if user.LastName != "" {
+		fullname = fmt.Sprintf("%v %v", user.FirstName, user.LastName)
+	}
+	return fullname
+}
+
+func UserName(user *telebot.User) string {
+	username := user.Username
+	if user.Username == "" {
+		username = UserFullName(user)
+	}
+	return username
+}
+
+func MentionUser(user *telebot.User) string {
+	return fmt.Sprintf("<a href=\"tg://user?id=%v\">%v</a>", user.ID, UserFullName(user))
+}
 
 func RandInt(min int, max int) int {
 	b, err := rand.Int(rand.Reader, big.NewInt(int64(max)))
@@ -36,23 +56,23 @@ func StringInSlice(a string, list []string) bool {
 	return false
 }
 
-func IsAdmin(username string) bool {
+func IsAdmin(userid int64) bool {
 	for _, b := range Config.Admins {
-		if b == username {
+		if b == userid {
 			return true
 		}
 	}
 	return false
 }
 
-func IsAdminOrModer(username string) bool {
+func IsAdminOrModer(userid int64) bool {
 	for _, b := range Config.Admins {
-		if b == username {
+		if b == userid {
 			return true
 		}
 	}
 	for _, b := range Config.Moders {
-		if b == username {
+		if b == userid {
 			return true
 		}
 	}
@@ -138,7 +158,7 @@ func GatherData(update *telebot.Update) error {
 	if UserResult.Error != nil {
 		return UserResult.Error
 	}
-	if update.Message.Sender.IsBot || update.Message.Chat.Username != Config.Chat {
+	if update.Message.Sender.IsBot || update.Message.Chat.ID != Config.Chat {
 		return nil
 	}
 	//Message insert
@@ -233,7 +253,7 @@ var Forward ForwardMesssage
 
 //Repost channel post to chat
 func Repost(context telebot.Context) error {
-	chat, err := Bot.ChatByID("@" + Config.Chat)
+	chat, err := Bot.ChatByID(Config.Chat)
 	if err != nil {
 		return err
 	}
@@ -267,7 +287,6 @@ func Repost(context telebot.Context) error {
 					message.Photo.Caption = ""
 					if i == 0 {
 						message.Photo.Caption = Forward.Caption
-						message.Photo.ParseMode = telebot.ModeHTML
 					}
 					Album = append(Album, message.Photo)
 				case context.Message().Video != nil:
@@ -303,9 +322,9 @@ func Repost(context telebot.Context) error {
 			Bot.Send(&telebot.Chat{ID: Config.StreamChannel}, &telebot.Audio{File: context.Message().Audio.File, Caption: context.Message().Caption})
 		}
 	case context.Message().Photo != nil:
-		ChatMessage, err = Bot.Send(chat, &telebot.Photo{File: context.Message().Photo.File, Caption: GetHtmlText(*context.Message()), ParseMode: telebot.ModeHTML})
+		ChatMessage, err = Bot.Send(chat, &telebot.Photo{File: context.Message().Photo.File, Caption: GetHtmlText(*context.Message())})
 		if Config.StreamChannel != 0 && strings.Contains(context.Message().Caption, "zavtracast/live") {
-			Bot.Send(&telebot.Chat{ID: Config.StreamChannel}, &telebot.Photo{File: context.Message().Photo.File, Caption: GetHtmlText(*context.Message()), ParseMode: telebot.ModeHTML})
+			Bot.Send(&telebot.Chat{ID: Config.StreamChannel}, &telebot.Photo{File: context.Message().Photo.File, Caption: GetHtmlText(*context.Message())})
 		}
 	case context.Message().Video != nil:
 		ChatMessage, err = Bot.Send(chat, &telebot.Video{File: context.Message().Video.File, Caption: context.Message().Caption})

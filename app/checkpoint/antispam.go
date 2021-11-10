@@ -9,10 +9,10 @@ import (
 	"time"
 	"unicode/utf16"
 
-	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	m "github.com/keighl/metabolize"
 	"github.com/valyala/fastjson"
+	"gopkg.in/tucnak/telebot.v3"
 	"gorm.io/gorm/clause"
 	"mvdan.cc/xurls/v2"
 )
@@ -45,7 +45,7 @@ func CommandGetSpamChance(context telebot.Context) error {
 	if spamchance < 0 {
 		spamchance = 0
 	}
-	return context.Reply(fmt.Sprintf("%v спамер на %v%%.", user.FullName(), spamchance))
+	return context.Reply(fmt.Sprintf("%v спамер на %v%%.", utils.UserFullName(&user), spamchance))
 }
 
 func GetSpamChance(user telebot.User) int {
@@ -166,7 +166,7 @@ func SpamFilter(context telebot.Context) error {
 		return err
 	}
 	if fastjson.GetBool(jsonBytes, "ok") {
-		text := fmt.Sprintf("Сообщение пользователя %v было удалено, т.к. он забанен CAS:\n<pre>%v</pre>", context.Sender().MentionHTML(), context.Message().Text)
+		text := fmt.Sprintf("Сообщение пользователя %v было удалено, т.к. он забанен CAS:\n<pre>%v</pre>", utils.MentionUser(context.Sender()), context.Message().Text)
 		utils.Bot.Send(telebot.ChatID(utils.Config.SysAdmin), text)
 		return context.Delete()
 	}
@@ -178,7 +178,7 @@ func SpamFilter(context telebot.Context) error {
 	if context.Message() != nil && context.Message().Sticker != nil {
 		for _, AntiSpamEntry := range AntiSpam {
 			if AntiSpamEntry.Type == "StickerPack" && context.Message().Sticker.SetName == AntiSpamEntry.Text {
-				text := fmt.Sprintf("Стикер пользователя %v был удален, т.к. стикерпак %v запрещен:", context.Sender().MentionHTML(), AntiSpamEntry.Text)
+				text := fmt.Sprintf("Стикер пользователя %v был удален, т.к. стикерпак %v запрещен:", utils.MentionUser(context.Sender()), AntiSpamEntry.Text)
 				utils.Bot.Send(telebot.ChatID(utils.Config.SysAdmin), text)
 				utils.Bot.Send(telebot.ChatID(utils.Config.SysAdmin), &telebot.Sticker{
 					File: telebot.File{FileID: context.Message().Sticker.FileID},
@@ -193,7 +193,7 @@ func SpamFilter(context telebot.Context) error {
 			url := string(utf16.Decode(utf16.Encode([]rune(context.Message().Text))[entity.Offset : entity.Offset+entity.Length]))
 			for _, AntiSpamEntry := range AntiSpam {
 				if AntiSpamEntry.Type == "URL" && strings.Contains(strings.ToLower(url), strings.ToLower(AntiSpamEntry.Text)) {
-					text := fmt.Sprintf("Сообщение пользователя %v было удалено, т.к. URL запрещен:\n<pre>%v</pre>", context.Sender().MentionHTML(), context.Text())
+					text := fmt.Sprintf("Сообщение пользователя %v было удалено, т.к. URL запрещен:\n<pre>%v</pre>", utils.MentionUser(context.Sender()), context.Text())
 					utils.Bot.Send(telebot.ChatID(utils.Config.SysAdmin), text)
 					return context.Delete()
 				}
@@ -203,7 +203,7 @@ func SpamFilter(context telebot.Context) error {
 	if context.Text() != "" {
 		for _, AntiSpamEntry := range AntiSpam {
 			if AntiSpamEntry.Type == "Text" && strings.Contains(strings.ToLower(context.Text()), strings.ToLower(AntiSpamEntry.Text)) {
-				text := fmt.Sprintf("Сообщение пользователя %v было удалено, т.к. содержит запрещенный текст:\n<pre>%v</pre>", context.Sender().MentionHTML(), context.Text())
+				text := fmt.Sprintf("Сообщение пользователя %v было удалено, т.к. содержит запрещенный текст:\n<pre>%v</pre>", utils.MentionUser(context.Sender()), context.Text())
 				utils.Bot.Send(telebot.ChatID(utils.Config.SysAdmin), text)
 				return context.Delete()
 			}

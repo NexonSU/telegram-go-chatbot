@@ -5,9 +5,10 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/NexonSU/telebot"
+	"github.com/NexonSU/telegram-go-chatbot/app/utils"
 	"github.com/chai2010/webp"
 	"github.com/fogleman/gg"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 //Write username on hug picture and send to target
@@ -32,7 +33,7 @@ func Hug(context telebot.Context) error {
 		return err
 	}
 	dc.SetRGB(1, 1, 1)
-	s := context.Sender().FullName()
+	s := utils.UserFullName(context.Sender())
 	n := 4
 	for dy := -n; dy <= n; dy++ {
 		for dx := -n; dx <= n; dx++ {

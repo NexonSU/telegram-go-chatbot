@@ -3,8 +3,8 @@ package duel
 import (
 	"fmt"
 
-	"github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
+	"gopkg.in/tucnak/telebot.v3"
 )
 
 func Deny(context telebot.Context) error {
@@ -19,5 +19,5 @@ func Deny(context telebot.Context) error {
 	busy["russianroulette"] = false
 	busy["russianroulettePending"] = false
 	busy["russianrouletteInProgress"] = false
-	return context.Edit(fmt.Sprintf("%v отказался от дуэли.", context.Sender().FullName()))
+	return context.Edit(fmt.Sprintf("%v отказался от дуэли.", utils.UserFullName(context.Sender())))
 }
