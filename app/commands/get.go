@@ -153,7 +153,6 @@ func GetInline(context telebot.Context) error {
 	}
 
 	return context.Answer(&telebot.QueryResponse{
-		Results:   results,
-		CacheTime: 0,
+		Results: results,
 	})
 }
