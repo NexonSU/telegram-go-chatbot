@@ -16,7 +16,6 @@ func main() {
 
 	//Admin commands
 	utils.Bot.Handle("/restart", commands.Restart, utils.AdminLevel)
-	utils.Bot.Handle("/update", commands.Update, utils.AdminLevel)
 
 	//Moder commands
 	utils.Bot.Handle("/debug", commands.Debug, utils.ModerLevel)
