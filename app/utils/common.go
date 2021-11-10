@@ -332,10 +332,7 @@ func EditRepost(context telebot.Context) error {
 
 //Remove message
 func Remove(context telebot.Context) error {
-	context.Delete()
-	time.Sleep(1 * time.Second)
-	context.Delete()
-	return nil
+	return context.Delete()
 }
 
 func GetNope() string {
