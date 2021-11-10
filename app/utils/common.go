@@ -268,7 +268,7 @@ func Repost(context telebot.Context) error {
 			sort.SliceStable(Forward.Messages, func(i, j int) bool {
 				return Forward.Messages[i].ID < Forward.Messages[j].ID
 			})
-			var Album []telebot.InputMedia
+			var Album []telebot.Inputtable
 			for i, message := range Forward.Messages {
 				switch {
 				case context.Message().Audio != nil:
