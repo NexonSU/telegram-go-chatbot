@@ -253,10 +253,7 @@ var Forward ForwardMesssage
 
 //Repost channel post to chat
 func Repost(context telebot.Context) error {
-	chat, err := Bot.ChatByID(Config.Chat)
-	if err != nil {
-		return err
-	}
+	var err error
 	if context.Message().AlbumID != "" {
 		Forward.Messages = append(Forward.Messages, context.Message())
 		if context.Message().Caption != "" {
@@ -297,7 +294,7 @@ func Repost(context telebot.Context) error {
 					Album = append(Album, message.Video)
 				}
 			}
-			ChatMessage, err := Bot.SendAlbum(chat, Album)
+			ChatMessage, err := Bot.SendAlbum(&telebot.Chat{ID: Config.Chat}, Album)
 			for i, message := range Forward.Messages {
 				Forward.ForwardedMesssages = append(Forward.ForwardedMesssages, ForwardedMesssage{message, ChatMessage[i]})
 			}
@@ -310,42 +307,9 @@ func Repost(context telebot.Context) error {
 	}
 
 	var ChatMessage *telebot.Message
-	switch {
-	case context.Message().Animation != nil:
-		ChatMessage, err = Bot.Send(chat, &telebot.Animation{File: context.Message().Animation.File, Caption: context.Message().Caption})
-		if Config.StreamChannel != 0 && strings.Contains(context.Message().Caption, "zavtracast/live") {
-			Bot.Send(&telebot.Chat{ID: Config.StreamChannel}, &telebot.Animation{File: context.Message().Animation.File, Caption: context.Message().Caption})
-		}
-	case context.Message().Audio != nil:
-		ChatMessage, err = Bot.Send(chat, &telebot.Audio{File: context.Message().Audio.File, Caption: context.Message().Caption})
-		if Config.StreamChannel != 0 && strings.Contains(context.Message().Caption, "zavtracast/live") {
-			Bot.Send(&telebot.Chat{ID: Config.StreamChannel}, &telebot.Audio{File: context.Message().Audio.File, Caption: context.Message().Caption})
-		}
-	case context.Message().Photo != nil:
-		ChatMessage, err = Bot.Send(chat, &telebot.Photo{File: context.Message().Photo.File, Caption: GetHtmlText(*context.Message())})
-		if Config.StreamChannel != 0 && strings.Contains(context.Message().Caption, "zavtracast/live") {
-			Bot.Send(&telebot.Chat{ID: Config.StreamChannel}, &telebot.Photo{File: context.Message().Photo.File, Caption: GetHtmlText(*context.Message())})
-		}
-	case context.Message().Video != nil:
-		ChatMessage, err = Bot.Send(chat, &telebot.Video{File: context.Message().Video.File, Caption: context.Message().Caption})
-		if Config.StreamChannel != 0 && strings.Contains(context.Message().Caption, "zavtracast/live") {
-			Bot.Send(&telebot.Chat{ID: Config.StreamChannel}, &telebot.Video{File: context.Message().Video.File, Caption: context.Message().Caption})
-		}
-	case context.Message().Voice != nil:
-		ChatMessage, err = Bot.Send(chat, &telebot.Voice{File: context.Message().Voice.File, Caption: context.Message().Caption})
-		if Config.StreamChannel != 0 && strings.Contains(context.Message().Caption, "zavtracast/live") {
-			Bot.Send(&telebot.Chat{ID: Config.StreamChannel}, &telebot.Voice{File: context.Message().Voice.File, Caption: context.Message().Caption})
-		}
-	case context.Message().Document != nil:
-		ChatMessage, err = Bot.Send(chat, &telebot.Document{File: context.Message().Document.File, Caption: context.Message().Caption})
-		if Config.StreamChannel != 0 && strings.Contains(context.Message().Caption, "zavtracast/live") {
-			Bot.Send(&telebot.Chat{ID: Config.StreamChannel}, &telebot.Document{File: context.Message().Document.File, Caption: context.Message().Caption})
-		}
-	default:
-		ChatMessage, err = Bot.Send(chat, GetHtmlText(*context.Message()))
-		if Config.StreamChannel != 0 && strings.Contains(context.Message().Text, "zavtracast/live") {
-			Bot.Send(&telebot.Chat{ID: Config.StreamChannel}, GetHtmlText(*context.Message()))
-		}
+	ChatMessage, err = Bot.Copy(&telebot.Chat{ID: Config.Chat}, context.Message())
+	if Config.StreamChannel != 0 && strings.Contains(context.Message().Text, "zavtracast/live") {
+		Bot.Copy(&telebot.Chat{ID: Config.StreamChannel}, context.Message())
 	}
 	Forward.ForwardedMesssages = append(Forward.ForwardedMesssages, ForwardedMesssage{context.Message(), *ChatMessage})
 	return err
@@ -356,20 +320,9 @@ func EditRepost(context telebot.Context) error {
 	var err error
 	for _, ForwardedMesssage := range Forward.ForwardedMesssages {
 		if ForwardedMesssage.ChannelMessage.ID == context.Message().ID {
-			switch {
-			case context.Message().Animation != nil:
-				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Animation{File: context.Message().Animation.File, Caption: context.Message().Caption})
-			case context.Message().Audio != nil:
-				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Audio{File: context.Message().Audio.File, Caption: context.Message().Caption})
-			case context.Message().Photo != nil:
-				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Photo{File: context.Message().Photo.File, Caption: context.Message().Caption})
-			case context.Message().Video != nil:
-				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Video{File: context.Message().Video.File, Caption: context.Message().Caption})
-			case context.Message().Voice != nil:
-				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Voice{File: context.Message().Voice.File, Caption: context.Message().Caption})
-			case context.Message().Document != nil:
-				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, &telebot.Document{File: context.Message().Document.File, Caption: context.Message().Caption})
-			default:
+			if context.Media() != nil {
+				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, context.Media())
+			} else {
 				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, GetHtmlText(*context.Message()))
 			}
 		}
