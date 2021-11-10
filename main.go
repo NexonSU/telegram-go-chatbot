@@ -90,7 +90,7 @@ func main() {
 	utils.Bot.Handle(telebot.OnText, checkpoint.SpamFilter, utils.CommentChatOnly)
 	utils.Bot.Handle(telebot.OnSticker, checkpoint.SpamFilter, utils.CommentChatOnly)
 
-	//User join
+	//User entry
 	utils.Bot.Handle(telebot.OnChatMember, checkpoint.ChatMemberUpdate, utils.ChatOnly)
 	utils.Bot.Handle(telebot.OnUserJoined, utils.Remove, utils.ChatOnly)
 	utils.Bot.Handle(telebot.OnUserLeft, utils.Remove, utils.ChatOnly)
