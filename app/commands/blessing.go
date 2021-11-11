@@ -41,5 +41,5 @@ func Blessing(context telebot.Context) error {
 	if err != nil {
 		return err
 	}
-	return context.Send(fmt.Sprintf("<code>💥 %v выбрал лёгкий путь.\nРеспавн через %v0 минут.</code>", utils.UserFullName(context.Sender()), duelist.Deaths))
+	return context.Send(fmt.Sprintf("<code>💥 %v выбрал лёгкий путь.\nРеспавн через %v минут.</code>", utils.UserFullName(context.Sender()), duelist.Deaths))
 }
