@@ -36,7 +36,7 @@ func Kill(context telebot.Context) error {
 	if result.Error != nil {
 		return err
 	}
-	ChatMember.RestrictedUntil = time.Now().Add(time.Second * time.Duration(600*duelist.Deaths)).Unix()
+	ChatMember.RestrictedUntil = time.Now().Add(time.Second * time.Duration(60*duelist.Deaths)).Unix()
 	err = utils.Bot.Restrict(context.Chat(), ChatMember)
 	if err != nil {
 		return err

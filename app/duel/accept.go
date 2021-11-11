@@ -109,7 +109,7 @@ func Accept(context telebot.Context) error {
 		if result.Error != nil {
 			return err
 		}
-		PlayerChatMember.RestrictedUntil = time.Now().Add(time.Second * time.Duration(600*duelist.Deaths)).Unix()
+		PlayerChatMember.RestrictedUntil = time.Now().Add(time.Second * time.Duration(60*duelist.Deaths)).Unix()
 		err = utils.Bot.Restrict(context.Message().Chat, PlayerChatMember)
 		if err != nil {
 			return err
@@ -153,7 +153,7 @@ func Accept(context telebot.Context) error {
 	if result.Error != nil {
 		return err
 	}
-	VictimChatMember.RestrictedUntil = time.Now().Add(time.Second * time.Duration(600*VictimDuelist.Deaths)).Unix()
+	VictimChatMember.RestrictedUntil = time.Now().Add(time.Second * time.Duration(60*VictimDuelist.Deaths)).Unix()
 	err = utils.Bot.Restrict(context.Message().Chat, VictimChatMember)
 	if err != nil {
 		return err
