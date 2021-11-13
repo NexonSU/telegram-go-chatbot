@@ -177,7 +177,7 @@ func JoinMessageUpdate() error {
 			if i != 0 {
 				text += ", "
 			}
-			text += utils.MentionUser(user.User)
+			text += fmt.Sprintf("%v %v", user.User.FirstName, user.User.LastName)
 			if len(banned) < 10 {
 				text += " (" + user.Reason + ")"
 			}
