@@ -173,15 +173,7 @@ func JoinMessageUpdate() error {
 	}
 	if len(banned) != 0 {
 		text += fmt.Sprintf("Заблокированные пользователи(%d): ", len(banned))
-		for i, user := range LastNElements(banned, 30) {
-			if i != 0 {
-				text += ", "
-			}
-			text += utils.MentionUser(user.User)
-			if len(banned) < 10 {
-				text += " (" + user.Reason + ")"
-			}
-		}
+		/** Не выводим список пользователей, так как в именах или никнеймах может быть реклама */
 		text += ".\n"
 	}
 	if len(Border.Users) > 10 && Border.NeedCreate && time.Now().Unix()-Border.Message.Time().Unix() < 120 {
