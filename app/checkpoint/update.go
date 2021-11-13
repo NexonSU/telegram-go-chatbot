@@ -123,6 +123,17 @@ func LastNElements(arr []BorderUser, n int) []BorderUser {
 	return arr
 }
 
+func GetUserNames(list []BorderUser) string {
+	var text string
+	for i, user := range LastNElements(list, 30) {
+		if i != 0 {
+			text += ", "
+		}
+		text += utils.MentionUser(user.User)
+	}
+	return text
+}
+
 func JoinMessageUpdate() error {
 	var pending []BorderUser
 	var banned []BorderUser
@@ -150,12 +161,7 @@ func JoinMessageUpdate() error {
 	}
 	if len(pending) != 0 {
 		text += fmt.Sprintf("Добро пожаловать(%d): ", len(pending))
-		for i, user := range LastNElements(pending, 30) {
-			if i != 0 {
-				text += ", "
-			}
-			text += utils.MentionUser(user.User)
-		}
+		text += GetUserNames(pending)
 		text += "!\nОтветь на вопрос, чтобы получить доступ в чат, иначе бан.\n"
 		text += "<b>" + question + "</b>\n"
 	} else {
@@ -163,12 +169,7 @@ func JoinMessageUpdate() error {
 	}
 	if len(accepted) != 0 {
 		text += fmt.Sprintf("Новые подтвержденные пользователи(%d): ", len(accepted))
-		for i, user := range LastNElements(accepted, 30) {
-			if i != 0 {
-				text += ", "
-			}
-			text += utils.MentionUser(user.User)
-		}
+		text += GetUserNames(accepted)
 		text += ".\n"
 	}
 	if len(banned) != 0 {
