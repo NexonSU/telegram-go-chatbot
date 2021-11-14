@@ -20,5 +20,6 @@ func Getall(context telebot.Context) error {
 		}
 		getall = append(getall, get.Name)
 	}
-	return context.Reply(fmt.Sprintf("Доступные геты: %v", strings.Join(getall[:], ", ")))
+	_ = context.Send(context.Sender(), fmt.Sprintf("Доступные геты: %v", strings.Join(getall[:], ", ")))
+	return context.Reply("Список отправлен в личку.\nЕсли список не пришел, то убедитесь, что бот запущен и не заблокирован в личке.")
 }
