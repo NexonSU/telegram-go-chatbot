@@ -308,7 +308,7 @@ func Repost(context telebot.Context) error {
 
 	var ChatMessage *telebot.Message
 	ChatMessage, err = Bot.Copy(&telebot.Chat{ID: Config.Chat}, context.Message())
-	if Config.StreamChannel != 0 && strings.Contains(context.Message().Text, "zavtracast/live") {
+	if Config.StreamChannel != 0 && strings.Contains(context.Text(), "zavtracast/live") {
 		Bot.Copy(&telebot.Chat{ID: Config.StreamChannel}, context.Message())
 	}
 	Forward.ForwardedMesssages = append(Forward.ForwardedMesssages, ForwardedMesssage{context.Message(), *ChatMessage})
