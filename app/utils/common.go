@@ -91,6 +91,9 @@ func ErrorReporting(err error, context telebot.Context) {
 	_, fn, line, _ := runtime.Caller(1)
 	log.Printf("[%s:%d] %v", fn, line, err)
 	text := fmt.Sprintf("<pre>[%s:%d]\n%v</pre>", fn, line, err)
+	if strings.Contains(err.Error(), "specified new message content and reply markup are exactly the same") {
+		return
+	}
 	if context.Message() != nil {
 		MarshalledMessage, _ := json.MarshalIndent(context.Message(), "", "    ")
 		JsonMessage := html.EscapeString(string(MarshalledMessage))
