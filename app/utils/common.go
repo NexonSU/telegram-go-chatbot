@@ -238,35 +238,37 @@ func GetUserFromDB(findstring string) (telebot.User, error) {
 	return user, err
 }
 
-type ForwardedMesssage struct {
-	ChannelMessage *telebot.Message
-	ChatMessage    telebot.Message
+type ForwardHistory struct {
+	ChannelMessageID int
+	ChatMessageID    int
 }
 type ForwardMesssage struct {
-	AlbumID            string
-	Messages           []*telebot.Message
-	Caption            string
-	ForwardedMesssages []ForwardedMesssage
+	AlbumID       string
+	Caption       string
+	History       []ForwardHistory
+	StreamHistory []ForwardHistory
 }
 
 var Forward ForwardMesssage
+var AlbumMessages []*telebot.Message
 
 //Repost channel post to chat
 func Repost(context telebot.Context) error {
 	var err error
+	var err2 error
 	if context.Message().AlbumID != "" {
-		Forward.Messages = append(Forward.Messages, context.Message())
+		AlbumMessages = append(AlbumMessages, context.Message())
 		if context.Message().Caption != "" {
 			Forward.Caption = context.Message().Caption
 		}
 		if context.Message().AlbumID != Forward.AlbumID {
 			Forward.AlbumID = context.Message().AlbumID
 			time.Sleep(5 * time.Second)
-			sort.SliceStable(Forward.Messages, func(i, j int) bool {
-				return Forward.Messages[i].ID < Forward.Messages[j].ID
+			sort.SliceStable(AlbumMessages, func(i, j int) bool {
+				return AlbumMessages[i].ID < AlbumMessages[j].ID
 			})
 			var Album []telebot.Inputtable
-			for i, message := range Forward.Messages {
+			for i, message := range AlbumMessages {
 				switch {
 				case context.Message().Audio != nil:
 					message.Audio.Caption = ""
@@ -295,11 +297,11 @@ func Repost(context telebot.Context) error {
 				}
 			}
 			ChatMessage, err := Bot.SendAlbum(&telebot.Chat{ID: Config.Chat}, Album)
-			for i, message := range Forward.Messages {
-				Forward.ForwardedMesssages = append(Forward.ForwardedMesssages, ForwardedMesssage{message, ChatMessage[i]})
+			for i, message := range AlbumMessages {
+				Forward.History = append(Forward.History, ForwardHistory{message.ID, ChatMessage[i].ID})
 			}
 			Forward.AlbumID = ""
-			Forward.Messages = []*telebot.Message{}
+			AlbumMessages = []*telebot.Message{}
 			Forward.Caption = ""
 			return err
 		}
@@ -308,24 +310,52 @@ func Repost(context telebot.Context) error {
 
 	var ChatMessage *telebot.Message
 	ChatMessage, err = Bot.Copy(&telebot.Chat{ID: Config.Chat}, context.Message())
+	Forward.History = append(Forward.History, ForwardHistory{context.Message().ID, ChatMessage.ID})
 	if Config.StreamChannel != 0 && strings.Contains(context.Text(), "zavtracast/live") {
-		Bot.Copy(&telebot.Chat{ID: Config.StreamChannel}, context.Message())
+		ChatMessage, err2 = Bot.Copy(&telebot.Chat{ID: Config.StreamChannel}, context.Message())
+		Forward.StreamHistory = append(Forward.StreamHistory, ForwardHistory{context.Message().ID, ChatMessage.ID})
 	}
-	Forward.ForwardedMesssages = append(Forward.ForwardedMesssages, ForwardedMesssage{context.Message(), *ChatMessage})
+	if err2 != nil {
+		err = err2
+	}
 	return err
 }
 
 //Edit reposted post
 func EditRepost(context telebot.Context) error {
 	var err error
-	for _, ForwardedMesssage := range Forward.ForwardedMesssages {
-		if ForwardedMesssage.ChannelMessage.ID == context.Message().ID {
+	var err2 error
+	for _, ForwardHistory := range Forward.History {
+		if ForwardHistory.ChannelMessageID == context.Message().ID {
 			if context.Media() != nil {
-				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, context.Media())
+				_, err = Bot.Edit(&telebot.Message{ID: ForwardHistory.ChatMessageID, Chat: &telebot.Chat{ID: Config.Chat}}, context.Media())
+				_, err2 = Bot.EditCaption(&telebot.Message{ID: ForwardHistory.ChatMessageID, Chat: &telebot.Chat{ID: Config.Chat}}, GetHtmlText(*context.Message()))
 			} else {
-				_, err = Bot.Edit(&ForwardedMesssage.ChatMessage, GetHtmlText(*context.Message()))
+				_, err = Bot.Edit(&telebot.Message{ID: ForwardHistory.ChatMessageID, Chat: &telebot.Chat{ID: Config.Chat}}, GetHtmlText(*context.Message()))
 			}
 		}
+	}
+	if Config.StreamChannel != 0 && strings.Contains(context.Text(), "zavtracast/live") {
+		forwarded := false
+		for _, ForwardHistory := range Forward.StreamHistory {
+			if ForwardHistory.ChannelMessageID == context.Message().ID {
+				forwarded = true
+				if context.Media() != nil {
+					_, err = Bot.Edit(&telebot.Message{ID: ForwardHistory.ChatMessageID, Chat: &telebot.Chat{ID: Config.StreamChannel}}, context.Media())
+					_, err2 = Bot.EditCaption(&telebot.Message{ID: ForwardHistory.ChatMessageID, Chat: &telebot.Chat{ID: Config.StreamChannel}}, GetHtmlText(*context.Message()))
+				} else {
+					_, err = Bot.Edit(&telebot.Message{ID: ForwardHistory.ChatMessageID, Chat: &telebot.Chat{ID: Config.StreamChannel}}, GetHtmlText(*context.Message()))
+				}
+			}
+		}
+		if !forwarded {
+			var ChatMessage *telebot.Message
+			ChatMessage, err2 = Bot.Copy(&telebot.Chat{ID: Config.StreamChannel}, context.Message())
+			Forward.StreamHistory = append(Forward.StreamHistory, ForwardHistory{context.Message().ID, ChatMessage.ID})
+		}
+	}
+	if err2 != nil {
+		err = err2
 	}
 	return err
 }
