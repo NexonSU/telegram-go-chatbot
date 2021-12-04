@@ -15,7 +15,7 @@ func BotInit() telebot.Bot {
 	if Config.Chat == 0 {
 		log.Fatal("Chat username not found in config.json")
 	}
-	settings := telebot.Settings{
+	Settings := telebot.Settings{
 		URL:       Config.BotApiUrl,
 		Token:     Config.Token,
 		ParseMode: telebot.ModeHTML,
@@ -25,7 +25,7 @@ func BotInit() telebot.Bot {
 		},
 	}
 	if Config.EndpointPublicURL != "" || Config.Listen != "" {
-		settings.Poller = &telebot.Webhook{
+		Settings.Poller = &telebot.Webhook{
 			Listen: Config.Listen,
 			Endpoint: &telebot.WebhookEndpoint{
 				PublicURL: Config.EndpointPublicURL,
@@ -34,12 +34,12 @@ func BotInit() telebot.Bot {
 			AllowedUpdates: Config.AllowedUpdates,
 		}
 	} else {
-		settings.Poller = &telebot.LongPoller{
+		Settings.Poller = &telebot.LongPoller{
 			Timeout:        10 * time.Second,
 			AllowedUpdates: Config.AllowedUpdates,
 		}
 	}
-	var Bot, err = telebot.NewBot(settings)
+	var Bot, err = telebot.NewBot(Settings)
 	if err != nil {
 		log.Println(Config.BotApiUrl)
 		log.Fatal(err)

@@ -158,29 +158,3 @@ func ChatLevel(next telebot.HandlerFunc) telebot.HandlerFunc {
 		return nil
 	}
 }
-
-func AnyLevel(next telebot.HandlerFunc) telebot.HandlerFunc {
-	return func(context telebot.Context) error {
-		if context.Message() == nil || context.Message().Sender == nil {
-			return next(context)
-		}
-		GatherData(context)
-		LastChatMessageID = context.Message().ID
-		if context.Message().ReplyTo != nil && context.Message().ReplyTo.ID == WelcomeMessageID {
-			delete := DB.Delete(CheckPointRestrict{UserID: context.Message().Sender.ID})
-			if delete.Error != nil {
-				return delete.Error
-			}
-			restricted := DB.Find(&RestrictedUsers)
-			if restricted.Error != nil {
-				return restricted.Error
-			}
-		}
-		for _, user := range RestrictedUsers {
-			if context.Message().Sender.ID == user.UserID {
-				return context.Delete()
-			}
-		}
-		return next(context)
-	}
-}

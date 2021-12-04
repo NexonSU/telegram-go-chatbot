@@ -14,8 +14,13 @@ func main() {
 	//ErrorReporting handler
 	utils.Bot.OnError = utils.ErrorReporting
 
-	//Main middleware
-	utils.Bot.Use(utils.AnyLevel)
+	//Middleware
+	utils.Bot.Poller = telebot.NewMiddlewarePoller(utils.Bot.Poller, func(upd *telebot.Update) bool {
+		utils.GatherData(upd)
+		utils.CheckPoint(upd)
+
+		return true
+	})
 
 	//Admin commands
 	utils.Bot.Handle("/restart", commands.Restart, utils.AdminLevel)
