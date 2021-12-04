@@ -60,10 +60,16 @@ func UserJoin(context telebot.Context) error {
 	if restricted.Error != nil {
 		return restricted.Error
 	}
+	//welcome message text
+	var welcomeGet utils.Get
+	utils.DB.Where(&utils.Get{Name: "welcome"}).First(&welcomeGet)
+	if welcomeGet.Data == "" {
+		welcomeGet.Data = "Ответь на это сообщение и расскажи о себе."
+	}
 	//welcome message create\update
 	if WelcomeMessage.ID == 0 || (time.Now().Unix()-WelcomeMessage.time > 60 && utils.LastChatMessageID-WelcomeMessage.ID > 0) {
 		WelcomeMessage.text = fmt.Sprintf("Привет %v!", utils.MentionUser(User))
-		m, err := utils.Bot.Send(&telebot.Chat{ID: utils.Config.Chat}, WelcomeMessage.text+utils.Config.WelcomeMessage)
+		m, err := utils.Bot.Send(&telebot.Chat{ID: utils.Config.Chat}, WelcomeMessage.text+"\n"+welcomeGet.Data)
 		if err != nil {
 			_ = utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, User)
 			return err
@@ -77,7 +83,7 @@ func UserJoin(context telebot.Context) error {
 		if time.Now().Unix()-WelcomeMessage.time < 5 {
 			return nil
 		}
-		_, err := utils.Bot.Edit(&telebot.Message{ID: WelcomeMessage.ID, Chat: &telebot.Chat{ID: utils.Config.Chat}}, WelcomeMessage.text+utils.Config.WelcomeMessage)
+		_, err := utils.Bot.Edit(&telebot.Message{ID: WelcomeMessage.ID, Chat: &telebot.Chat{ID: utils.Config.Chat}}, WelcomeMessage.text+"\n"+welcomeGet.Data)
 		if err != nil {
 			_ = utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, User)
 			return err
