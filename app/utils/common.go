@@ -98,6 +98,9 @@ func ErrorReporting(err error, context telebot.Context) {
 	if strings.Contains(err.Error(), "specified new message content and reply markup are exactly the same") {
 		return
 	}
+	if strings.Contains(err.Error(), "message to delete not found") {
+		return
+	}
 	if context.Message() != nil {
 		MarshalledMessage, _ := json.MarshalIndent(context.Message(), "", "    ")
 		JsonMessage := html.EscapeString(string(MarshalledMessage))
