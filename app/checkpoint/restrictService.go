@@ -14,7 +14,7 @@ func restrictUpdate() error {
 		return restricted.Error
 	}
 	for _, user := range utils.RestrictedUsers {
-		if user.Since > time.Now().Unix()-1800 {
+		if user.Since > time.Now().Unix()-300 {
 			continue
 		}
 		delete := utils.DB.Delete(&user)
@@ -39,7 +39,7 @@ func restrictService(init bool) error {
 		if err != nil {
 			log.Println(err.Error())
 		}
-		time.Sleep(time.Second * time.Duration(300))
+		time.Sleep(time.Second * time.Duration(60))
 	}
 }
 
