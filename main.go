@@ -14,6 +14,9 @@ func main() {
 	//ErrorReporting handler
 	utils.Bot.OnError = utils.ErrorReporting
 
+	//Main middleware
+	utils.Bot.Use(utils.AnyLevel)
+
 	//Admin commands
 	utils.Bot.Handle("/restart", commands.Restart, utils.AdminLevel)
 
@@ -93,7 +96,6 @@ func main() {
 	utils.Bot.Handle(telebot.OnChatMember, checkpoint.ChatMemberUpdate, utils.ChatOnly)
 	utils.Bot.Handle(telebot.OnUserJoined, utils.Remove, utils.ChatOnly)
 	utils.Bot.Handle(telebot.OnUserLeft, utils.Remove, utils.ChatOnly)
-	utils.Bot.Handle(telebot.OnCallback, checkpoint.ButtonCallback, utils.ChatOnly)
 
 	utils.Bot.Start()
 }

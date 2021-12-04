@@ -64,6 +64,11 @@ type Word struct {
 	Text   string
 }
 
+type CheckPointRestrict struct {
+	UserID int64 `gorm:"primaryKey"`
+	Since  int64
+}
+
 func DataBaseInit(file string) gorm.DB {
 	database, err := gorm.Open(
 		sqlite.Open(file),
@@ -76,7 +81,7 @@ func DataBaseInit(file string) gorm.DB {
 	}
 
 	//Create tables, if they not exists in DB
-	err = database.AutoMigrate(telebot.User{}, Message{}, Word{}, Get{}, Warn{}, PidorStats{}, PidorList{}, Duelist{}, Nope{}, AntiSpam{})
+	err = database.AutoMigrate(telebot.User{}, Message{}, Word{}, Get{}, Warn{}, PidorStats{}, PidorList{}, Duelist{}, Nope{}, AntiSpam{}, CheckPointRestrict{})
 	if err != nil {
 		log.Println(err)
 	}

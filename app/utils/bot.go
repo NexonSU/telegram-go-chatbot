@@ -39,11 +39,6 @@ func BotInit() telebot.Bot {
 			AllowedUpdates: Config.AllowedUpdates,
 		}
 	}
-	settings.Poller = telebot.NewMiddlewarePoller(settings.Poller, func(upd *telebot.Update) bool {
-		GatherData(upd)
-
-		return true
-	})
 	var Bot, err = telebot.NewBot(settings)
 	if err != nil {
 		log.Println(Config.BotApiUrl)

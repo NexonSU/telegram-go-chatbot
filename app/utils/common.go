@@ -19,6 +19,10 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+var LastChatMessageID int
+var WelcomeMessageID int
+var RestrictedUsers []CheckPointRestrict
+
 func UserFullName(user *telebot.User) string {
 	fullname := user.FirstName
 	if user.LastName != "" {
@@ -150,55 +154,52 @@ func FindUserInMessage(context telebot.Context) (telebot.User, int64, error) {
 	return user, untildate, err
 }
 
-func GatherData(update *telebot.Update) error {
-	if update.Message == nil || update.Message.Sender == nil {
-		return nil
-	}
+func GatherData(context telebot.Context) error {
 	//User update
 	UserResult := DB.Clauses(clause.OnConflict{
 		UpdateAll: true,
-	}).Create(update.Message.Sender)
+	}).Create(context.Message().Sender)
 	if UserResult.Error != nil {
 		return UserResult.Error
 	}
-	if update.Message.Sender.IsBot || update.Message.Chat.ID != Config.Chat {
+	if context.Message().Sender.IsBot || context.Message().Chat.ID != Config.Chat {
 		return nil
 	}
 	//Message insert
 	var Message Message
-	Message.ID = update.Message.ID
-	Message.UserID = update.Message.Sender.ID
-	Message.Date = time.Unix(update.Message.Unixtime, 0)
-	Message.ChatID = update.Message.Chat.ID
-	if update.Message.ReplyTo != nil {
-		Message.ReplyTo = update.Message.ReplyTo.ID
+	Message.ID = context.Message().ID
+	Message.UserID = context.Message().Sender.ID
+	Message.Date = time.Unix(context.Message().Unixtime, 0)
+	Message.ChatID = context.Message().Chat.ID
+	if context.Message().ReplyTo != nil {
+		Message.ReplyTo = context.Message().ReplyTo.ID
 	}
-	Message.Text = update.Message.Text
+	Message.Text = context.Message().Text
 	switch {
-	case update.Message.Animation != nil:
+	case context.Message().Animation != nil:
 		Message.FileType = "Animation"
-		Message.FileID = update.Message.Animation.FileID
-		Message.Text = update.Message.Caption
-	case update.Message.Audio != nil:
+		Message.FileID = context.Message().Animation.FileID
+		Message.Text = context.Message().Caption
+	case context.Message().Audio != nil:
 		Message.FileType = "Audio"
-		Message.FileID = update.Message.Audio.FileID
-		Message.Text = update.Message.Caption
-	case update.Message.Photo != nil:
+		Message.FileID = context.Message().Audio.FileID
+		Message.Text = context.Message().Caption
+	case context.Message().Photo != nil:
 		Message.FileType = "Photo"
-		Message.FileID = update.Message.Photo.FileID
-		Message.Text = update.Message.Caption
-	case update.Message.Video != nil:
+		Message.FileID = context.Message().Photo.FileID
+		Message.Text = context.Message().Caption
+	case context.Message().Video != nil:
 		Message.FileType = "Video"
-		Message.FileID = update.Message.Video.FileID
-		Message.Text = update.Message.Caption
-	case update.Message.Voice != nil:
+		Message.FileID = context.Message().Video.FileID
+		Message.Text = context.Message().Caption
+	case context.Message().Voice != nil:
 		Message.FileType = "Voice"
-		Message.FileID = update.Message.Voice.FileID
-		Message.Text = update.Message.Caption
-	case update.Message.Document != nil:
+		Message.FileID = context.Message().Voice.FileID
+		Message.Text = context.Message().Caption
+	case context.Message().Document != nil:
 		Message.FileType = "Document"
-		Message.FileID = update.Message.Document.FileID
-		Message.Text = update.Message.Caption
+		Message.FileID = context.Message().Document.FileID
+		Message.Text = context.Message().Caption
 	}
 	MessageResult := DB.Create(&Message)
 	if MessageResult.Error != nil {

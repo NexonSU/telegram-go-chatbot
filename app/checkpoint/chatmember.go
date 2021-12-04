@@ -5,9 +5,6 @@ import (
 )
 
 func ChatMemberUpdate(context telebot.Context) error {
-	if Border.Chat == nil {
-		Border.Chat = context.Chat()
-	}
 	Old := context.ChatMember().OldChatMember
 	New := context.ChatMember().NewChatMember
 	if Old.Role == "left" && New.Role == "member" {
