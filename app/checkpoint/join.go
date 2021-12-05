@@ -79,11 +79,11 @@ func UserJoin(context telebot.Context) error {
 		utils.WelcomeMessageID = m.ID
 	} else if len(WelcomeMessage.text) < 3500 &&
 		!strings.ContainsAny(WelcomeMessage.text, fmt.Sprint(User.ID)) {
-		WelcomeMessage.time = time.Now().Unix()
 		WelcomeMessage.text = strings.Replace(WelcomeMessage.text, "Привет ", fmt.Sprintf("Привет %v, ", utils.MentionUser(User)), 1)
 		if time.Now().Unix()-WelcomeMessage.time < 5 {
 			return nil
 		}
+		WelcomeMessage.time = time.Now().Unix()
 		_, err := utils.Bot.Edit(&telebot.Message{ID: WelcomeMessage.ID, Chat: &telebot.Chat{ID: utils.Config.Chat}}, WelcomeMessage.text+"\n"+welcomeGet.Data)
 		if err != nil {
 			_ = utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, User)
