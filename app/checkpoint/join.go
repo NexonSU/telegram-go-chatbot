@@ -68,6 +68,7 @@ func UserJoin(context telebot.Context) error {
 	}
 	//welcome message create\update
 	if WelcomeMessage.ID == 0 || (time.Now().Unix()-WelcomeMessage.time > 60 && utils.LastChatMessageID-WelcomeMessage.ID > 0) {
+		WelcomeMessage.time = time.Now().Unix()
 		WelcomeMessage.text = fmt.Sprintf("Привет %v!", utils.MentionUser(User))
 		m, err := utils.Bot.Send(&telebot.Chat{ID: utils.Config.Chat}, WelcomeMessage.text+"\n"+welcomeGet.Data)
 		if err != nil {
@@ -76,9 +77,9 @@ func UserJoin(context telebot.Context) error {
 		}
 		WelcomeMessage.ID = m.ID
 		utils.WelcomeMessageID = m.ID
-		WelcomeMessage.time = time.Now().Unix()
 	} else if len(WelcomeMessage.text) < 3500 &&
 		!strings.ContainsAny(WelcomeMessage.text, fmt.Sprint(User.ID)) {
+		WelcomeMessage.time = time.Now().Unix()
 		WelcomeMessage.text = strings.Replace(WelcomeMessage.text, "Привет ", fmt.Sprintf("Привет %v, ", utils.MentionUser(User)), 1)
 		if time.Now().Unix()-WelcomeMessage.time < 5 {
 			return nil
@@ -88,7 +89,6 @@ func UserJoin(context telebot.Context) error {
 			_ = utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, User)
 			return err
 		}
-		WelcomeMessage.time = time.Now().Unix()
 	}
 	return nil
 }
