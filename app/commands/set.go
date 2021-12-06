@@ -42,7 +42,7 @@ func Set(context telebot.Context) error {
 			get.Data = context.Message().ReplyTo.Document.FileID
 		case context.Message().ReplyTo.Text != "":
 			get.Type = "Text"
-			get.Data = context.Message().ReplyTo.Text
+			get.Data = utils.GetHtmlText(*context.Message().ReplyTo)
 		default:
 			return context.Reply("Не удалось распознать файл в сообщении, возможно, он не поддерживается.")
 		}
