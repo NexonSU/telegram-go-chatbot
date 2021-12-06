@@ -18,7 +18,7 @@ func PopWordsWcChart(from time.Time, to time.Time, context telebot.Context) *cha
 		Where("date BETWEEN ? AND ?", from, to).
 		Group("text").
 		Order("count DESC").
-		Limit(100).
+		Limit(200).
 		Rows()
 	var Word string
 	var Count int
