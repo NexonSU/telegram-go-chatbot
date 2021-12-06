@@ -12,8 +12,9 @@ import (
 
 func PopHoursBarChart(from time.Time, to time.Time, context telebot.Context) *charts.Bar {
 	result, _ := utils.DB.
-		Model(utils.Message{ChatID: context.Chat().ID}).
+		Model(utils.Message{}).
 		Select("strftime('%H', `DATE`, 'localtime') AS Hours, COUNT(`id`) as Messages").
+		Where("chat_id = ?", context.Chat().ID).
 		Where("date BETWEEN ? AND ?", from, to).
 		Group("Hours").
 		Order("Hours").
