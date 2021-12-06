@@ -236,7 +236,7 @@ func GatherData(update *telebot.Update) error {
 		return MessageResult.Error
 	}
 	//Words insert
-	if string(Message.Text[0]) == "/" {
+	if Message.Text == "" || string(Message.Text[0]) == "/" {
 		return nil
 	}
 	var Word Word
