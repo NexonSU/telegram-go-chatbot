@@ -60,7 +60,7 @@ func PopDaysBarChart(from time.Time, to time.Time, context telebot.Context) *cha
 	bar := charts.NewBar()
 	// set some global options like Title/Legend/ToolTip or anything else
 	bar.SetGlobalOptions(
-		charts.WithInitializationOpts(opts.Initialization{PageTitle: context.Chat().Title + " Popular Days of Week", Theme: "shine"}),
+		charts.WithInitializationOpts(opts.Initialization{PageTitle: fmt.Sprintf("%v Popular Days of Week since %v to %v", context.Chat().Title, from.Format("02.01.2006"), to.Format("02.01.2006")), Theme: "shine"}),
 		charts.WithTitleOpts(opts.Title{
 			Title: "Popular days of week",
 		}),

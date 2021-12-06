@@ -1,6 +1,7 @@
 package stats
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
@@ -33,7 +34,7 @@ func PopWordsWcChart(from time.Time, to time.Time, context telebot.Context) *cha
 
 	wc := charts.NewWordCloud()
 	wc.SetGlobalOptions(
-		charts.WithInitializationOpts(opts.Initialization{PageTitle: context.Chat().Title + " Popular Words", Theme: "shine"}),
+		charts.WithInitializationOpts(opts.Initialization{PageTitle: fmt.Sprintf("%v Popular Words since %v to %v", context.Chat().Title, from.Format("02.01.2006"), to.Format("02.01.2006")), Theme: "shine"}),
 		charts.WithTooltipOpts(opts.Tooltip{Show: true}),
 		charts.WithTitleOpts(opts.Title{
 			Title: "Popular words",

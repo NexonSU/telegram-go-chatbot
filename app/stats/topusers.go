@@ -1,6 +1,7 @@
 package stats
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/app/utils"
@@ -43,7 +44,7 @@ func TopUsersBarChart(from time.Time, to time.Time, context telebot.Context) *ch
 	bar := charts.NewBar()
 	// set some global options like Title/Legend/ToolTip or anything else
 	bar.SetGlobalOptions(
-		charts.WithInitializationOpts(opts.Initialization{PageTitle: context.Chat().Title + " Top Users", Theme: "shine"}),
+		charts.WithInitializationOpts(opts.Initialization{PageTitle: fmt.Sprintf("%v Top Users since %v to %v", context.Chat().Title, from.Format("02.01.2006"), to.Format("02.01.2006")), Theme: "shine"}),
 		charts.WithTitleOpts(opts.Title{
 			Title: "Top users",
 		}),
