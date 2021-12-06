@@ -11,7 +11,7 @@ import (
 func restrictUpdate() error {
 	restricted := utils.DB.Find(&utils.RestrictedUsers)
 	if restricted.Error != nil {
-		return restricted.Error
+		log.Println(restricted.Error)
 	}
 	for _, user := range utils.RestrictedUsers {
 		if user.Since > time.Now().Unix()-300 {
@@ -19,11 +19,11 @@ func restrictUpdate() error {
 		}
 		delete := utils.DB.Delete(&user)
 		if delete.Error != nil {
-			return delete.Error
+			log.Println(delete.Error)
 		}
 		err := utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, &telebot.User{ID: user.UserID})
 		if err != nil {
-			return err
+			log.Println(err)
 		}
 	}
 	return nil
