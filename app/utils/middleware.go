@@ -158,3 +158,39 @@ func ChatLevel(next telebot.HandlerFunc) telebot.HandlerFunc {
 		return nil
 	}
 }
+
+type MiddlewarePoller struct {
+	Capacity int // Default: 1
+	Poller   telebot.Poller
+	Filter   func(*telebot.Update) bool
+}
+
+func NewMiddlewarePoller(original telebot.Poller, filter func(*telebot.Update) bool) *MiddlewarePoller {
+	return &MiddlewarePoller{
+		Poller: original,
+		Filter: filter,
+	}
+}
+
+func (p *MiddlewarePoller) Poll(b *telebot.Bot, dest chan telebot.Update, stop chan struct{}) {
+	if p.Capacity < 1 {
+		p.Capacity = 1
+	}
+
+	middle := make(chan telebot.Update, p.Capacity)
+	stopPoller := make(chan struct{})
+
+	go p.Poller.Poll(b, middle, stopPoller)
+
+	for {
+		select {
+		case <-stop:
+			close(stopPoller)
+			return
+		case upd := <-middle:
+			if p.Filter(&upd) {
+				dest <- upd
+			}
+		}
+	}
+}

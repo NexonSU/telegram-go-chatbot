@@ -15,7 +15,7 @@ func main() {
 	utils.Bot.OnError = utils.ErrorReporting
 
 	//Middleware
-	utils.Bot.Poller = telebot.NewMiddlewarePoller(utils.Bot.Poller, func(upd *telebot.Update) bool {
+	utils.Bot.Poller = utils.NewMiddlewarePoller(utils.Bot.Poller, func(upd *telebot.Update) bool {
 		utils.GatherData(upd)
 		utils.CheckPoint(upd)
 
