@@ -51,7 +51,7 @@ func UserJoin(context telebot.Context) error {
 	restrictUser := utils.CheckPointRestrict{UserID: User.ID, Since: time.Now().Unix()}
 	restrict := utils.DB.Clauses(clause.OnConflict{
 		UpdateAll: true,
-	}).Create(restrictUser)
+	}).Create(&restrictUser)
 	if restrict.Error != nil {
 		_ = utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, User)
 		return restrict.Error
