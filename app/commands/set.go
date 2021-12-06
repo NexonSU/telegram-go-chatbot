@@ -50,7 +50,7 @@ func Set(context telebot.Context) error {
 	get.Creator = context.Sender().ID
 	result := utils.DB.Clauses(clause.OnConflict{
 		UpdateAll: true,
-	}).Create(get)
+	}).Create(&get)
 	if result.Error != nil {
 		return context.Reply(fmt.Sprintf("Не удалось сохранить гет <code>%v</code>.", get.Name))
 	}

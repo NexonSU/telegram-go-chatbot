@@ -32,7 +32,7 @@ func Kill(context telebot.Context) error {
 	duelist.Deaths++
 	result = utils.DB.Clauses(clause.OnConflict{
 		UpdateAll: true,
-	}).Create(duelist)
+	}).Create(&duelist)
 	if result.Error != nil {
 		return err
 	}

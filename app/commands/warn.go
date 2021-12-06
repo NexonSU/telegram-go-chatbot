@@ -33,7 +33,7 @@ func Warn(context telebot.Context) error {
 	warn.LastWarn = time.Now()
 	result = utils.DB.Clauses(clause.OnConflict{
 		UpdateAll: true,
-	}).Create(warn)
+	}).Create(&warn)
 	if result.Error != nil {
 		return context.Reply(fmt.Sprintf("Не удалось выдать предупреждение:\n<code>%v</code>.", result.Error))
 	}

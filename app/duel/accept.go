@@ -105,7 +105,7 @@ func Accept(context telebot.Context) error {
 		duelist.Deaths++
 		result = utils.DB.Clauses(clause.OnConflict{
 			UpdateAll: true,
-		}).Create(duelist)
+		}).Create(&duelist)
 		if result.Error != nil {
 			return err
 		}
@@ -149,7 +149,7 @@ func Accept(context telebot.Context) error {
 	VictimDuelist.Deaths++
 	result = utils.DB.Clauses(clause.OnConflict{
 		UpdateAll: true,
-	}).Create(VictimDuelist)
+	}).Create(&VictimDuelist)
 	if result.Error != nil {
 		return err
 	}
@@ -172,7 +172,7 @@ func Accept(context telebot.Context) error {
 	PlayerDuelist.Kills++
 	result = utils.DB.Clauses(clause.OnConflict{
 		UpdateAll: true,
-	}).Create(PlayerDuelist)
+	}).Create(&PlayerDuelist)
 	if result.Error != nil {
 		return result.Error
 	}

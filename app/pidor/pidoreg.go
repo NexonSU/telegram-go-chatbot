@@ -17,7 +17,7 @@ func Pidoreg(context telebot.Context) error {
 		pidor = utils.PidorList(*context.Sender())
 		result := utils.DB.Clauses(clause.OnConflict{
 			UpdateAll: true,
-		}).Create(pidor)
+		}).Create(&pidor)
 		if result.Error != nil {
 			return context.Reply(fmt.Sprintf("Не удалось зарегистрироваться:\n<code>%v</code>.", result.Error))
 		}

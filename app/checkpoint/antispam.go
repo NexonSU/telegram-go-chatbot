@@ -122,7 +122,7 @@ func DelAntispam(context telebot.Context) error {
 	if AntiSpam.Type == "" {
 		return context.Reply("Нужно указать URL, текст или какое-либо сообщение.")
 	}
-	result := utils.DB.Delete(AntiSpam)
+	result := utils.DB.Delete(&AntiSpam)
 	if result.Error != nil {
 		return context.Reply(fmt.Sprintf("Ошибка запроса: <code>%v</code>", result.Error.Error()))
 	}
