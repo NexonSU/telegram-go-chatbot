@@ -22,6 +22,10 @@ func Kill(context telebot.Context) error {
 	if err != nil {
 		return context.Reply(fmt.Sprintf("Ошибка определения пользователя чата:\n<code>%v</code>", err.Error()))
 	}
+	utils.Bot.Delete(context.Message().ReplyTo)
+	if ChatMember.Role == "administrator" || ChatMember.Role == "creator" {
+		return context.Send(fmt.Sprintf("<code>👻 %v возродился у костра.</code>", utils.UserFullName(&target)))
+	}
 	var duelist utils.Duelist
 	result := utils.DB.Model(utils.Duelist{}).Where(target.ID).First(&duelist)
 	if result.RowsAffected == 0 {
