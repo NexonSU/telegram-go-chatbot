@@ -102,5 +102,8 @@ func main() {
 	utils.Bot.Handle(telebot.OnUserJoined, utils.Remove, utils.ChatOnly)
 	utils.Bot.Handle(telebot.OnUserLeft, utils.Remove, utils.ChatOnly)
 
+	//Word stats exclusion list
+	utils.DB.Find(&utils.WordStatsExcludes)
+
 	utils.Bot.Start()
 }

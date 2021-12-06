@@ -46,6 +46,10 @@ type Nope struct {
 	Text string `gorm:"primaryKey"`
 }
 
+type WordStatsExclude struct {
+	Text string `gorm:"primaryKey"`
+}
+
 type Message struct {
 	ID       int   `gorm:"primaryKey"`
 	ChatID   int64 `gorm:"primaryKey"`
@@ -81,7 +85,7 @@ func DataBaseInit(file string) gorm.DB {
 	}
 
 	//Create tables, if they not exists in DB
-	err = database.AutoMigrate(telebot.User{}, Message{}, Word{}, Get{}, Warn{}, PidorStats{}, PidorList{}, Duelist{}, Nope{}, AntiSpam{}, CheckPointRestrict{})
+	err = database.AutoMigrate(telebot.User{}, Message{}, Word{}, Get{}, Warn{}, PidorStats{}, PidorList{}, Duelist{}, Nope{}, AntiSpam{}, CheckPointRestrict{}, WordStatsExclude{})
 	if err != nil {
 		log.Println(err)
 	}

@@ -16,9 +16,17 @@ func RemoveWord(context telebot.Context) error {
 	if len(context.Args()) != 1 {
 		return context.Reply("Укажите слово.")
 	}
+	//add word to DB
+	exclude := utils.DB.Create(&utils.WordStatsExclude{Text: context.Data()})
+	if exclude.Error != nil {
+		return context.Reply(fmt.Sprintf("Не удалось запретить слово:\n<code>%v</code>", exclude.Error.Error()))
+	}
+	//update utils.WordStatsExcludes
+	utils.DB.Find(&utils.WordStatsExcludes)
+	//remove word
 	result := utils.DB.Where("text = ?", context.Data()).Delete(&utils.Word{})
 	if result.RowsAffected != 0 {
-		return context.Reply("Слово удалено.")
+		return context.Reply("Слово запрещено для статистики и удалено из базы.")
 	} else {
 		return context.Reply(fmt.Sprintf("Не удалось удалить слово:\n<code>%v</code>", result.Error.Error()))
 	}
