@@ -13,7 +13,7 @@ import (
 //Send Get to user on /get
 func Get(context telebot.Context) error {
 	var get utils.Get
-	if len(context.Args()) != 1 {
+	if len(context.Args()) == 0 {
 		return context.Reply("Пример использования: <code>/get {гет}</code>")
 	}
 	result := utils.DB.Where(&utils.Get{Name: strings.ToLower(context.Data())}).First(&get)
@@ -66,7 +66,7 @@ func GetInline(context telebot.Context) error {
 	if query == "" {
 		return context.Answer(&telebot.QueryResponse{})
 	}
-	gets := utils.DB.Limit(10).Model(utils.Get{}).Where("name LIKE ?", query+"%").Count(&count)
+	gets := utils.DB.Limit(10).Model(utils.Get{}).Where("name LIKE ?", "%"+query+"%").Count(&count)
 	get_rows, err := gets.Rows()
 	if err != nil {
 		log.Println(err.Error())
@@ -87,51 +87,51 @@ func GetInline(context telebot.Context) error {
 		switch {
 		case get.Type == "Animation":
 			results[i] = &telebot.GifResult{
-				Title:   get.Name,
+				Title:   get.Title,
 				Caption: get.Caption,
 				Cache:   get.Data,
 			}
 		case get.Type == "Audio":
 			results[i] = &telebot.DocumentResult{
-				Title:       get.Name,
+				Title:       get.Title,
 				Caption:     get.Caption,
 				Cache:       get.Data,
 				Description: get.Caption,
 			}
 		case get.Type == "Photo":
 			results[i] = &telebot.PhotoResult{
-				Title:       get.Name,
+				Title:       get.Title,
 				Caption:     get.Caption,
 				Cache:       get.Data,
 				Description: get.Caption,
 			}
 		case get.Type == "Video":
 			results[i] = &telebot.VideoResult{
-				Title:       get.Name,
+				Title:       get.Title,
 				Caption:     get.Caption,
 				Cache:       get.Data,
 				Description: get.Caption,
 			}
 		case get.Type == "Voice":
 			results[i] = &telebot.VoiceResult{
-				Title:   get.Name,
+				Title:   get.Title,
 				Caption: get.Caption,
 				Cache:   get.Data,
 			}
 		case get.Type == "Document":
 			results[i] = &telebot.DocumentResult{
-				Title:       get.Name,
+				Title:       get.Title,
 				Caption:     get.Caption,
 				Cache:       get.Data,
 				Description: get.Caption,
 			}
 		case get.Type == "Text":
 			results[i] = &telebot.ArticleResult{
-				Title:       get.Name,
+				Title:       get.Title,
 				Description: get.Data,
 			}
 			results[i].SetContent(telebot.InputMessageContent(&telebot.InputTextMessageContent{
-				Text:      fmt.Sprintf("<b>%v</b>\n%v", get.Name, get.Data),
+				Text:      fmt.Sprintf("<b>%v</b>\n%v", get.Title, get.Data),
 				ParseMode: telebot.ModeHTML,
 			}))
 		default:

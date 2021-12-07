@@ -12,6 +12,7 @@ import (
 
 type Get struct {
 	Name    string `gorm:"primaryKey"`
+	Title   string
 	Type    string
 	Data    string
 	Caption string

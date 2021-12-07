@@ -12,14 +12,17 @@ import (
 //Save Get to DB on /set
 func Set(context telebot.Context) error {
 	var get utils.Get
-	if (context.Message().ReplyTo == nil && len(context.Args()) < 2) || (context.Message().ReplyTo != nil && len(context.Args()) != 1) {
+	if (context.Message().ReplyTo == nil && len(context.Args()) < 2) || (context.Message().ReplyTo != nil && len(context.Args()) == 0) {
 		return context.Reply("Пример использования: <code>/set {гет} {значение}</code>\nИли отправь в ответ на какое-либо сообщение <code>/set {гет}</code>")
 	}
-	get.Name = strings.ToLower(context.Args()[0])
-	if context.Message().ReplyTo == nil && len(context.Args()) > 1 {
+	if context.Message().ReplyTo == nil {
+		get.Name = strings.ToLower(context.Args()[0])
+		get.Title = context.Args()[0]
 		get.Type = "Text"
 		get.Data = utils.GetHtmlText(*context.Message())
-	} else if context.Message().ReplyTo != nil && len(context.Args()) == 1 {
+	} else {
+		get.Name = strings.ToLower(context.Data())
+		get.Title = context.Data()
 		get.Caption = utils.GetHtmlText(*context.Message().ReplyTo)
 		switch {
 		case context.Message().ReplyTo.Animation != nil:
