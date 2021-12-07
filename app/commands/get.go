@@ -84,6 +84,9 @@ func GetInline(context telebot.Context) error {
 			log.Println(err.Error())
 			return err
 		}
+		if get.Title == "" {
+			get.Title = get.Name
+		}
 		switch {
 		case get.Type == "Animation":
 			results[i] = &telebot.GifResult{
