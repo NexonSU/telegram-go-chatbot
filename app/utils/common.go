@@ -162,6 +162,9 @@ func CheckPoint(update *telebot.Update) error {
 	if update.Message == nil || update.Message.Sender == nil {
 		return nil
 	}
+	if update.Message.Chat.ID == Config.Chat && update.Message.Sender.ID == 777000 {
+		return Bot.Delete(update.Message)
+	}
 	LastChatMessageID = update.Message.ID
 	if update.Message.ReplyTo != nil && update.Message.ReplyTo.ID == WelcomeMessageID {
 		delete := DB.Delete(CheckPointRestrict{UserID: update.Message.Sender.ID})
