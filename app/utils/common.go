@@ -163,7 +163,8 @@ func CheckPoint(update *telebot.Update) error {
 		return nil
 	}
 	if update.Message.SenderChat != nil &&
-		update.Message.Chat.ID == Config.Chat &&
+		(update.Message.Chat.ID == Config.Chat ||
+			update.Message.Chat.ID == Config.CommentChat) &&
 		update.Message.Sender.ID == 777000 &&
 		update.Message.SenderChat.ID != Config.Channel {
 		return Bot.Delete(update.Message)
