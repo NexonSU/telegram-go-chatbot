@@ -16,14 +16,14 @@ func RemoveWord(context telebot.Context) error {
 	if len(context.Args()) != 1 {
 		return context.Reply("Укажите слово.")
 	}
-	word := strings.ToLower(context.Data())
+	word := context.Data()
 	//remove word
-	delete := utils.DB.Where("text = ?", word).Delete(&utils.Word{})
+	delete := utils.DB.Where("text = ? OR text = ?", word, strings.ToLower(word)).Delete(&utils.Word{})
 	if delete.Error != nil {
 		return context.Reply(fmt.Sprintf("Не удалось удалить слово:\n<code>%v</code>", delete.Error.Error()))
 	}
 	//add word to DB
-	exclude := utils.DB.Create(&utils.WordStatsExclude{Text: word})
+	exclude := utils.DB.Create(&utils.WordStatsExclude{Text: strings.ToLower(word)})
 	if exclude.Error != nil {
 		return context.Reply(fmt.Sprintf("Не удалось запретить слово:\n<code>%v</code>", exclude.Error.Error()))
 	}
