@@ -58,7 +58,11 @@ func GetSpamChance(user telebot.User) int {
 	}
 	spamchance -= photoCount*10 - 20
 	//ID
-	spamchance += int(float64(user.ID)/float64(MaximumIdFromDB)*100) - 50
+	if user.ID > 5000000000 {
+		spamchance += int(float64(user.ID)/float64(MaximumIdFromDB)*100) - 50
+	} else {
+		spamchance += int(float64(user.ID)/float64(2147483647)*100) - 75
+	}
 	//Bio
 	if user.Username != "" {
 		res, _ := http.Get(fmt.Sprintf("https://t.me/%v", user.Username))
