@@ -263,7 +263,7 @@ words:
 		}
 		if _, err := strconv.Atoi(Word.Text); err == nil ||
 			Word.Text == "" ||
-			len(Word.Text) < 3 {
+			len(Word.Text) == 1 {
 			continue
 		}
 		WordResult := DB.Create(&Word)
