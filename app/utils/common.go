@@ -255,7 +255,7 @@ func GatherData(update *telebot.Update) error {
 	Message.Text = strings.ReplaceAll(Message.Text, "!", "")
 	Message.Text = strings.ReplaceAll(Message.Text, "?", "")
 words:
-	for _, Word.Text = range strings.Fields(Message.Text) {
+	for _, Word.Text = range strings.Fields(strings.ToLower(Message.Text)) {
 		for _, exclude := range WordStatsExcludes {
 			if Word.Text == exclude.Text {
 				continue words
