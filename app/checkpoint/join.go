@@ -15,9 +15,10 @@ import (
 )
 
 type welcomeMessage struct {
-	ID   int
-	time int64
-	text string
+	ID    int
+	time  int64
+	users int
+	text  string
 }
 
 var WelcomeMessage welcomeMessage
@@ -66,9 +67,11 @@ func UserJoin(context telebot.Context) error {
 	if welcomeGet.Data == "" {
 		welcomeGet.Data = "Ответь на это сообщение и расскажи о себе."
 	}
+	WelcomeMessage.users++
 	//welcome message create\update
 	if time.Now().Unix()-WelcomeMessage.time > 60 && utils.LastChatMessageID-WelcomeMessage.ID > 0 {
 		WelcomeMessage.time = time.Now().Unix()
+		WelcomeMessage.users = 1
 		WelcomeMessage.text = fmt.Sprintf("Привет %v!", utils.MentionUser(User))
 		m, err := utils.Bot.Send(&telebot.Chat{ID: utils.Config.Chat}, WelcomeMessage.text+"\n"+welcomeGet.Data)
 		if err != nil {
@@ -80,7 +83,7 @@ func UserJoin(context telebot.Context) error {
 	} else if len(WelcomeMessage.text) < 3500 &&
 		!strings.ContainsAny(WelcomeMessage.text, fmt.Sprint(User.ID)) {
 		WelcomeMessage.text = strings.Replace(WelcomeMessage.text, "Привет ", fmt.Sprintf("Привет %v, ", utils.MentionUser(User)), 1)
-		if time.Now().Unix()-WelcomeMessage.time < 5 {
+		if WelcomeMessage.users > 5 && time.Now().Unix()-WelcomeMessage.time < 5 {
 			return nil
 		}
 		WelcomeMessage.time = time.Now().Unix()
