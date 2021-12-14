@@ -73,7 +73,7 @@ func UserJoin(context telebot.Context) error {
 		WelcomeMessage.time = time.Now().Unix()
 		WelcomeMessage.users = 1
 		WelcomeMessage.text = fmt.Sprintf("Привет %v!", utils.MentionUser(User))
-		m, err := utils.Bot.Send(&telebot.Chat{ID: utils.Config.Chat}, WelcomeMessage.text+"\n"+welcomeGet.Data)
+		m, err := utils.Bot.Send(&telebot.Chat{ID: utils.Config.Chat}, WelcomeMessage.text+"\n"+welcomeGet.Data, &telebot.SendOptions{DisableWebPagePreview: true})
 		if err != nil {
 			_ = utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, User)
 			return err
@@ -87,7 +87,7 @@ func UserJoin(context telebot.Context) error {
 			return nil
 		}
 		WelcomeMessage.time = time.Now().Unix()
-		_, err := utils.Bot.Edit(&telebot.Message{ID: WelcomeMessage.ID, Chat: &telebot.Chat{ID: utils.Config.Chat}}, WelcomeMessage.text+"\n"+welcomeGet.Data)
+		_, err := utils.Bot.Edit(&telebot.Message{ID: WelcomeMessage.ID, Chat: &telebot.Chat{ID: utils.Config.Chat}}, WelcomeMessage.text+"\n"+welcomeGet.Data, &telebot.SendOptions{DisableWebPagePreview: true})
 		if err != nil {
 			_ = utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, User)
 			return err
