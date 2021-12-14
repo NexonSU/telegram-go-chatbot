@@ -69,7 +69,7 @@ func UserJoin(context telebot.Context) error {
 	}
 	WelcomeMessage.users++
 	//welcome message create\update
-	if time.Now().Unix()-WelcomeMessage.time > 60 && utils.LastChatMessageID-WelcomeMessage.ID > 0 {
+	if time.Now().Unix()-WelcomeMessage.time > 60 && utils.LastChatMessageID-WelcomeMessage.ID > 2 {
 		WelcomeMessage.time = time.Now().Unix()
 		WelcomeMessage.users = 1
 		WelcomeMessage.text = fmt.Sprintf("Привет %v!", utils.MentionUser(User))
