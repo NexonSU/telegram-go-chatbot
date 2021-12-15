@@ -48,19 +48,6 @@ func UserJoin(context telebot.Context) error {
 			return err
 		}
 	}
-	//user chat restrict
-	restrictUser := utils.CheckPointRestrict{UserID: User.ID, Since: time.Now().Unix()}
-	restrict := utils.DB.Clauses(clause.OnConflict{
-		UpdateAll: true,
-	}).Create(&restrictUser)
-	if restrict.Error != nil {
-		_ = utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, User)
-		return restrict.Error
-	}
-	restricted := utils.DB.Find(&utils.RestrictedUsers)
-	if restricted.Error != nil {
-		return restricted.Error
-	}
 	//welcome message text
 	var welcomeGet utils.Get
 	utils.DB.Where(&utils.Get{Name: "welcome"}).First(&welcomeGet)
@@ -69,7 +56,8 @@ func UserJoin(context telebot.Context) error {
 	}
 	WelcomeMessage.users++
 	//welcome message create\update
-	if time.Now().Unix()-WelcomeMessage.time > 60 && utils.LastChatMessageID-WelcomeMessage.ID > 2 {
+	if utils.WelcomeMessageID == 0 ||
+		time.Now().Unix()-WelcomeMessage.time > 120 && utils.LastChatMessageID-utils.WelcomeMessageID > 2 {
 		WelcomeMessage.time = time.Now().Unix()
 		WelcomeMessage.users = 1
 		WelcomeMessage.text = fmt.Sprintf("Привет %v!", utils.MentionUser(User))
@@ -92,6 +80,23 @@ func UserJoin(context telebot.Context) error {
 			_ = utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, User)
 			return err
 		}
+	}
+	//user chat restrict
+	restrictUser := utils.CheckPointRestrict{
+		UserID:           User.ID,
+		Since:            time.Now().Unix(),
+		WelcomeMessageID: WelcomeMessage.ID,
+	}
+	restrict := utils.DB.Clauses(clause.OnConflict{
+		UpdateAll: true,
+	}).Create(&restrictUser)
+	if restrict.Error != nil {
+		_ = utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, User)
+		return restrict.Error
+	}
+	restricted := utils.DB.Find(&utils.RestrictedUsers)
+	if restricted.Error != nil {
+		return restricted.Error
 	}
 	return nil
 }

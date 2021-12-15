@@ -172,18 +172,27 @@ func CheckPoint(update *telebot.Update) error {
 	if update.Message.Chat.ID == Config.Chat {
 		LastChatMessageID = update.Message.ID
 	}
-	if update.Message.ReplyTo != nil && update.Message.ReplyTo.ID == WelcomeMessageID {
-		delete := DB.Delete(CheckPointRestrict{UserID: update.Message.Sender.ID})
-		if delete.Error != nil {
-			return delete.Error
-		}
-		find := DB.Find(&RestrictedUsers)
-		if find.Error != nil {
-			return find.Error
-		}
-	}
 	for _, user := range RestrictedUsers {
-		if update.Message.Sender.ID == user.UserID {
+		if update.Message.ReplyTo != nil && update.Message.ReplyTo.ID == user.WelcomeMessageID {
+			delete := DB.Delete(CheckPointRestrict{UserID: update.Message.Sender.ID})
+			if delete.Error != nil {
+				return delete.Error
+			}
+			find := DB.Find(&RestrictedUsers)
+			if find.Error != nil {
+				return find.Error
+			}
+			if DB.First(&CheckPointRestrict{WelcomeMessageID: user.WelcomeMessageID}).RowsAffected == 0 {
+				if WelcomeMessageID == user.WelcomeMessageID {
+					WelcomeMessageID = 0
+				}
+				return Bot.Delete(&telebot.Message{ID: user.WelcomeMessageID, Chat: &telebot.Chat{ID: Config.Chat}})
+			}
+			restricted := DB.Find(&RestrictedUsers)
+			if restricted.Error != nil {
+				log.Println(restricted.Error)
+			}
+		} else if update.Message.Sender.ID == user.UserID {
 			return Bot.Delete(update.Message)
 		}
 	}

@@ -14,7 +14,7 @@ func restrictUpdate() error {
 		log.Println(restricted.Error)
 	}
 	for _, user := range utils.RestrictedUsers {
-		if user.Since > time.Now().Unix()-300 {
+		if user.Since > time.Now().Unix()-120 {
 			continue
 		}
 		delete := utils.DB.Delete(&user)
@@ -24,6 +24,12 @@ func restrictUpdate() error {
 		err := utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, &telebot.User{ID: user.UserID})
 		if err != nil {
 			log.Println(err)
+		}
+		if utils.DB.First(&utils.CheckPointRestrict{WelcomeMessageID: user.WelcomeMessageID}).RowsAffected == 0 {
+			if utils.WelcomeMessageID == user.WelcomeMessageID {
+				utils.WelcomeMessageID = 0
+			}
+			utils.Bot.Delete(&telebot.Message{ID: user.WelcomeMessageID, Chat: &telebot.Chat{ID: utils.Config.Chat}})
 		}
 	}
 	return nil

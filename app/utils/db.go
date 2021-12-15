@@ -70,8 +70,9 @@ type Word struct {
 }
 
 type CheckPointRestrict struct {
-	UserID int64 `gorm:"primaryKey"`
-	Since  int64
+	UserID           int64 `gorm:"primaryKey"`
+	WelcomeMessageID int
+	Since            int64
 }
 
 func DataBaseInit(file string) gorm.DB {
