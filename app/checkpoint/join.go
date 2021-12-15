@@ -68,8 +68,7 @@ func UserJoin(context telebot.Context) error {
 		}
 		WelcomeMessage.ID = m.ID
 		utils.WelcomeMessageID = m.ID
-	} else if len(WelcomeMessage.text) < 3500 &&
-		!strings.ContainsAny(WelcomeMessage.text, fmt.Sprint(User.ID)) {
+	} else if len(WelcomeMessage.text) < 3500 {
 		WelcomeMessage.text = strings.Replace(WelcomeMessage.text, "Привет ", fmt.Sprintf("Привет %v, ", utils.MentionUser(User)), 1)
 		if WelcomeMessage.users > 5 && time.Now().Unix()-WelcomeMessage.time < 5 {
 			return nil
