@@ -18,6 +18,7 @@ func Bashorg(context telebot.Context) error {
 	if time.Now().Unix()-lastTimeBashorg < 60 {
 		return context.Reply("Подожди минуту...")
 	}
+	lastTimeBashorg = time.Now().Unix()
 	httpClient := &http.Client{Timeout: 10 * time.Second}
 	httpResponse, err := httpClient.Get("https://bash.im/forweb/")
 	if err != nil {

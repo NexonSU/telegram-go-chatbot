@@ -18,6 +18,7 @@ func Anekdot(context telebot.Context) error {
 	if time.Now().Unix()-lastTimeAnekdot < 60 {
 		return context.Reply("Подожди минуту...")
 	}
+	lastTimeAnekdot = time.Now().Unix()
 	httpClient := &http.Client{Timeout: 10 * time.Second}
 	httpResponse, err := httpClient.Get("https://www.anekdot.ru/rss/randomu.html")
 	if err != nil {
