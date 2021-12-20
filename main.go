@@ -68,6 +68,7 @@ func main() {
 	utils.Bot.Handle("/blessing", commands.Blessing, utils.ChatLevel)
 	utils.Bot.Handle("/suicide", commands.Blessing, utils.ChatLevel)
 	utils.Bot.Handle("/anekdot", commands.Anekdot, utils.ChatLevel)
+	utils.Bot.Handle("/bashorg", commands.Bashorg, utils.ChatLevel)
 
 	//Stats commands
 	utils.Bot.Handle("/stats", stats.Stats, utils.ChatLevel)
