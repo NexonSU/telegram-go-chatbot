@@ -11,14 +11,8 @@ import (
 	"gopkg.in/tucnak/telebot.v3"
 )
 
-var lastTimeAnekdot int64
-
 //Send text in chat on /say
 func Anekdot(context telebot.Context) error {
-	if time.Now().Unix()-lastTimeAnekdot < 60 {
-		return context.Reply("Подожди минуту...")
-	}
-	lastTimeAnekdot = time.Now().Unix()
 	httpClient := &http.Client{Timeout: 10 * time.Second}
 	httpResponse, err := httpClient.Get("https://www.anekdot.ru/rss/randomu.html")
 	if err != nil {

@@ -11,16 +11,12 @@ import (
 	"gopkg.in/tucnak/telebot.v3"
 )
 
-var lastTimeBashorg int64
+var lastBash string
 
 //Send text in chat on /say
 func Bashorg(context telebot.Context) error {
-	if time.Now().Unix()-lastTimeBashorg < 60 {
-		return context.Reply("Подожди минуту...")
-	}
-	lastTimeBashorg = time.Now().Unix()
 	httpClient := &http.Client{Timeout: 10 * time.Second}
-	httpResponse, err := httpClient.Get("https://bash.im/forweb/")
+	httpResponse, err := httpClient.Get("https://bash.im/forweb/?u")
 	if err != nil {
 		return err
 	}
@@ -37,8 +33,16 @@ func Bashorg(context telebot.Context) error {
 	text = strings.Split(text, "/header>")[1]
 	text = strings.Split(text, "<footer")[0]
 	text = strings.ReplaceAll(text, "<br>", "\n")
-	tags := regexp.MustCompile(`<div.*>|</div>`)
+	text = strings.ReplaceAll(text, "<br/>", "\n")
+	text = strings.ReplaceAll(text, "<br />", "\n")
+	tags := regexp.MustCompile(`<div.*">|</div>`)
 	text = tags.ReplaceAllString(text, ``)
+
+	if lastBash == text {
+		text += "\n\n<code>https://bash.im/forweb/?u вернул кэшированный баш.\nПодождите ~10 секунд, чтобы получить новый.</code>"
+	} else {
+		lastBash = text
+	}
 
 	return context.Reply(text)
 }
