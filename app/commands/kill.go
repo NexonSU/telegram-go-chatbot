@@ -45,5 +45,5 @@ func Kill(context telebot.Context) error {
 	if err != nil {
 		return err
 	}
-	return context.Send(fmt.Sprintf("💥 %v пристрелил %v.\n%v отправился на респавн на %v минут.", utils.UserFullName(context.Sender()), utils.UserFullName(&target), utils.UserFullName(&target), duelist.Deaths))
+	return context.Send(fmt.Sprintf("💥 %v пристрелил %v.\n%v отправился на респавн на %v мин.", utils.UserFullName(context.Sender()), utils.UserFullName(&target), utils.UserFullName(&target), duelist.Deaths))
 }

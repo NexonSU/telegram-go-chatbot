@@ -114,7 +114,7 @@ func Accept(context telebot.Context) error {
 		if err != nil {
 			return err
 		}
-		_, err = utils.Bot.Edit(message, fmt.Sprintf("%v😈 Наводит револьвер на %v и стреляет.\nЯ хз как это объяснить, но %v победитель!\n%v отправился на респавн на %v минут.", prefix, utils.MentionUser(player), utils.MentionUser(victim), utils.MentionUser(player), duelist.Deaths))
+		_, err = utils.Bot.Edit(message, fmt.Sprintf("%v😈 Наводит револьвер на %v и стреляет.\nЯ хз как это объяснить, но %v победитель!\n%v отправился на респавн на %v мин.", prefix, utils.MentionUser(player), utils.MentionUser(victim), utils.MentionUser(player), duelist.Deaths))
 		if err != nil {
 			return err
 		}
@@ -158,7 +158,7 @@ func Accept(context telebot.Context) error {
 	if err != nil {
 		return err
 	}
-	_, err = utils.Bot.Edit(message, fmt.Sprintf("%v\nПобедитель дуэли: %v.\n%v отправился на респавн на %v минут.", prefix, utils.MentionUser(player), utils.MentionUser(victim), VictimDuelist.Deaths))
+	_, err = utils.Bot.Edit(message, fmt.Sprintf("%v\nПобедитель дуэли: %v.\n%v отправился на респавн на %v мин.", prefix, utils.MentionUser(player), utils.MentionUser(victim), VictimDuelist.Deaths))
 	if err != nil {
 		return err
 	}
