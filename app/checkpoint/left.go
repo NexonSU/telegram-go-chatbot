@@ -9,7 +9,7 @@ import (
 
 func UserLeft(context telebot.Context) error {
 	for _, user := range utils.RestrictedUsers {
-		if user.UserID != context.Sender().ID {
+		if user.UserID != context.ChatMember().NewChatMember.User.ID {
 			continue
 		}
 		delete := utils.DB.Delete(&user)
