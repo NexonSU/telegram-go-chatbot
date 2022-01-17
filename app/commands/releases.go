@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -29,7 +30,11 @@ func Releases(context telebot.Context) error {
 	releases := ""
 	today, _ := strconv.Atoi(time.Now().Format("20060102"))
 	twoweeks, _ := strconv.Atoi(time.Now().AddDate(0, 0, 14).Format("20060102"))
-	for _, element := range cal.Events() {
+	events := cal.Events()
+	sort.SliceStable(events, func(i, j int) bool {
+		return events[i].GetProperty(ical.ComponentPropertyDtStart).Value > events[j].GetProperty(ical.ComponentPropertyDtStart).Value
+	})
+	for _, element := range events {
 		date := element.GetProperty(ical.ComponentPropertyDtStart).Value
 		name := element.GetProperty(ical.ComponentPropertySummary).Value
 		dateint, _ := strconv.Atoi(date)
