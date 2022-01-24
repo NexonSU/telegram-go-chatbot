@@ -70,14 +70,13 @@ func UserJoin(context telebot.Context) error {
 		utils.WelcomeMessageID = m.ID
 	} else if len(WelcomeMessage.text) < 3500 {
 		WelcomeMessage.text = strings.Replace(WelcomeMessage.text, "Привет", fmt.Sprintf("Привет, %v", utils.MentionUser(User)), 1)
-		if WelcomeMessage.users > 5 && time.Now().Unix()-WelcomeMessage.time < 5 {
-			return nil
-		}
-		WelcomeMessage.time = time.Now().Unix()
-		_, err := utils.Bot.Edit(&telebot.Message{ID: WelcomeMessage.ID, Chat: &telebot.Chat{ID: utils.Config.Chat}}, WelcomeMessage.text+"\n"+welcomeGet.Data, &telebot.SendOptions{DisableWebPagePreview: true})
-		if err != nil {
-			_ = utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, User)
-			return err
+		if WelcomeMessage.users < 5 || time.Now().Unix()-WelcomeMessage.time > 5 {
+			WelcomeMessage.time = time.Now().Unix()
+			_, err := utils.Bot.Edit(&telebot.Message{ID: WelcomeMessage.ID, Chat: &telebot.Chat{ID: utils.Config.Chat}}, WelcomeMessage.text+"\n"+welcomeGet.Data, &telebot.SendOptions{DisableWebPagePreview: true})
+			if err != nil {
+				_ = utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, User)
+				return err
+			}
 		}
 	}
 	//user chat restrict
