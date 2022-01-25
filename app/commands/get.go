@@ -55,7 +55,7 @@ func Get(context telebot.Context) error {
 			return context.Reply(fmt.Sprintf("Ошибка при определении типа гета, я не знаю тип <code>%v</code>.", get.Type))
 		}
 	} else {
-		return context.Reply(fmt.Sprintf("Гет <code>%v</code> не найден.", context.Data()))
+		return context.Reply(fmt.Sprintf("Гет <code>%v</code> не найден.\nИспользуйте inline-режим бота, чтобы найти гет.", context.Data()))
 	}
 }
 
