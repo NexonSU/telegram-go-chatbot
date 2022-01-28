@@ -14,7 +14,14 @@ import (
 
 var CryptoMap []*cmc.MapListing
 var FiatMap []*cmc.FiatMapListing
+var JokeMap = []JokeMapStruct{}
 var _ = GenerateMaps()
+
+type JokeMapStruct struct {
+	symbol string
+	name   string
+	amount float64
+}
 
 func GenerateMaps() error {
 	if utils.Config.CurrencyKey == "" {
@@ -30,6 +37,8 @@ func GenerateMaps() error {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	JokeMap = append(JokeMap, JokeMapStruct{symbol: "COC", name: "Cup Of Coffee", amount: 300.0})
+	JokeMap = append(JokeMap, JokeMapStruct{symbol: "DSHK", name: "Doshirak", amount: 50.0})
 	return nil
 }
 
@@ -38,8 +47,10 @@ func GetSymbolId(symbol string) (string, error) {
 	if symbol == "BYR" {
 		symbol = "BYN"
 	}
-	if symbol == "COC" {
-		symbol = "RUB"
+	for _, JokeFiat := range JokeMap {
+		if symbol == JokeFiat.symbol {
+			symbol = "RUB"
+		}
 	}
 	for _, fiat := range FiatMap {
 		if fiat.Symbol == symbol {
@@ -89,9 +100,10 @@ func Cur(context telebot.Context) error {
 	if err != nil {
 		return context.Reply(err.Error())
 	}
-	//COC
-	if strings.ToUpper(context.Args()[1]) == "COC" {
-		amount = amount * 300
+	for _, JokeFiat := range JokeMap {
+		if strings.ToUpper(context.Args()[1]) == JokeFiat.symbol {
+			amount = amount * JokeFiat.amount
+		}
 	}
 	client := cmc.NewClient(&cmc.Config{ProAPIKey: utils.Config.CurrencyKey})
 	conversion, err := client.Tools.PriceConversion(&cmc.ConvertOptions{Amount: amount, ID: symbol, ConvertID: convert})
@@ -100,14 +112,15 @@ func Cur(context telebot.Context) error {
 	}
 	resultAmount := conversion.Quote[convert].Price
 	resultName := GetIdName(convert)
-	//COC
-	if strings.ToUpper(context.Args()[1]) == "COC" {
-		conversion.Amount = amount / 300
-		conversion.Name = "Cup Of Coffee"
-	}
-	if strings.ToUpper(context.Args()[2]) == "COC" {
-		resultAmount = resultAmount / 300
-		resultName = "Cup Of Coffee"
+	for _, JokeFiat := range JokeMap {
+		if strings.ToUpper(context.Args()[1]) == JokeFiat.symbol {
+			conversion.Amount = amount / JokeFiat.amount
+			conversion.Name = JokeFiat.name
+		}
+		if strings.ToUpper(context.Args()[2]) == JokeFiat.symbol {
+			resultAmount = resultAmount / JokeFiat.amount
+			resultName = JokeFiat.name
+		}
 	}
 	resultAmount_s := strings.Replace(humanize.CommafWithDigits(resultAmount, 2), ",", " ", -1)
 	if resultAmount > 1000 {
