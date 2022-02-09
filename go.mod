@@ -18,7 +18,7 @@ require (
 	github.com/valyala/fastjson v1.6.3
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410 // indirect
 	golang.org/x/net v0.0.0-20211205041911-012df41ee64c // indirect
-	gopkg.in/tucnak/telebot.v3 v3.0.0-20211126232936-7f936709f3ee
+	gopkg.in/telebot.v3 v3.0.0
 	gorm.io/driver/sqlite v1.2.6
 	gorm.io/gorm v1.22.4
 	mvdan.cc/xurls/v2 v2.3.0

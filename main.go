@@ -1,13 +1,13 @@
 package main
 
 import (
-	"github.com/NexonSU/telegram-go-chatbot/app/checkpoint"
-	"github.com/NexonSU/telegram-go-chatbot/app/commands"
-	"github.com/NexonSU/telegram-go-chatbot/app/duel"
-	"github.com/NexonSU/telegram-go-chatbot/app/pidor"
-	"github.com/NexonSU/telegram-go-chatbot/app/stats"
-	"github.com/NexonSU/telegram-go-chatbot/app/utils"
-	"gopkg.in/tucnak/telebot.v3"
+	"github.com/NexonSU/telegram-go-chatbot/checkpoint"
+	"github.com/NexonSU/telegram-go-chatbot/commands"
+	"github.com/NexonSU/telegram-go-chatbot/duel"
+	"github.com/NexonSU/telegram-go-chatbot/pidor"
+	"github.com/NexonSU/telegram-go-chatbot/stats"
+	"github.com/NexonSU/telegram-go-chatbot/utils"
+	tele "gopkg.in/telebot.v3"
 )
 
 func main() {
@@ -15,7 +15,7 @@ func main() {
 	utils.Bot.OnError = utils.ErrorReporting
 
 	//Middleware
-	utils.Bot.Poller = utils.NewMiddlewarePoller(utils.Bot.Poller, func(upd *telebot.Update) bool {
+	utils.Bot.Poller = tele.NewMiddlewarePoller(utils.Bot.Poller, func(upd *tele.Update) bool {
 		utils.GatherData(upd)
 		utils.CheckPoint(upd)
 
@@ -49,7 +49,7 @@ func main() {
 	//Chat commands
 	utils.Bot.Handle("/admin", commands.Admin, utils.ChatLevel)
 	utils.Bot.Handle("/get", commands.Get, utils.ChatLevel)
-	utils.Bot.Handle(telebot.OnQuery, commands.GetInline)
+	utils.Bot.Handle(tele.OnQuery, commands.GetInline)
 	utils.Bot.Handle("/getall", commands.Getall, utils.ChatLevel)
 	utils.Bot.Handle("/set", commands.Set, utils.GetFilterCreator)
 	utils.Bot.Handle("/del", commands.Del, utils.GetFilterCreator)
@@ -92,17 +92,17 @@ func main() {
 	utils.Bot.Handle(&duel.DenyButton, duel.Deny, utils.ChatOnly)
 
 	//Repost channel post to chat
-	utils.Bot.Handle(telebot.OnChannelPost, utils.Repost, utils.ChannelOnly)
-	utils.Bot.Handle(telebot.OnEditedChannelPost, utils.EditRepost, utils.ChannelOnly)
+	utils.Bot.Handle(tele.OnChannelPost, utils.Repost, utils.ChannelOnly)
+	utils.Bot.Handle(tele.OnEditedChannelPost, utils.EditRepost, utils.ChannelOnly)
 
 	//Filter messages in comment chat
-	utils.Bot.Handle(telebot.OnText, checkpoint.SpamFilter, utils.CommentChatOnly)
-	utils.Bot.Handle(telebot.OnSticker, checkpoint.SpamFilter, utils.CommentChatOnly)
+	utils.Bot.Handle(tele.OnText, checkpoint.SpamFilter, utils.CommentChatOnly)
+	utils.Bot.Handle(tele.OnSticker, checkpoint.SpamFilter, utils.CommentChatOnly)
 
 	//User entry
-	utils.Bot.Handle(telebot.OnChatMember, checkpoint.ChatMemberUpdate, utils.ChatOnly)
-	utils.Bot.Handle(telebot.OnUserJoined, utils.Remove, utils.ChatOnly)
-	utils.Bot.Handle(telebot.OnUserLeft, utils.Remove, utils.ChatOnly)
+	utils.Bot.Handle(tele.OnChatMember, checkpoint.ChatMemberUpdate, utils.ChatOnly)
+	utils.Bot.Handle(tele.OnUserJoined, utils.Remove, utils.ChatOnly)
+	utils.Bot.Handle(tele.OnUserLeft, utils.Remove, utils.ChatOnly)
 
 	//Word stats exclusion list
 	utils.DB.Find(&utils.WordStatsExcludes)
