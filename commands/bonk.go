@@ -2,8 +2,6 @@ package commands
 
 import (
 	"bytes"
-	"path/filepath"
-	"runtime"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	"github.com/chai2010/webp"
@@ -17,16 +15,14 @@ func Bonk(context telebot.Context) error {
 		return context.Reply("Просто отправь <code>/bonk</code> в ответ на чье-либо сообщение.")
 	}
 	context.Delete()
-	_, b, _, _ := runtime.Caller(0)
-	basepath := filepath.Dir(b)
-	im, err := webp.Load(basepath + "/../../files/bonk.webp")
+	im, err := webp.Load("files/bonk.webp")
 	if err != nil {
 		return err
 	}
 	dc := gg.NewContextForImage(im)
 	dc.DrawImage(im, 0, 0)
 	dc.SetRGB(0, 0, 0)
-	err = dc.LoadFontFace(basepath+"/../../files/impact.ttf", 20)
+	err = dc.LoadFontFace("files/impact.ttf", 20)
 	if err != nil {
 		return err
 	}

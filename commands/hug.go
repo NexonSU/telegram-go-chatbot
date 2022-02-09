@@ -2,8 +2,6 @@ package commands
 
 import (
 	"bytes"
-	"path/filepath"
-	"runtime"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	"github.com/chai2010/webp"
@@ -18,9 +16,7 @@ func Hug(context telebot.Context) error {
 		return context.Reply("Просто отправь <code>/hug</code> в ответ на чье-либо сообщение.")
 	}
 	context.Delete()
-	_, b, _, _ := runtime.Caller(0)
-	basepath := filepath.Dir(b)
-	im, err := webp.Load(basepath + "/../../files/hug.webp")
+	im, err := webp.Load("files/hug.webp")
 	if err != nil {
 		return err
 	}
@@ -28,7 +24,7 @@ func Hug(context telebot.Context) error {
 	dc.DrawImage(im, 0, 0)
 	dc.Rotate(gg.Radians(15))
 	dc.SetRGB(0, 0, 0)
-	err = dc.LoadFontFace(basepath+"/../../files/impact.ttf", 20)
+	err = dc.LoadFontFace("files/impact.ttf", 20)
 	if err != nil {
 		return err
 	}
