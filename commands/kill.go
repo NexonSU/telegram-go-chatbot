@@ -12,7 +12,6 @@ import (
 //Kill user on /kill
 func Kill(context tele.Context) error {
 	command := "/bless"
-	print(context.Text()[1:5])
 	if context.Text()[1:5] == "kill" {
 		command = "/kill"
 	}
