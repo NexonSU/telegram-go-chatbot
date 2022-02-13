@@ -5,12 +5,12 @@ import (
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 	"gorm.io/gorm/clause"
 )
 
 //Kill user on /blessing, /suicide
-func Blessing(context telebot.Context) error {
+func Blessing(context tele.Context) error {
 	err := context.Delete()
 	if err != nil {
 		return err

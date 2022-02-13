@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Ban user on /ban
-func Ban(context telebot.Context) error {
+func Ban(context tele.Context) error {
 	if (context.Message().ReplyTo == nil && len(context.Args()) == 0) || (context.Message().ReplyTo != nil && len(context.Args()) > 1) {
 		return context.Reply("Пример использования: <code>/ban {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/ban</code>\nЕсли нужно забанить на время, то добавь время в секундах через пробел.")
 	}

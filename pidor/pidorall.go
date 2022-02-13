@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Send top 10 pidors of all time on /pidorall
-func Pidorall(context telebot.Context) error {
+func Pidorall(context tele.Context) error {
 	var i = 0
 	var username string
 	var count int64

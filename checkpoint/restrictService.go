@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 func restrictUpdate() error {
@@ -21,7 +21,7 @@ func restrictUpdate() error {
 		if delete.Error != nil {
 			log.Println(delete.Error)
 		}
-		err := utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, &telebot.User{ID: user.UserID})
+		err := utils.Bot.Unban(&tele.Chat{ID: utils.Config.Chat}, &tele.User{ID: user.UserID})
 		if err != nil {
 			log.Println(err)
 		}
@@ -29,7 +29,7 @@ func restrictUpdate() error {
 			if utils.WelcomeMessageID == user.WelcomeMessageID {
 				utils.WelcomeMessageID = 0
 			}
-			utils.Bot.Delete(&telebot.Message{ID: user.WelcomeMessageID, Chat: &telebot.Chat{ID: utils.Config.Chat}})
+			utils.Bot.Delete(&tele.Message{ID: user.WelcomeMessageID, Chat: &tele.Chat{ID: utils.Config.Chat}})
 		}
 	}
 	return nil

@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Send user utils.Duelist stats on /duelstats
-func Duelstats(context telebot.Context) error {
+func Duelstats(context tele.Context) error {
 	var duelist utils.Duelist
 	result := utils.DB.Model(utils.Duelist{}).Where(context.Sender().ID).First(&duelist)
 	if result.RowsAffected == 0 {

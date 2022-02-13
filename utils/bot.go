@@ -1,53 +1,216 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
+	"html"
 	"log"
+	"runtime"
+	"strconv"
+	"strings"
 	"time"
 
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
+	"gorm.io/gorm/clause"
 )
 
-func BotInit() telebot.Bot {
+var Bot = BotInit()
+
+func BotInit() tele.Bot {
 	if Config.Token == "" {
 		log.Fatal("Telegram Bot token not found in config.json")
 	}
 	if Config.Chat == 0 {
 		log.Fatal("Chat username not found in config.json")
 	}
-	Settings := telebot.Settings{
+	Settings := tele.Settings{
 		URL:       Config.BotApiUrl,
 		Token:     Config.Token,
-		ParseMode: telebot.ModeHTML,
-		Poller: &telebot.LongPoller{
+		ParseMode: tele.ModeHTML,
+		Poller: &tele.LongPoller{
 			Timeout:        10 * time.Second,
 			AllowedUpdates: Config.AllowedUpdates,
 		},
 	}
 	if Config.EndpointPublicURL != "" || Config.Listen != "" {
-		Settings.Poller = &telebot.Webhook{
+		Settings.Poller = &tele.Webhook{
 			Listen: Config.Listen,
-			Endpoint: &telebot.WebhookEndpoint{
+			Endpoint: &tele.WebhookEndpoint{
 				PublicURL: Config.EndpointPublicURL,
 			},
 			MaxConnections: Config.MaxConnections,
 			AllowedUpdates: Config.AllowedUpdates,
 		}
 	} else {
-		Settings.Poller = &telebot.LongPoller{
+		Settings.Poller = &tele.LongPoller{
 			Timeout:        10 * time.Second,
 			AllowedUpdates: Config.AllowedUpdates,
 		}
 	}
-	var Bot, err = telebot.NewBot(Settings)
+	var Bot, err = tele.NewBot(Settings)
 	if err != nil {
 		log.Println(Config.BotApiUrl)
 		log.Fatal(err)
 	}
 	if Config.SysAdmin != 0 {
-		Bot.Send(telebot.ChatID(Config.SysAdmin), fmt.Sprintf("%v has finished starting up.", MentionUser(Bot.Me)))
+		Bot.Send(tele.ChatID(Config.SysAdmin), fmt.Sprintf("%v has finished starting up.", MentionUser(Bot.Me)))
 	}
+
 	return *Bot
 }
 
-var Bot = BotInit()
+func ErrorReporting(err error, context tele.Context) {
+	_, fn, line, _ := runtime.Caller(1)
+	log.Printf("[%s:%d] %v", fn, line, err)
+	text := fmt.Sprintf("<pre>[%s:%d]\n%v</pre>", fn, line, err)
+	if strings.Contains(err.Error(), "specified new message content and reply markup are exactly the same") {
+		return
+	}
+	if strings.Contains(err.Error(), "message to delete not found") {
+		return
+	}
+	if context.Message() != nil {
+		MarshalledMessage, _ := json.MarshalIndent(context.Message(), "", "    ")
+		JsonMessage := html.EscapeString(string(MarshalledMessage))
+		text += fmt.Sprintf("\n\nMessage:\n<pre>%v</pre>", JsonMessage)
+	}
+	Bot.Send(tele.ChatID(Config.SysAdmin), text)
+}
+
+func GatherData(update *tele.Update) error {
+	if update.Message == nil || update.Message.Sender == nil {
+		return nil
+	}
+	//User update
+	UserResult := DB.Clauses(clause.OnConflict{
+		UpdateAll: true,
+	}).Create(update.Message.Sender)
+	if UserResult.Error != nil {
+		return UserResult.Error
+	}
+	if update.Message.Sender.IsBot || update.Message.Chat.ID != Config.Chat {
+		return nil
+	}
+	//Message insert
+	var Message Message
+	Message.ID = update.Message.ID
+	Message.UserID = update.Message.Sender.ID
+	Message.Date = time.Unix(update.Message.Unixtime, 0)
+	Message.ChatID = update.Message.Chat.ID
+	if update.Message.ReplyTo != nil {
+		Message.ReplyTo = update.Message.ReplyTo.ID
+	}
+	Message.Text = update.Message.Text
+	switch {
+	case update.Message.Animation != nil:
+		Message.FileType = "Animation"
+		Message.FileID = update.Message.Animation.FileID
+		Message.Text = update.Message.Caption
+	case update.Message.Audio != nil:
+		Message.FileType = "Audio"
+		Message.FileID = update.Message.Audio.FileID
+		Message.Text = update.Message.Caption
+	case update.Message.Photo != nil:
+		Message.FileType = "Photo"
+		Message.FileID = update.Message.Photo.FileID
+		Message.Text = update.Message.Caption
+	case update.Message.Video != nil:
+		Message.FileType = "Video"
+		Message.FileID = update.Message.Video.FileID
+		Message.Text = update.Message.Caption
+	case update.Message.Voice != nil:
+		Message.FileType = "Voice"
+		Message.FileID = update.Message.Voice.FileID
+		Message.Text = update.Message.Caption
+	case update.Message.Document != nil:
+		Message.FileType = "Document"
+		Message.FileID = update.Message.Document.FileID
+		Message.Text = update.Message.Caption
+	}
+	MessageResult := DB.Create(&Message)
+	if MessageResult.Error != nil {
+		return MessageResult.Error
+	}
+	//Words insert
+	if Message.Text == "" || string(Message.Text[0]) == "/" {
+		return nil
+	}
+	var Word Word
+	Word.ChatID = Message.ChatID
+	Word.UserID = Message.UserID
+	Word.Date = Message.Date
+	Message.Text = strings.ReplaceAll(Message.Text, ",", "")
+	Message.Text = strings.ReplaceAll(Message.Text, ".", "")
+	Message.Text = strings.ReplaceAll(Message.Text, "!", "")
+	Message.Text = strings.ReplaceAll(Message.Text, "?", "")
+words:
+	for _, Word.Text = range strings.Fields(strings.ToLower(Message.Text)) {
+		for _, exclude := range WordStatsExcludes {
+			if Word.Text == exclude.Text {
+				continue words
+			}
+		}
+		if _, err := strconv.Atoi(Word.Text); err == nil ||
+			Word.Text == "" ||
+			len(Word.Text) == 1 {
+			continue
+		}
+		WordResult := DB.Create(&Word)
+		if WordResult.Error != nil {
+			return WordResult.Error
+		}
+	}
+	return nil
+}
+
+func CheckPoint(update *tele.Update) error {
+	if update.Message == nil || update.Message.Sender == nil {
+		return nil
+	}
+	if update.Message.SenderChat != nil &&
+		(update.Message.Chat.ID == Config.Chat ||
+			update.Message.Chat.ID == Config.CommentChat) &&
+		update.Message.Sender.ID == 777000 &&
+		update.Message.SenderChat.ID != Config.Channel {
+		return Bot.Delete(update.Message)
+	}
+	if update.Message.Chat.ID == Config.Chat {
+		LastChatMessageID = update.Message.ID
+	}
+	for _, user := range RestrictedUsers {
+		if update.Message.ReplyTo != nil && update.Message.ReplyTo.ID == user.WelcomeMessageID {
+			delete := DB.Delete(CheckPointRestrict{UserID: update.Message.Sender.ID})
+			if delete.Error != nil {
+				return delete.Error
+			}
+			find := DB.Find(&RestrictedUsers)
+			if find.Error != nil {
+				return find.Error
+			}
+			if DB.First(&CheckPointRestrict{WelcomeMessageID: user.WelcomeMessageID}).RowsAffected == 0 {
+				if WelcomeMessageID == user.WelcomeMessageID {
+					WelcomeMessageID = 0
+				}
+				return Bot.Delete(&tele.Message{ID: user.WelcomeMessageID, Chat: &tele.Chat{ID: Config.Chat}})
+			}
+			restricted := DB.Find(&RestrictedUsers)
+			if restricted.Error != nil {
+				log.Println(restricted.Error)
+			}
+		} else if update.Message.Sender.ID == user.UserID {
+			return Bot.Delete(update.Message)
+		}
+	}
+	return nil
+}
+
+func init() {
+	Bot.OnError = ErrorReporting
+
+	Bot.Poller = tele.NewMiddlewarePoller(Bot.Poller, func(upd *tele.Update) bool {
+		GatherData(upd)
+		CheckPoint(upd)
+
+		return true
+	})
+}

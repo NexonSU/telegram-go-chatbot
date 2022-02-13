@@ -1,8 +1,8 @@
 package commands
 
-import "gopkg.in/telebot.v3"
+import tele "gopkg.in/telebot.v3"
 
 //Reply "Polo!" on "marco"
-func Marco(context telebot.Context) error {
+func Marco(context tele.Context) error {
 	return context.Reply("Polo!")
 }

@@ -5,11 +5,11 @@ import (
 	"strings"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Send list of Gets to user on /getall
-func Getall(context telebot.Context) error {
+func Getall(context tele.Context) error {
 	var getall []string
 	var get utils.Get
 	result, _ := utils.DB.Model(&utils.Get{}).Rows()

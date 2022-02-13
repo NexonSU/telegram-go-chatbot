@@ -7,11 +7,11 @@ import (
 	"strings"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Send Get to user on /get
-func Get(context telebot.Context) error {
+func Get(context tele.Context) error {
 	var get utils.Get
 	if len(context.Args()) == 0 {
 		return context.Reply("Пример использования: <code>/get {гет}</code>")
@@ -20,33 +20,33 @@ func Get(context telebot.Context) error {
 	if result.RowsAffected != 0 {
 		switch {
 		case get.Type == "Animation":
-			return context.Reply(&telebot.Animation{
-				File:    telebot.File{FileID: get.Data},
+			return context.Reply(&tele.Animation{
+				File:    tele.File{FileID: get.Data},
 				Caption: get.Caption,
 			})
 		case get.Type == "Audio":
-			return context.Reply(&telebot.Audio{
-				File:    telebot.File{FileID: get.Data},
+			return context.Reply(&tele.Audio{
+				File:    tele.File{FileID: get.Data},
 				Caption: get.Caption,
 			})
 		case get.Type == "Photo":
-			return context.Reply(&telebot.Photo{
-				File:    telebot.File{FileID: get.Data},
+			return context.Reply(&tele.Photo{
+				File:    tele.File{FileID: get.Data},
 				Caption: get.Caption,
 			})
 		case get.Type == "Video":
-			return context.Reply(&telebot.Video{
-				File:    telebot.File{FileID: get.Data},
+			return context.Reply(&tele.Video{
+				File:    tele.File{FileID: get.Data},
 				Caption: get.Caption,
 			})
 		case get.Type == "Voice":
-			return context.Reply(&telebot.Voice{
-				File:    telebot.File{FileID: get.Data},
+			return context.Reply(&tele.Voice{
+				File:    tele.File{FileID: get.Data},
 				Caption: get.Caption,
 			})
 		case get.Type == "Document":
-			return context.Reply(&telebot.Document{
-				File:    telebot.File{FileID: get.Data},
+			return context.Reply(&tele.Document{
+				File:    tele.File{FileID: get.Data},
 				Caption: get.Caption,
 			})
 		case get.Type == "Text":
@@ -60,11 +60,11 @@ func Get(context telebot.Context) error {
 }
 
 //Answer on inline get query
-func GetInline(context telebot.Context) error {
+func GetInline(context tele.Context) error {
 	var count int64
 	query := strings.ToLower(context.Query().Text)
 	if query == "" {
-		return context.Answer(&telebot.QueryResponse{})
+		return context.Answer(&tele.QueryResponse{})
 	}
 	gets := utils.DB.Limit(10).Model(utils.Get{}).Where("name LIKE ?", "%"+query+"%").Count(&count)
 	get_rows, err := gets.Rows()
@@ -75,7 +75,7 @@ func GetInline(context telebot.Context) error {
 	if count > 10 {
 		count = 10
 	}
-	results := make(telebot.Results, count)
+	results := make(tele.Results, count)
 	var i int
 	for get_rows.Next() {
 		var get utils.Get
@@ -89,53 +89,53 @@ func GetInline(context telebot.Context) error {
 		}
 		switch {
 		case get.Type == "Animation":
-			results[i] = &telebot.GifResult{
+			results[i] = &tele.GifResult{
 				Title:   get.Title,
 				Caption: get.Caption,
 				Cache:   get.Data,
 			}
 		case get.Type == "Audio":
-			results[i] = &telebot.DocumentResult{
+			results[i] = &tele.DocumentResult{
 				Title:       get.Title,
 				Caption:     get.Caption,
 				Cache:       get.Data,
 				Description: get.Caption,
 			}
 		case get.Type == "Photo":
-			results[i] = &telebot.PhotoResult{
+			results[i] = &tele.PhotoResult{
 				Title:       get.Title,
 				Caption:     get.Caption,
 				Cache:       get.Data,
 				Description: get.Caption,
 			}
 		case get.Type == "Video":
-			results[i] = &telebot.VideoResult{
+			results[i] = &tele.VideoResult{
 				Title:       get.Title,
 				Caption:     get.Caption,
 				Cache:       get.Data,
 				Description: get.Caption,
 			}
 		case get.Type == "Voice":
-			results[i] = &telebot.VoiceResult{
+			results[i] = &tele.VoiceResult{
 				Title:   get.Title,
 				Caption: get.Caption,
 				Cache:   get.Data,
 			}
 		case get.Type == "Document":
-			results[i] = &telebot.DocumentResult{
+			results[i] = &tele.DocumentResult{
 				Title:       get.Title,
 				Caption:     get.Caption,
 				Cache:       get.Data,
 				Description: get.Caption,
 			}
 		case get.Type == "Text":
-			results[i] = &telebot.ArticleResult{
+			results[i] = &tele.ArticleResult{
 				Title:       get.Title,
 				Description: get.Data,
 			}
-			results[i].SetContent(telebot.InputMessageContent(&telebot.InputTextMessageContent{
+			results[i].SetContent(tele.InputMessageContent(&tele.InputTextMessageContent{
 				Text:      fmt.Sprintf("<b>%v</b>\n%v", get.Title, get.Data),
-				ParseMode: telebot.ModeHTML,
+				ParseMode: tele.ModeHTML,
 			}))
 		default:
 			log.Printf("Не удалось отправить гет %v через inline.", get.Name)
@@ -149,7 +149,7 @@ func GetInline(context telebot.Context) error {
 		}
 	}
 
-	return context.Answer(&telebot.QueryResponse{
+	return context.Answer(&tele.QueryResponse{
 		Results: results,
 	})
 }

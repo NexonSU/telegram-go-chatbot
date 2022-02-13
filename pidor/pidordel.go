@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Remove user in DB on /pidordel
-func Pidordel(context telebot.Context) error {
+func Pidordel(context tele.Context) error {
 	var pidor utils.PidorList
 	user, _, err := utils.FindUserInMessage(context)
 	if err != nil {

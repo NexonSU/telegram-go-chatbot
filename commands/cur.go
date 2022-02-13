@@ -9,7 +9,7 @@ import (
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	"github.com/dustin/go-humanize"
 	cmc "github.com/miguelmota/go-coinmarketcap/pro/v1"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 var CryptoMap []*cmc.MapListing
@@ -82,7 +82,7 @@ func GetIdName(ID string) string {
 }
 
 //Reply currency "cur"
-func Cur(context telebot.Context) error {
+func Cur(context tele.Context) error {
 	if utils.Config.CurrencyKey == "" {
 		return context.Reply("Конвертация валют не настроена")
 	}
@@ -109,7 +109,7 @@ func Cur(context telebot.Context) error {
 	client := cmc.NewClient(&cmc.Config{ProAPIKey: utils.Config.CurrencyKey})
 	conversion, err := client.Tools.PriceConversion(&cmc.ConvertOptions{Amount: amount, ID: symbol, ConvertID: convert})
 	if err != nil {
-		return context.Reply(fmt.Sprintf("Ошибка при запросе: %v\nОнлайн-версия: https://coinmarketcap.com/ru/converter/", err.Error()), &telebot.SendOptions{DisableWebPagePreview: true})
+		return context.Reply(fmt.Sprintf("Ошибка при запросе: %v\nОнлайн-версия: https://coinmarketcap.com/ru/converter/", err.Error()), &tele.SendOptions{DisableWebPagePreview: true})
 	}
 	resultAmount := conversion.Quote[convert].Price
 	resultName := GetIdName(convert)
@@ -127,5 +127,5 @@ func Cur(context telebot.Context) error {
 	if resultAmount > 1000 {
 		resultAmount_s = strings.Replace(humanize.CommafWithDigits(resultAmount, 0), ",", " ", -1)
 	}
-	return context.Send(fmt.Sprintf("%v %v = %v %v", conversion.Amount, conversion.Name, resultAmount_s, resultName), &telebot.SendOptions{ReplyTo: context.Message().ReplyTo, AllowWithoutReply: true})
+	return context.Send(fmt.Sprintf("%v %v = %v %v", conversion.Amount, conversion.Name, resultAmount_s, resultName), &tele.SendOptions{ReplyTo: context.Message().ReplyTo, AllowWithoutReply: true})
 }

@@ -5,11 +5,11 @@ import (
 	"fmt"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Return message on /debug command
-func Debug(context telebot.Context) error {
+func Debug(context tele.Context) error {
 	err := utils.Bot.Delete(context.Message())
 	if err != nil {
 		return err

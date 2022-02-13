@@ -1,8 +1,8 @@
 package checkpoint
 
-import "gopkg.in/telebot.v3"
+import tele "gopkg.in/telebot.v3"
 
-func ChatMemberUpdate(context telebot.Context) error {
+func ChatMemberUpdate(context tele.Context) error {
 	Old := context.ChatMember().OldChatMember
 	New := context.ChatMember().NewChatMember
 	if Old.Role == "left" && New.Role == "member" {

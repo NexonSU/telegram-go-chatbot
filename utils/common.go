@@ -2,21 +2,16 @@ package utils
 
 import (
 	"crypto/rand"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"html"
-	"log"
 	"math/big"
-	"runtime"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 	"unicode/utf16"
 
-	"gopkg.in/telebot.v3"
-	"gorm.io/gorm/clause"
+	tele "gopkg.in/telebot.v3"
 )
 
 var LastChatMessageID int
@@ -24,7 +19,7 @@ var WelcomeMessageID int
 var RestrictedUsers []CheckPointRestrict
 var WordStatsExcludes []WordStatsExclude
 
-func UserFullName(user *telebot.User) string {
+func UserFullName(user *tele.User) string {
 	fullname := user.FirstName
 	if user.LastName != "" {
 		fullname = fmt.Sprintf("%v %v", user.FirstName, user.LastName)
@@ -32,7 +27,7 @@ func UserFullName(user *telebot.User) string {
 	return fullname
 }
 
-func UserName(user *telebot.User) string {
+func UserName(user *tele.User) string {
 	username := user.Username
 	if user.Username == "" {
 		username = UserFullName(user)
@@ -40,7 +35,7 @@ func UserName(user *telebot.User) string {
 	return username
 }
 
-func MentionUser(user *telebot.User) string {
+func MentionUser(user *tele.User) string {
 	return fmt.Sprintf("<a href=\"tg://user?id=%v\">%v</a>", user.ID, UserFullName(user))
 }
 
@@ -92,30 +87,12 @@ func RestrictionTimeMessage(seconds int64) string {
 	return message
 }
 
-func ErrorReporting(err error, context telebot.Context) {
-	_, fn, line, _ := runtime.Caller(1)
-	log.Printf("[%s:%d] %v", fn, line, err)
-	text := fmt.Sprintf("<pre>[%s:%d]\n%v</pre>", fn, line, err)
-	if strings.Contains(err.Error(), "specified new message content and reply markup are exactly the same") {
-		return
-	}
-	if strings.Contains(err.Error(), "message to delete not found") {
-		return
-	}
-	if context.Message() != nil {
-		MarshalledMessage, _ := json.MarshalIndent(context.Message(), "", "    ")
-		JsonMessage := html.EscapeString(string(MarshalledMessage))
-		text += fmt.Sprintf("\n\nMessage:\n<pre>%v</pre>", JsonMessage)
-	}
-	Bot.Send(telebot.ChatID(Config.SysAdmin), text)
-}
-
-func FindUserInMessage(context telebot.Context) (telebot.User, int64, error) {
-	var user telebot.User
+func FindUserInMessage(context tele.Context) (tele.User, int64, error) {
+	var user tele.User
 	var err error = nil
 	var untildate = time.Now().Unix() + 86400
 	for _, entity := range context.Message().Entities {
-		if entity.Type == telebot.EntityTMention {
+		if entity.Type == tele.EntityTMention {
 			user = *entity.User
 			if len(context.Args()) == 2 {
 				addtime, err := strconv.ParseInt(context.Args()[1], 10, 64)
@@ -158,135 +135,8 @@ func FindUserInMessage(context telebot.Context) (telebot.User, int64, error) {
 	return user, untildate, err
 }
 
-func CheckPoint(update *telebot.Update) error {
-	if update.Message == nil || update.Message.Sender == nil {
-		return nil
-	}
-	if update.Message.SenderChat != nil &&
-		(update.Message.Chat.ID == Config.Chat ||
-			update.Message.Chat.ID == Config.CommentChat) &&
-		update.Message.Sender.ID == 777000 &&
-		update.Message.SenderChat.ID != Config.Channel {
-		return Bot.Delete(update.Message)
-	}
-	if update.Message.Chat.ID == Config.Chat {
-		LastChatMessageID = update.Message.ID
-	}
-	for _, user := range RestrictedUsers {
-		if update.Message.ReplyTo != nil && update.Message.ReplyTo.ID == user.WelcomeMessageID {
-			delete := DB.Delete(CheckPointRestrict{UserID: update.Message.Sender.ID})
-			if delete.Error != nil {
-				return delete.Error
-			}
-			find := DB.Find(&RestrictedUsers)
-			if find.Error != nil {
-				return find.Error
-			}
-			if DB.First(&CheckPointRestrict{WelcomeMessageID: user.WelcomeMessageID}).RowsAffected == 0 {
-				if WelcomeMessageID == user.WelcomeMessageID {
-					WelcomeMessageID = 0
-				}
-				return Bot.Delete(&telebot.Message{ID: user.WelcomeMessageID, Chat: &telebot.Chat{ID: Config.Chat}})
-			}
-			restricted := DB.Find(&RestrictedUsers)
-			if restricted.Error != nil {
-				log.Println(restricted.Error)
-			}
-		} else if update.Message.Sender.ID == user.UserID {
-			return Bot.Delete(update.Message)
-		}
-	}
-	return nil
-}
-
-func GatherData(update *telebot.Update) error {
-	if update.Message == nil || update.Message.Sender == nil {
-		return nil
-	}
-	//User update
-	UserResult := DB.Clauses(clause.OnConflict{
-		UpdateAll: true,
-	}).Create(update.Message.Sender)
-	if UserResult.Error != nil {
-		return UserResult.Error
-	}
-	if update.Message.Sender.IsBot || update.Message.Chat.ID != Config.Chat {
-		return nil
-	}
-	//Message insert
-	var Message Message
-	Message.ID = update.Message.ID
-	Message.UserID = update.Message.Sender.ID
-	Message.Date = time.Unix(update.Message.Unixtime, 0)
-	Message.ChatID = update.Message.Chat.ID
-	if update.Message.ReplyTo != nil {
-		Message.ReplyTo = update.Message.ReplyTo.ID
-	}
-	Message.Text = update.Message.Text
-	switch {
-	case update.Message.Animation != nil:
-		Message.FileType = "Animation"
-		Message.FileID = update.Message.Animation.FileID
-		Message.Text = update.Message.Caption
-	case update.Message.Audio != nil:
-		Message.FileType = "Audio"
-		Message.FileID = update.Message.Audio.FileID
-		Message.Text = update.Message.Caption
-	case update.Message.Photo != nil:
-		Message.FileType = "Photo"
-		Message.FileID = update.Message.Photo.FileID
-		Message.Text = update.Message.Caption
-	case update.Message.Video != nil:
-		Message.FileType = "Video"
-		Message.FileID = update.Message.Video.FileID
-		Message.Text = update.Message.Caption
-	case update.Message.Voice != nil:
-		Message.FileType = "Voice"
-		Message.FileID = update.Message.Voice.FileID
-		Message.Text = update.Message.Caption
-	case update.Message.Document != nil:
-		Message.FileType = "Document"
-		Message.FileID = update.Message.Document.FileID
-		Message.Text = update.Message.Caption
-	}
-	MessageResult := DB.Create(&Message)
-	if MessageResult.Error != nil {
-		return MessageResult.Error
-	}
-	//Words insert
-	if Message.Text == "" || string(Message.Text[0]) == "/" {
-		return nil
-	}
-	var Word Word
-	Word.ChatID = Message.ChatID
-	Word.UserID = Message.UserID
-	Word.Date = Message.Date
-	Message.Text = strings.ReplaceAll(Message.Text, ",", "")
-	Message.Text = strings.ReplaceAll(Message.Text, ".", "")
-	Message.Text = strings.ReplaceAll(Message.Text, "!", "")
-	Message.Text = strings.ReplaceAll(Message.Text, "?", "")
-words:
-	for _, Word.Text = range strings.Fields(strings.ToLower(Message.Text)) {
-		for _, exclude := range WordStatsExcludes {
-			if Word.Text == exclude.Text {
-				continue words
-			}
-		}
-		if _, err := strconv.Atoi(Word.Text); err == nil ||
-			Word.Text == "" ||
-			len(Word.Text) == 1 {
-			continue
-		}
-		WordResult := DB.Create(&Word)
-		if WordResult.Error != nil {
-			return WordResult.Error
-		}
-	}
-	return nil
-}
-
-func GetUserFromDB(findstring string) (telebot.User, error) {
-	var user telebot.User
+func GetUserFromDB(findstring string) (tele.User, error) {
+	var user tele.User
 	var err error = nil
 	if string(findstring[0]) == "@" {
 		user.Username = findstring[1:]
@@ -312,10 +162,10 @@ type ForwardMesssage struct {
 }
 
 var Forward ForwardMesssage
-var AlbumMessages []*telebot.Message
+var AlbumMessages []*tele.Message
 
 //Repost channel post to chat
-func Repost(context telebot.Context) error {
+func Repost(context tele.Context) error {
 	var err error
 	var err2 error
 	if context.Message().AlbumID != "" {
@@ -329,7 +179,7 @@ func Repost(context telebot.Context) error {
 			sort.SliceStable(AlbumMessages, func(i, j int) bool {
 				return AlbumMessages[i].ID < AlbumMessages[j].ID
 			})
-			var Album []telebot.Inputtable
+			var Album []tele.Inputtable
 			for i, message := range AlbumMessages {
 				switch {
 				case context.Message().Audio != nil:
@@ -358,23 +208,23 @@ func Repost(context telebot.Context) error {
 					Album = append(Album, message.Video)
 				}
 			}
-			ChatMessage, err := Bot.SendAlbum(&telebot.Chat{ID: Config.Chat}, Album)
+			ChatMessage, err := Bot.SendAlbum(&tele.Chat{ID: Config.Chat}, Album)
 			for i, message := range AlbumMessages {
 				Forward.History = append(Forward.History, ForwardHistory{message.ID, ChatMessage[i].ID})
 			}
 			Forward.AlbumID = ""
-			AlbumMessages = []*telebot.Message{}
+			AlbumMessages = []*tele.Message{}
 			Forward.Caption = ""
 			return err
 		}
 		return nil
 	}
 
-	var ChatMessage *telebot.Message
-	ChatMessage, err = Bot.Copy(&telebot.Chat{ID: Config.Chat}, context.Message())
+	var ChatMessage *tele.Message
+	ChatMessage, err = Bot.Copy(&tele.Chat{ID: Config.Chat}, context.Message())
 	Forward.History = append(Forward.History, ForwardHistory{context.Message().ID, ChatMessage.ID})
 	if Config.StreamChannel != 0 && strings.Contains(context.Text(), "zavtracast/live") {
-		ChatMessage, err2 = Bot.Copy(&telebot.Chat{ID: Config.StreamChannel}, context.Message())
+		ChatMessage, err2 = Bot.Copy(&tele.Chat{ID: Config.StreamChannel}, context.Message())
 		Forward.StreamHistory = append(Forward.StreamHistory, ForwardHistory{context.Message().ID, ChatMessage.ID})
 	}
 	if err2 != nil {
@@ -384,16 +234,16 @@ func Repost(context telebot.Context) error {
 }
 
 //Edit reposted post
-func EditRepost(context telebot.Context) error {
+func EditRepost(context tele.Context) error {
 	var err error
 	var err2 error
 	for _, ForwardHistory := range Forward.History {
 		if ForwardHistory.ChannelMessageID == context.Message().ID {
 			if context.Message().Media() != nil {
-				_, err = Bot.Edit(&telebot.Message{ID: ForwardHistory.ChatMessageID, Chat: &telebot.Chat{ID: Config.Chat}}, context.Message().Media())
-				_, err2 = Bot.EditCaption(&telebot.Message{ID: ForwardHistory.ChatMessageID, Chat: &telebot.Chat{ID: Config.Chat}}, GetHtmlText(*context.Message()))
+				_, err = Bot.Edit(&tele.Message{ID: ForwardHistory.ChatMessageID, Chat: &tele.Chat{ID: Config.Chat}}, context.Message().Media())
+				_, err2 = Bot.EditCaption(&tele.Message{ID: ForwardHistory.ChatMessageID, Chat: &tele.Chat{ID: Config.Chat}}, GetHtmlText(*context.Message()))
 			} else {
-				_, err = Bot.Edit(&telebot.Message{ID: ForwardHistory.ChatMessageID, Chat: &telebot.Chat{ID: Config.Chat}}, GetHtmlText(*context.Message()))
+				_, err = Bot.Edit(&tele.Message{ID: ForwardHistory.ChatMessageID, Chat: &tele.Chat{ID: Config.Chat}}, GetHtmlText(*context.Message()))
 			}
 		}
 	}
@@ -403,16 +253,16 @@ func EditRepost(context telebot.Context) error {
 			if ForwardHistory.ChannelMessageID == context.Message().ID {
 				forwarded = true
 				if context.Message().Media() != nil {
-					_, err = Bot.Edit(&telebot.Message{ID: ForwardHistory.ChatMessageID, Chat: &telebot.Chat{ID: Config.StreamChannel}}, context.Message().Media())
-					_, err2 = Bot.EditCaption(&telebot.Message{ID: ForwardHistory.ChatMessageID, Chat: &telebot.Chat{ID: Config.StreamChannel}}, GetHtmlText(*context.Message()))
+					_, err = Bot.Edit(&tele.Message{ID: ForwardHistory.ChatMessageID, Chat: &tele.Chat{ID: Config.StreamChannel}}, context.Message().Media())
+					_, err2 = Bot.EditCaption(&tele.Message{ID: ForwardHistory.ChatMessageID, Chat: &tele.Chat{ID: Config.StreamChannel}}, GetHtmlText(*context.Message()))
 				} else {
-					_, err = Bot.Edit(&telebot.Message{ID: ForwardHistory.ChatMessageID, Chat: &telebot.Chat{ID: Config.StreamChannel}}, GetHtmlText(*context.Message()))
+					_, err = Bot.Edit(&tele.Message{ID: ForwardHistory.ChatMessageID, Chat: &tele.Chat{ID: Config.StreamChannel}}, GetHtmlText(*context.Message()))
 				}
 			}
 		}
 		if !forwarded {
-			var ChatMessage *telebot.Message
-			ChatMessage, err2 = Bot.Copy(&telebot.Chat{ID: Config.StreamChannel}, context.Message())
+			var ChatMessage *tele.Message
+			ChatMessage, err2 = Bot.Copy(&tele.Chat{ID: Config.StreamChannel}, context.Message())
 			Forward.StreamHistory = append(Forward.StreamHistory, ForwardHistory{context.Message().ID, ChatMessage.ID})
 		}
 	}
@@ -423,7 +273,7 @@ func EditRepost(context telebot.Context) error {
 }
 
 //Remove message
-func Remove(context telebot.Context) error {
+func Remove(context tele.Context) error {
 	return context.Delete()
 }
 
@@ -433,7 +283,7 @@ func GetNope() string {
 	return nope.Text
 }
 
-func GetHtmlText(message telebot.Message) string {
+func GetHtmlText(message tele.Message) string {
 	type entity struct {
 		s string
 		i int
@@ -457,17 +307,17 @@ func GetHtmlText(message telebot.Message) string {
 		var a, b string
 
 		switch ent.Type {
-		case telebot.EntityBold, telebot.EntityItalic,
-			telebot.EntityUnderline, telebot.EntityStrikethrough:
+		case tele.EntityBold, tele.EntityItalic,
+			tele.EntityUnderline, tele.EntityStrikethrough:
 			a = fmt.Sprintf("<%c>", ent.Type[0])
 			b = a[:1] + "/" + a[1:]
-		case telebot.EntityCode, telebot.EntityCodeBlock:
+		case tele.EntityCode, tele.EntityCodeBlock:
 			a = fmt.Sprintf("<%s>", ent.Type)
 			b = a[:1] + "/" + a[1:]
-		case telebot.EntityTextLink:
+		case tele.EntityTextLink:
 			a = fmt.Sprintf("<a href='%s'>", ent.URL)
 			b = "</a>"
-		case telebot.EntityTMention:
+		case tele.EntityTMention:
 			a = fmt.Sprintf("<a href='tg://user?id=%d'>", ent.User.ID)
 			b = "</a>"
 		default:
@@ -490,7 +340,7 @@ func GetHtmlText(message telebot.Message) string {
 
 	textString = string(utf16.Decode(text))
 
-	if len(message.Entities) != 0 && message.Entities[0].Type == telebot.EntityCommand {
+	if len(message.Entities) != 0 && message.Entities[0].Type == tele.EntityCommand {
 		if textString[1:4] == "set" {
 			textString = strings.Join(strings.Split(textString, " ")[2:], " ")
 		} else {
@@ -499,4 +349,9 @@ func GetHtmlText(message telebot.Message) string {
 	}
 
 	return textString
+}
+
+func init() {
+	//Word stats exclusion list
+	DB.Find(&WordStatsExcludes)
 }

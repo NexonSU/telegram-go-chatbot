@@ -9,10 +9,10 @@ import (
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	"github.com/go-echarts/go-echarts/v2/components"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
-func RemoveWord(context telebot.Context) error {
+func RemoveWord(context tele.Context) error {
 	if len(context.Args()) != 1 {
 		return context.Reply("Укажите слово.")
 	}
@@ -32,7 +32,7 @@ func RemoveWord(context telebot.Context) error {
 	return context.Reply("Слово запрещено для статистики и удалено из базы.")
 }
 
-func Stats(context telebot.Context) error {
+func Stats(context tele.Context) error {
 	selected := "Stats"
 	graphs := []string{"Activity", "MostActiveToday", "PopDays", "PopHours", "PopWords", "TopUsers"}
 	days := 30
@@ -43,7 +43,7 @@ func Stats(context telebot.Context) error {
 			return context.Reply("Ошибка определения дней.")
 		}
 		if days == 2077 {
-			return context.Reply(&telebot.Video{File: telebot.File{FileID: "BAACAgIAAx0CRXO-MQADWWB4LQABzrOqWPkq-JXIi4TIixY4dwACPw4AArBgwUt5sRu-_fDR5x4E"}})
+			return context.Reply(&tele.Video{File: tele.File{FileID: "BAACAgIAAx0CRXO-MQADWWB4LQABzrOqWPkq-JXIi4TIixY4dwACPw4AArBgwUt5sRu-_fDR5x4E"}})
 		}
 	}
 	if len(context.Args()) == 2 {
@@ -91,8 +91,8 @@ func Stats(context telebot.Context) error {
 	default:
 		return nil
 	}
-	return context.Reply(&telebot.Document{
-		File: telebot.File{
+	return context.Reply(&tele.Document{
+		File: tele.File{
 			FileReader: f,
 		},
 		FileName: fmt.Sprintf("%v %v %v - %v.html", selected, context.Chat().Username, from.Format("02.01.2006"), time.Now().Format("02.01.2006")),

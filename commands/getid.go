@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Send userid on /getid
-func Getid(context telebot.Context) error {
+func Getid(context tele.Context) error {
 	if context.Message().ReplyTo != nil && context.Message().ReplyTo.OriginalSender != nil {
 		_, err := utils.Bot.Send(context.Sender(), fmt.Sprintf("Firstname: %v\nLastname: %v\nUsername: %v\nUserID: %v", context.Message().ReplyTo.OriginalSender.FirstName, context.Message().ReplyTo.OriginalSender.LastName, context.Message().ReplyTo.OriginalSender.Username, context.Message().ReplyTo.OriginalSender.ID))
 		return err

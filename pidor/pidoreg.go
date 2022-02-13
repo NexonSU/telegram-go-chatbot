@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 	"gorm.io/gorm/clause"
 )
 
 //Send DB result on /pidoreg
-func Pidoreg(context telebot.Context) error {
+func Pidoreg(context tele.Context) error {
 	var pidor utils.PidorList
 	if utils.DB.First(&pidor, context.Sender().ID).RowsAffected != 0 {
 		return context.Reply("Эй, ты уже в игре!")

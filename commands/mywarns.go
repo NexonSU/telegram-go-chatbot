@@ -5,11 +5,11 @@ import (
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Send warning amount on /mywarns
-func Mywarns(context telebot.Context) error {
+func Mywarns(context tele.Context) error {
 	var warn utils.Warn
 	result := utils.DB.First(&warn, context.Sender().ID)
 	if result.RowsAffected != 0 {

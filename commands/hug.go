@@ -6,11 +6,11 @@ import (
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	"github.com/chai2010/webp"
 	"github.com/fogleman/gg"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Write username on hug picture and send to target
-func Hug(context telebot.Context) error {
+func Hug(context tele.Context) error {
 	var err error
 	if context.Message().ReplyTo == nil {
 		return context.Reply("Просто отправь <code>/hug</code> в ответ на чье-либо сообщение.")
@@ -48,5 +48,5 @@ func Hug(context telebot.Context) error {
 	if err != nil {
 		return err
 	}
-	return context.Send(&telebot.Sticker{File: telebot.FromReader(buf)}, &telebot.SendOptions{ReplyTo: context.Message().ReplyTo})
+	return context.Send(&tele.Sticker{File: tele.FromReader(buf)}, &tele.SendOptions{ReplyTo: context.Message().ReplyTo})
 }

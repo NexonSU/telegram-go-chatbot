@@ -5,11 +5,11 @@ import (
 	"strings"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Adds nope text to DB
-func AddNope(context telebot.Context) error {
+func AddNope(context tele.Context) error {
 	var nope utils.Nope
 	if (context.Message().ReplyTo == nil && len(context.Args()) == 0) || (context.Message().ReplyTo != nil && len(context.Args()) != 0) {
 		return context.Reply("Пример использования: <code>/addnope {текст}</code>\nИли отправь в ответ на сообщение с текстом <code>/addnope</code>")

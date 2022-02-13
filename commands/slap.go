@@ -4,13 +4,13 @@ import (
 	"fmt"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Send slap message on /slap
-func Slap(context telebot.Context) error {
+func Slap(context tele.Context) error {
 	var action = "дал леща"
-	var target telebot.User
+	var target tele.User
 	if utils.IsAdminOrModer(context.Sender().ID) {
 		action = "дал отцовского леща"
 	}

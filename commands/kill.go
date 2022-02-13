@@ -2,17 +2,19 @@ package commands
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 	"gorm.io/gorm/clause"
 )
 
 //Kill user on /kill
-func Kill(context telebot.Context) error {
+func Kill(context tele.Context) error {
+	command := strings.Split(context.Text(), " ")[0]
 	if (context.Message().ReplyTo == nil && len(context.Args()) != 1) || (context.Message().ReplyTo != nil && len(context.Args()) != 0) {
-		return context.Reply("Пример использования: <code>/kill {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/kill</code>")
+		return context.Reply(fmt.Sprintf("Пример использования: <code>%v {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>%v</code>", command, command))
 	}
 	target, _, err := utils.FindUserInMessage(context)
 	if err != nil {
@@ -22,7 +24,9 @@ func Kill(context telebot.Context) error {
 	if err != nil {
 		return context.Reply(fmt.Sprintf("Ошибка определения пользователя чата:\n<code>%v</code>", err.Error()))
 	}
-	utils.Bot.Delete(context.Message().ReplyTo)
+	if context.Message().ReplyTo != nil {
+		utils.Bot.Delete(context.Message().ReplyTo)
+	}
 	if ChatMember.Role == "administrator" || ChatMember.Role == "creator" {
 		return context.Send(fmt.Sprintf("<code>👻 %v возродился у костра.</code>", utils.UserFullName(&target)))
 	}
@@ -45,5 +49,9 @@ func Kill(context telebot.Context) error {
 	if err != nil {
 		return err
 	}
-	return context.Send(fmt.Sprintf("💥 %v пристрелил %v.\n%v отправился на респавн на %v мин.", utils.UserFullName(context.Sender()), utils.UserFullName(&target), utils.UserFullName(&target), duelist.Deaths))
+	text := fmt.Sprintf("💥 %v пристрелил %v.\n%v отправился на респавн на %v мин.", utils.UserFullName(context.Sender()), utils.UserFullName(&target), utils.UserFullName(&target), duelist.Deaths)
+	if command == "/bless" {
+		text = fmt.Sprintf("🤫 %v попросил %v помолчать %v минут.", utils.UserFullName(context.Sender()), utils.UserFullName(&target), duelist.Deaths)
+	}
+	return context.Send(text)
 }

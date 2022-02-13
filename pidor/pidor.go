@@ -5,13 +5,13 @@ import (
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 var busy = make(map[string]bool)
 
 // Pidor game
-func Pidor(context telebot.Context) error {
+func Pidor(context tele.Context) error {
 	if context.Message().Private() {
 		return nil
 	}
@@ -28,7 +28,7 @@ func Pidor(context telebot.Context) error {
 	result := utils.DB.Model(utils.PidorStats{}).Where("date BETWEEN ? AND ?", time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Local), time.Now()).First(&pidor)
 	if result.RowsAffected == 0 {
 		utils.DB.Model(utils.PidorList{}).Order("RANDOM()").First(&pidorToday)
-		TargetChatMember, err := utils.Bot.ChatMemberOf(context.Chat(), &telebot.User{ID: pidorToday.ID})
+		TargetChatMember, err := utils.Bot.ChatMemberOf(context.Chat(), &tele.User{ID: pidorToday.ID})
 		if err != nil {
 			utils.DB.Delete(&pidorToday)
 			return context.Reply(fmt.Sprintf("Я нашел пидора дня, но похоже, что с <a href=\"tg://user?id=%v\">%v</a> что-то не так, так что попробуйте еще раз, пока я удаляю его из игры! Ошибка:\n<code>%v</code>", pidorToday.ID, pidorToday.Username, err.Error()))

@@ -5,11 +5,11 @@ import (
 	"strings"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Send Get to user on /get
-func SetGetOwner(context telebot.Context) error {
+func SetGetOwner(context tele.Context) error {
 	var get utils.Get
 	if len(context.Args()) != 1 || context.Message().ReplyTo == nil {
 		return context.Reply("Пример использования: <code>/setgetowner {гет}</code> в ответ пользователю, которого нужно задать владельцем.")

@@ -6,11 +6,11 @@ import (
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Send top 10 pidors of year on /pidorstats
-func Pidorstats(context telebot.Context) error {
+func Pidorstats(context tele.Context) error {
 	var i = 0
 	var year = time.Now().Year()
 	var username string
@@ -21,7 +21,7 @@ func Pidorstats(context telebot.Context) error {
 			return context.Reply("Ошибка определения года.\nУкажите год с 2019.")
 		}
 		if argYear == 2077 {
-			return context.Reply(&telebot.Video{File: telebot.File{FileID: "BAACAgIAAx0CRXO-MQADWWB4LQABzrOqWPkq-JXIi4TIixY4dwACPw4AArBgwUt5sRu-_fDR5x4E"}})
+			return context.Reply(&tele.Video{File: tele.File{FileID: "BAACAgIAAx0CRXO-MQADWWB4LQABzrOqWPkq-JXIi4TIixY4dwACPw4AArBgwUt5sRu-_fDR5x4E"}})
 		}
 		if argYear < year && argYear > 2018 {
 			year = argYear

@@ -10,7 +10,7 @@ import (
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	"github.com/valyala/fastjson"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 	"gorm.io/gorm/clause"
 )
 
@@ -23,14 +23,14 @@ type welcomeMessage struct {
 
 var WelcomeMessage welcomeMessage
 
-func UserJoin(context telebot.Context) error {
+func UserJoin(context tele.Context) error {
 	//joined user
 	User := context.ChatMember().NewChatMember.User
 	//CAS ban check
 	httpClient := &http.Client{Timeout: 10 * time.Second}
 	httpResponse, err := httpClient.Get(fmt.Sprintf("https://api.cas.chat/check?user_id=%v", User.ID))
 	if err != nil {
-		_ = utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, User)
+		_ = utils.Bot.Unban(&tele.Chat{ID: utils.Config.Chat}, User)
 		return err
 	}
 	defer func(Body io.ReadCloser) {
@@ -38,13 +38,13 @@ func UserJoin(context telebot.Context) error {
 	}(httpResponse.Body)
 	jsonBytes, err := ioutil.ReadAll(httpResponse.Body)
 	if err != nil {
-		_ = utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, User)
+		_ = utils.Bot.Unban(&tele.Chat{ID: utils.Config.Chat}, User)
 		return err
 	}
 	if fastjson.GetBool(jsonBytes, "ok") {
-		err := utils.Bot.Ban(&telebot.Chat{ID: utils.Config.Chat}, &telebot.ChatMember{User: User})
+		err := utils.Bot.Ban(&tele.Chat{ID: utils.Config.Chat}, &tele.ChatMember{User: User})
 		if err != nil {
-			_ = utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, User)
+			_ = utils.Bot.Unban(&tele.Chat{ID: utils.Config.Chat}, User)
 			return err
 		}
 	}
@@ -61,9 +61,9 @@ func UserJoin(context telebot.Context) error {
 		WelcomeMessage.time = time.Now().Unix()
 		WelcomeMessage.users = 1
 		WelcomeMessage.text = fmt.Sprintf("Привет, %v!", utils.MentionUser(User))
-		m, err := utils.Bot.Send(&telebot.Chat{ID: utils.Config.Chat}, WelcomeMessage.text+"\n"+welcomeGet.Data, &telebot.SendOptions{DisableWebPagePreview: true})
+		m, err := utils.Bot.Send(&tele.Chat{ID: utils.Config.Chat}, WelcomeMessage.text+"\n"+welcomeGet.Data, &tele.SendOptions{DisableWebPagePreview: true})
 		if err != nil {
-			_ = utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, User)
+			_ = utils.Bot.Unban(&tele.Chat{ID: utils.Config.Chat}, User)
 			return err
 		}
 		WelcomeMessage.ID = m.ID
@@ -72,9 +72,9 @@ func UserJoin(context telebot.Context) error {
 		WelcomeMessage.text = strings.Replace(WelcomeMessage.text, "Привет", fmt.Sprintf("Привет, %v", utils.MentionUser(User)), 1)
 		if WelcomeMessage.users < 5 || time.Now().Unix()-WelcomeMessage.time > 5 {
 			WelcomeMessage.time = time.Now().Unix()
-			_, err := utils.Bot.Edit(&telebot.Message{ID: WelcomeMessage.ID, Chat: &telebot.Chat{ID: utils.Config.Chat}}, WelcomeMessage.text+"\n"+welcomeGet.Data, &telebot.SendOptions{DisableWebPagePreview: true})
+			_, err := utils.Bot.Edit(&tele.Message{ID: WelcomeMessage.ID, Chat: &tele.Chat{ID: utils.Config.Chat}}, WelcomeMessage.text+"\n"+welcomeGet.Data, &tele.SendOptions{DisableWebPagePreview: true})
 			if err != nil {
-				_ = utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, User)
+				_ = utils.Bot.Unban(&tele.Chat{ID: utils.Config.Chat}, User)
 				return err
 			}
 		}
@@ -89,7 +89,7 @@ func UserJoin(context telebot.Context) error {
 		UpdateAll: true,
 	}).Create(&restrictUser)
 	if restrict.Error != nil {
-		_ = utils.Bot.Unban(&telebot.Chat{ID: utils.Config.Chat}, User)
+		_ = utils.Bot.Unban(&tele.Chat{ID: utils.Config.Chat}, User)
 		return restrict.Error
 	}
 	restricted := utils.DB.Find(&utils.RestrictedUsers)

@@ -7,10 +7,10 @@ import (
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
-func UserActivityLineChart(from time.Time, to time.Time, context telebot.Context) *charts.Line {
+func UserActivityLineChart(from time.Time, to time.Time, context tele.Context) *charts.Line {
 	result, _ := utils.DB.
 		Model(utils.Message{}).
 		Select("strftime('%d.%m',`date`, 'localtime') as Day, COUNT(DISTINCT `user_id`) AS Users, COUNT(`id`) as Messages").

@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -29,7 +29,7 @@ type PidorStats struct {
 	UserID int64
 }
 
-type PidorList telebot.User
+type PidorList tele.User
 
 type Duelist struct {
 	UserID int64 `gorm:"primaryKey"`
@@ -87,7 +87,7 @@ func DataBaseInit(file string) gorm.DB {
 	}
 
 	//Create tables, if they not exists in DB
-	err = database.AutoMigrate(telebot.User{}, Message{}, Word{}, Get{}, Warn{}, PidorStats{}, PidorList{}, Duelist{}, Nope{}, AntiSpam{}, CheckPointRestrict{}, WordStatsExclude{})
+	err = database.AutoMigrate(tele.User{}, Message{}, Word{}, Get{}, Warn{}, PidorStats{}, PidorList{}, Duelist{}, Nope{}, AntiSpam{}, CheckPointRestrict{}, WordStatsExclude{})
 	if err != nil {
 		log.Println(err)
 	}

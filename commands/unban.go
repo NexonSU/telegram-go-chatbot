@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Unban user on /unban
-func Unban(context telebot.Context) error {
+func Unban(context tele.Context) error {
 	if (context.Message().ReplyTo == nil && len(context.Args()) != 1) || (context.Message().ReplyTo != nil && len(context.Args()) != 0) {
 		return context.Reply("Пример использования: <code>/unban {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/unban</code>")
 	}
@@ -17,7 +17,7 @@ func Unban(context telebot.Context) error {
 		return context.Reply(fmt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
 	}
 	if utils.Bot.Me.ID == target.ID {
-		return context.Reply(&telebot.Animation{File: telebot.File{FileID: "CgACAgQAAx0CQvXPNQABH62yYQHUkpaPOe79NW4ZnwYZWCNJXW8AAgoBAAK-qkVQnRXXGK03dEMgBA"}})
+		return context.Reply(&tele.Animation{File: tele.File{FileID: "CgACAgQAAx0CQvXPNQABH62yYQHUkpaPOe79NW4ZnwYZWCNJXW8AAgoBAAK-qkVQnRXXGK03dEMgBA"}})
 	}
 	err = utils.Bot.Unban(context.Chat(), &target)
 	if err != nil {

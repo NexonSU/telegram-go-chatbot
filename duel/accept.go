@@ -5,17 +5,17 @@ import (
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 	"gorm.io/gorm/clause"
 )
 
-func Accept(context telebot.Context) error {
+func Accept(context tele.Context) error {
 	message := context.Message()
 	victim := message.Entities[0].User
 	if victim.ID != context.Sender().ID {
-		return context.Respond(&telebot.CallbackResponse{Text: utils.GetNope()})
+		return context.Respond(&tele.CallbackResponse{Text: utils.GetNope()})
 	}
-	err := utils.Bot.Respond(context.Callback(), &telebot.CallbackResponse{})
+	err := utils.Bot.Respond(context.Callback(), &tele.CallbackResponse{})
 	if err != nil {
 		return err
 	}
@@ -28,7 +28,7 @@ func Accept(context telebot.Context) error {
 	invincible := []string{"пуля отскочила от головы %v и улетела в другой чат.", "%v похмурил брови и отклеил расплющенную пулю со своей головы.", "но ничего не произошло. %v взглянул на револьвер, он был неисправен.", "пуля прошла навылет, но не оставила каких-либо следов на %v."}
 	fail := []string{"мозги %v разлетелись по чату!", "%v упал со стула и его кровь растеклась по месседжу.", "%v замер и спустя секунду упал на стол.", "пуля едва не задела кого-то из участников чата! А? Что? А, %v мёртв, да.", "и в воздухе повисла тишина. Все начали оглядываться, когда %v уже был мёртв."}
 	prefix := fmt.Sprintf("Дуэль! %v против %v!\n", utils.MentionUser(player), utils.MentionUser(victim))
-	_, err = utils.Bot.Edit(message, fmt.Sprintf("%vЗаряжаю один патрон в револьвер и прокручиваю барабан.", prefix), &telebot.SendOptions{ReplyMarkup: nil})
+	_, err = utils.Bot.Edit(message, fmt.Sprintf("%vЗаряжаю один патрон в револьвер и прокручиваю барабан.", prefix), &tele.SendOptions{ReplyMarkup: nil})
 	if err != nil {
 		return err
 	}

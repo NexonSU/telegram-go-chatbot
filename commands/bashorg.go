@@ -8,13 +8,13 @@ import (
 	"strings"
 	"time"
 
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 var lastBash string
 
 //Send text in chat on /say
-func Bashorg(context telebot.Context) error {
+func Bashorg(context tele.Context) error {
 	httpClient := &http.Client{Timeout: 10 * time.Second}
 	httpResponse, err := httpClient.Get("https://bash.im/forweb/?u")
 	if err != nil {

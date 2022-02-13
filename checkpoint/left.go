@@ -4,10 +4,10 @@ import (
 	"log"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
-func UserLeft(context telebot.Context) error {
+func UserLeft(context tele.Context) error {
 	for _, user := range utils.RestrictedUsers {
 		if user.UserID != context.ChatMember().NewChatMember.User.ID {
 			continue
@@ -24,7 +24,7 @@ func UserLeft(context telebot.Context) error {
 			if utils.WelcomeMessageID == user.WelcomeMessageID {
 				utils.WelcomeMessageID = 0
 			}
-			utils.Bot.Delete(&telebot.Message{ID: user.WelcomeMessageID, Chat: &telebot.Chat{ID: utils.Config.Chat}})
+			utils.Bot.Delete(&tele.Message{ID: user.WelcomeMessageID, Chat: &tele.Chat{ID: utils.Config.Chat}})
 		}
 	}
 	return nil

@@ -8,11 +8,11 @@ import (
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Convert given file
-func Convert(context telebot.Context) error {
+func Convert(context tele.Context) error {
 	var InputFilePath string
 	var OutputFilePath string
 	var err error
@@ -25,13 +25,13 @@ func Convert(context telebot.Context) error {
 	var Height int
 	var Caption string
 	var Duration int
-	var Thumbnail *telebot.Photo
+	var Thumbnail *tele.Photo
 	var Streaming bool
 	TempName := time.Now().UnixNano()
 	utils.Bot.URL = "https://api.telegram.org"
 	switch {
 	case context.Message().ReplyTo.Audio != nil:
-		context.Notify(telebot.RecordingAudio)
+		context.Notify(tele.RecordingAudio)
 		Caption = context.Message().ReplyTo.Audio.Caption
 		Duration = context.Message().ReplyTo.Audio.Duration
 		FileName = context.Message().ReplyTo.Audio.FileName
@@ -49,7 +49,7 @@ func Convert(context telebot.Context) error {
 			KwArgs = ffmpeg.KwArgs{"c:a": "libopus", "timelimit": 60}
 		}
 	case context.Message().ReplyTo.Document != nil && context.Message().ReplyTo.Document.MIME[0:5] == "video":
-		context.Notify(telebot.RecordingVideo)
+		context.Notify(tele.RecordingVideo)
 		Caption = context.Message().ReplyTo.Document.Caption
 		FileName = context.Message().ReplyTo.Document.FileName
 		Extension = "mp4"
@@ -63,12 +63,12 @@ func Convert(context telebot.Context) error {
 			KwArgs = ffmpeg.KwArgs{"c:v": "libx264", "an": "", "preset": "fast", "crf": 26, "timelimit": 900, "movflags": "+faststart", "c:a": "aac"}
 		}
 		if len(context.Args()) == 1 && context.Args()[0] == "mp3" {
-			context.Notify(telebot.RecordingAudio)
+			context.Notify(tele.RecordingAudio)
 			Extension = "mp3"
 			KwArgs = ffmpeg.KwArgs{"c:a": "libmp3lame", "vn": ""}
 		}
 	case context.Message().ReplyTo.Video != nil:
-		context.Notify(telebot.RecordingVideo)
+		context.Notify(tele.RecordingVideo)
 		Width = context.Message().ReplyTo.Video.Width
 		Height = context.Message().ReplyTo.Video.Height
 		Caption = context.Message().ReplyTo.Video.Caption
@@ -87,12 +87,12 @@ func Convert(context telebot.Context) error {
 			KwArgs = ffmpeg.KwArgs{"c:v": "libx264", "an": "", "preset": "fast", "crf": 26, "timelimit": 900, "movflags": "+faststart", "c:a": "aac"}
 		}
 		if len(context.Args()) == 1 && context.Args()[0] == "mp3" {
-			context.Notify(telebot.RecordingAudio)
+			context.Notify(tele.RecordingAudio)
 			Extension = "mp3"
 			KwArgs = ffmpeg.KwArgs{"c:a": "libmp3lame", "vn": ""}
 		}
 	case context.Message().ReplyTo.Voice != nil:
-		context.Notify(telebot.RecordingAudio)
+		context.Notify(tele.RecordingAudio)
 		Caption = context.Message().ReplyTo.Voice.Caption
 		Duration = context.Message().ReplyTo.Voice.Duration
 		Extension = "ogg"
@@ -107,7 +107,7 @@ func Convert(context telebot.Context) error {
 			KwArgs = ffmpeg.KwArgs{"c:a": "libmp3lame", "timelimit": 60}
 		}
 	default:
-		return context.Reply("Пример использования: /convert в ответ на какое-либо сообщение с аудио или видео.", &telebot.SendOptions{AllowWithoutReply: true})
+		return context.Reply("Пример использования: /convert в ответ на какое-либо сообщение с аудио или видео.", &tele.SendOptions{AllowWithoutReply: true})
 	}
 	OutputFilePath = fmt.Sprintf("%v/convert_output_%v.%v", os.TempDir(), TempName, Extension)
 	err = ffmpeg.Input(InputFilePath).Output(OutputFilePath, KwArgs).OverWriteOutput().WithOutput(nil, os.Stdout).Run()
@@ -116,27 +116,27 @@ func Convert(context telebot.Context) error {
 	}
 	os.Remove(InputFilePath)
 	if Extension == "mp3" {
-		context.Reply(&telebot.Audio{
-			File:      telebot.FromDisk(OutputFilePath),
+		context.Reply(&tele.Audio{
+			File:      tele.FromDisk(OutputFilePath),
 			Duration:  Duration,
 			Caption:   Caption,
 			Title:     Title,
 			Performer: Performer,
 			MIME:      "audio/mp3",
 			FileName:  FileName[:len(FileName)-len(filepath.Ext(FileName))] + ".mp3",
-		}, &telebot.SendOptions{AllowWithoutReply: true})
+		}, &tele.SendOptions{AllowWithoutReply: true})
 	}
 	if Extension == "ogg" {
-		context.Reply(&telebot.Voice{
-			File:     telebot.FromDisk(OutputFilePath),
+		context.Reply(&tele.Voice{
+			File:     tele.FromDisk(OutputFilePath),
 			Duration: Duration,
 			Caption:  Caption,
 			MIME:     "audio/ogg",
-		}, &telebot.SendOptions{AllowWithoutReply: true})
+		}, &tele.SendOptions{AllowWithoutReply: true})
 	}
 	if Extension == "mp4" {
-		context.Reply(&telebot.Video{
-			File:      telebot.FromDisk(OutputFilePath),
+		context.Reply(&tele.Video{
+			File:      tele.FromDisk(OutputFilePath),
 			Width:     Width,
 			Height:    Height,
 			Duration:  Duration,
@@ -145,7 +145,7 @@ func Convert(context telebot.Context) error {
 			Streaming: Streaming,
 			MIME:      "video/mp4",
 			FileName:  FileName[:len(FileName)-len(filepath.Ext(FileName))] + ".mp4",
-		}, &telebot.SendOptions{AllowWithoutReply: true})
+		}, &tele.SendOptions{AllowWithoutReply: true})
 	}
 	os.Remove(OutputFilePath)
 	return nil

@@ -7,10 +7,10 @@ import (
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
-func PopWordsWcChart(from time.Time, to time.Time, context telebot.Context) *charts.WordCloud {
+func PopWordsWcChart(from time.Time, to time.Time, context tele.Context) *charts.WordCloud {
 	result, _ := utils.DB.
 		Model(utils.Word{}).
 		Select("text, COUNT(*) as count").

@@ -6,10 +6,10 @@ import (
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
-func MostActiveUsersTodayPieChart(from time.Time, to time.Time, context telebot.Context) *charts.Pie {
+func MostActiveUsersTodayPieChart(from time.Time, to time.Time, context tele.Context) *charts.Pie {
 	result, _ := utils.DB.
 		Table("`messages`, `users`").
 		Select("`users`.first_name || ' ' || `users`.last_name AS FullName, COUNT(`messages`.`id`) as Messages").

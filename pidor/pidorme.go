@@ -5,11 +5,11 @@ import (
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Send DB stats on /pidorme
-func Pidorme(context telebot.Context) error {
+func Pidorme(context tele.Context) error {
 	var pidor utils.PidorStats
 	var countYear int64
 	var countAlltime int64

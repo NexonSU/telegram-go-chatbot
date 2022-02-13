@@ -8,11 +8,11 @@ import (
 	"strings"
 	"time"
 
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Send text in chat on /say
-func Anekdot(context telebot.Context) error {
+func Anekdot(context tele.Context) error {
 	httpClient := &http.Client{Timeout: 10 * time.Second}
 	httpResponse, err := httpClient.Get("https://www.anekdot.ru/rss/randomu.html")
 	if err != nil {

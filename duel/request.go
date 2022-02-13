@@ -6,16 +6,16 @@ import (
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
-var Message *telebot.Message
-var Selector = telebot.ReplyMarkup{}
+var Message *tele.Message
+var Selector = tele.ReplyMarkup{}
 var AcceptButton = Selector.Data("👍 Принять вызов", "russianroulette_accept")
 var DenyButton = Selector.Data("👎 Бежать с позором", "russianroulette_deny")
 var busy = make(map[string]bool)
 
-func Request(context telebot.Context) error {
+func Request(context tele.Context) error {
 	if Message == nil {
 		Message = context.Message()
 		Message.Unixtime = 0

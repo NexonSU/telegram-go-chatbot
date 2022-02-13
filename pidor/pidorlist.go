@@ -4,11 +4,11 @@ import (
 	"strconv"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 //List add pidors from DB on /pidorlist
-func Pidorlist(context telebot.Context) error {
+func Pidorlist(context tele.Context) error {
 	var pidorlist string
 	var pidor utils.PidorList
 	var i = 0

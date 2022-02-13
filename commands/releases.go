@@ -10,11 +10,11 @@ import (
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	ical "github.com/arran4/golang-ical"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Send releases of 2 weeks on /releases
-func Releases(context telebot.Context) error {
+func Releases(context tele.Context) error {
 	var err error
 	if utils.Config.ReleasesUrl == "" {
 		return context.Reply("Список ближайших релизов не настроен")

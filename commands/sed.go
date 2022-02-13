@@ -3,11 +3,11 @@ package commands
 import (
 	"strings"
 
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 // Sed Replace text in target message
-func Sed(context telebot.Context) error {
+func Sed(context tele.Context) error {
 	var foo = strings.Split(context.Data(), "/")[1]
 	var bar = strings.Split(context.Data(), "/")[2]
 	if context.Message().ReplyTo == nil || foo == "" || bar == "" || len(context.Args()) != 1 {
