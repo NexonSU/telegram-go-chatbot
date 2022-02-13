@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
@@ -12,7 +11,11 @@ import (
 
 //Kill user on /kill
 func Kill(context tele.Context) error {
-	command := strings.Split(context.Text(), " ")[0]
+	command := "/bless"
+	print(context.Text()[1:5])
+	if context.Text()[1:5] == "kill" {
+		command = "/kill"
+	}
 	if (context.Message().ReplyTo == nil && len(context.Args()) != 1) || (context.Message().ReplyTo != nil && len(context.Args()) != 0) {
 		return context.Reply(fmt.Sprintf("Пример использования: <code>%v {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>%v</code>", command, command))
 	}
