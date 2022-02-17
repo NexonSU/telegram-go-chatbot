@@ -48,12 +48,14 @@ func welcomeMessageUpdate() error {
 	}
 	if utf8.RuneCountInString(welcomeMessageUsers) > 2000 {
 		welcomeMessageUsers = fmt.Sprintf("%v и другие уважаемые цыгане!\nБотов в очереди: %v", welcomeMessageUsers, len(utils.RestrictedUsers))
+	} else {
+		welcomeMessageUsers = fmt.Sprintf("%v!", welcomeMessageUsers)
 	}
 	//welcome message text
 	utils.DB.Where(&utils.Get{Name: "welcome"}).First(&welcomeGet)
 	//welcome message create\update
 	if utils.WelcomeMessageID == 0 {
-		welcomeMessageText = fmt.Sprintf("Привет%v!\n%v", welcomeMessageUsers, welcomeGet.Data)
+		welcomeMessageText = fmt.Sprintf("Привет%v\n%v", welcomeMessageUsers, welcomeGet.Data)
 		m, err := utils.Bot.Send(&tele.Chat{ID: utils.Config.Chat}, welcomeMessageText, &tele.SendOptions{DisableWebPagePreview: true})
 		if err != nil {
 			return err
