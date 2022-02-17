@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"time"
+	"unicode/utf8"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	tele "gopkg.in/telebot.v3"
@@ -30,7 +31,9 @@ func welcomeMessageUpdate() error {
 			}
 			continue
 		}
-		welcomeMessageUsers = fmt.Sprintf("%v, %v", welcomeMessageUsers, utils.MentionUser(&tele.User{ID: user.UserID, FirstName: user.UserFirstName, LastName: user.UserLastName}))
+		if utf8.RuneCountInString(welcomeMessageUsers) < 2000 {
+			welcomeMessageUsers = fmt.Sprintf("%v, %v", welcomeMessageUsers, utils.MentionUser(&tele.User{ID: user.UserID, FirstName: user.UserFirstName, LastName: user.UserLastName}))
+		}
 	}
 	//usertext & welcomeMessage check
 	if welcomeMessageUsers == "" {
@@ -42,6 +45,9 @@ func welcomeMessageUpdate() error {
 			utils.WelcomeMessageID = 0
 		}
 		return nil
+	}
+	if utf8.RuneCountInString(welcomeMessageUsers) > 2000 {
+		welcomeMessageUsers = fmt.Sprintf("%v и другие уважаемые цыгане!\nБотов в очереди: %v", welcomeMessageUsers, len(utils.RestrictedUsers))
 	}
 	//welcome message text
 	utils.DB.Where(&utils.Get{Name: "welcome"}).First(&welcomeGet)
@@ -67,6 +73,7 @@ func welcomeMessageUpdateService() {
 	for {
 		err := welcomeMessageUpdate()
 		if err != nil {
+			log.Print("welcomeMessageUpdate: ")
 			log.Println(err.Error())
 		}
 		time.Sleep(time.Second * time.Duration(2))
