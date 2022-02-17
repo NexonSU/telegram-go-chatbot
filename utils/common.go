@@ -14,7 +14,6 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-var LastChatMessageID int
 var WelcomeMessageID int
 var RestrictedUsers []CheckPointRestrict
 var WordStatsExcludes []WordStatsExclude

@@ -5,7 +5,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
@@ -13,15 +12,6 @@ import (
 	tele "gopkg.in/telebot.v3"
 	"gorm.io/gorm/clause"
 )
-
-type welcomeMessage struct {
-	ID    int
-	time  int64
-	users int
-	text  string
-}
-
-var WelcomeMessage welcomeMessage
 
 func UserJoin(context tele.Context) error {
 	//joined user
@@ -48,42 +38,12 @@ func UserJoin(context tele.Context) error {
 			return err
 		}
 	}
-	//welcome message text
-	var welcomeGet utils.Get
-	utils.DB.Where(&utils.Get{Name: "welcome"}).First(&welcomeGet)
-	if welcomeGet.Data == "" {
-		welcomeGet.Data = "Ответь на это сообщение и расскажи о себе."
-	}
-	WelcomeMessage.users++
-	//welcome message create\update
-	if utils.WelcomeMessageID == 0 ||
-		time.Now().Unix()-WelcomeMessage.time > 120 && utils.LastChatMessageID-utils.WelcomeMessageID > 2 {
-		WelcomeMessage.time = time.Now().Unix()
-		WelcomeMessage.users = 1
-		WelcomeMessage.text = fmt.Sprintf("Привет, %v!", utils.MentionUser(User))
-		m, err := utils.Bot.Send(&tele.Chat{ID: utils.Config.Chat}, WelcomeMessage.text+"\n"+welcomeGet.Data, &tele.SendOptions{DisableWebPagePreview: true})
-		if err != nil {
-			_ = utils.Bot.Unban(&tele.Chat{ID: utils.Config.Chat}, User)
-			return err
-		}
-		WelcomeMessage.ID = m.ID
-		utils.WelcomeMessageID = m.ID
-	} else if len(WelcomeMessage.text) < 3500 {
-		WelcomeMessage.text = strings.Replace(WelcomeMessage.text, "Привет", fmt.Sprintf("Привет, %v", utils.MentionUser(User)), 1)
-		if WelcomeMessage.users < 5 || time.Now().Unix()-WelcomeMessage.time > 5 {
-			WelcomeMessage.time = time.Now().Unix()
-			_, err := utils.Bot.Edit(&tele.Message{ID: WelcomeMessage.ID, Chat: &tele.Chat{ID: utils.Config.Chat}}, WelcomeMessage.text+"\n"+welcomeGet.Data, &tele.SendOptions{DisableWebPagePreview: true})
-			if err != nil {
-				_ = utils.Bot.Unban(&tele.Chat{ID: utils.Config.Chat}, User)
-				return err
-			}
-		}
-	}
 	//user chat restrict
 	restrictUser := utils.CheckPointRestrict{
-		UserID:           User.ID,
-		Since:            time.Now().Unix(),
-		WelcomeMessageID: WelcomeMessage.ID,
+		UserID:        User.ID,
+		UserFirstName: User.FirstName,
+		UserLastName:  User.LastName,
+		Since:         time.Now().Unix(),
 	}
 	restrict := utils.DB.Clauses(clause.OnConflict{
 		UpdateAll: true,

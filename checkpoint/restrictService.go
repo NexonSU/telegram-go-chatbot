@@ -1,6 +1,7 @@
 package checkpoint
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -8,45 +9,70 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-func restrictUpdate() error {
+var welcomeMessageText = ""
+var welcomeGet = utils.Get{Data: "Ответь на это сообщение и расскажи о себе."}
+
+func welcomeMessageUpdate() error {
+	welcomeMessageUsers := ""
 	restricted := utils.DB.Find(&utils.RestrictedUsers)
 	if restricted.Error != nil {
-		log.Println(restricted.Error)
+		return restricted.Error
 	}
 	for _, user := range utils.RestrictedUsers {
-		if user.Since > time.Now().Unix()-120 {
+		if time.Now().Unix()-user.Since > 120 {
+			delete := utils.DB.Delete(&user)
+			if delete.Error != nil {
+				return delete.Error
+			}
+			err := utils.Bot.Ban(&tele.Chat{ID: utils.Config.Chat}, &tele.ChatMember{User: &tele.User{ID: user.UserID}, RestrictedUntil: time.Now().Unix() + 21600})
+			if err != nil {
+				return err
+			}
 			continue
 		}
-		delete := utils.DB.Delete(&user)
-		if delete.Error != nil {
-			log.Println(delete.Error)
-		}
-		err := utils.Bot.Unban(&tele.Chat{ID: utils.Config.Chat}, &tele.User{ID: user.UserID})
-		if err != nil {
-			log.Println(err)
-		}
-		if utils.DB.First(&utils.CheckPointRestrict{WelcomeMessageID: user.WelcomeMessageID}).RowsAffected == 0 {
-			if utils.WelcomeMessageID == user.WelcomeMessageID {
-				utils.WelcomeMessageID = 0
+		welcomeMessageUsers = fmt.Sprintf("%v, %v", welcomeMessageUsers, utils.MentionUser(&tele.User{ID: user.UserID, FirstName: user.UserFirstName, LastName: user.UserLastName}))
+	}
+	//usertext & welcomeMessage check
+	if welcomeMessageUsers == "" {
+		if utils.WelcomeMessageID != 0 {
+			err := utils.Bot.Delete(&tele.Message{ID: utils.WelcomeMessageID, Chat: &tele.Chat{ID: utils.Config.Chat}})
+			if err != nil {
+				return err
 			}
-			utils.Bot.Delete(&tele.Message{ID: user.WelcomeMessageID, Chat: &tele.Chat{ID: utils.Config.Chat}})
+			utils.WelcomeMessageID = 0
+		}
+		return nil
+	}
+	//welcome message text
+	utils.DB.Where(&utils.Get{Name: "welcome"}).First(&welcomeGet)
+	//welcome message create\update
+	if utils.WelcomeMessageID == 0 {
+		welcomeMessageText = fmt.Sprintf("Привет%v!\n%v", welcomeMessageUsers, welcomeGet.Data)
+		m, err := utils.Bot.Send(&tele.Chat{ID: utils.Config.Chat}, welcomeMessageText, &tele.SendOptions{DisableWebPagePreview: true})
+		if err != nil {
+			return err
+		}
+		utils.WelcomeMessageID = m.ID
+	} else if welcomeMessageText != fmt.Sprintf("Привет%v!\n%v", welcomeMessageUsers, welcomeGet.Data) {
+		welcomeMessageText = fmt.Sprintf("Привет%v!\n%v", welcomeMessageUsers, welcomeGet.Data)
+		_, err := utils.Bot.Edit(&tele.Message{ID: utils.WelcomeMessageID, Chat: &tele.Chat{ID: utils.Config.Chat}}, welcomeMessageText, &tele.SendOptions{DisableWebPagePreview: true})
+		if err != nil {
+			return err
 		}
 	}
 	return nil
 }
 
-func restrictService(init bool) error {
-	if init {
-		go restrictService(false)
-		return nil
-	}
+func welcomeMessageUpdateService() {
 	for {
-		err := restrictUpdate()
+		err := welcomeMessageUpdate()
 		if err != nil {
 			log.Println(err.Error())
 		}
-		time.Sleep(time.Second * time.Duration(60))
+		time.Sleep(time.Second * time.Duration(2))
 	}
 }
 
-var _ = restrictService(true)
+func init() {
+	go welcomeMessageUpdateService()
+}

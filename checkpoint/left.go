@@ -1,7 +1,7 @@
 package checkpoint
 
 import (
-	"log"
+	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	tele "gopkg.in/telebot.v3"
@@ -14,17 +14,11 @@ func UserLeft(context tele.Context) error {
 		}
 		delete := utils.DB.Delete(&user)
 		if delete.Error != nil {
-			log.Println(delete.Error)
+			return delete.Error
 		}
-		restricted := utils.DB.Find(&utils.RestrictedUsers)
-		if restricted.Error != nil {
-			log.Println(restricted.Error)
-		}
-		if utils.DB.First(&utils.CheckPointRestrict{WelcomeMessageID: user.WelcomeMessageID}).RowsAffected == 0 {
-			if utils.WelcomeMessageID == user.WelcomeMessageID {
-				utils.WelcomeMessageID = 0
-			}
-			utils.Bot.Delete(&tele.Message{ID: user.WelcomeMessageID, Chat: &tele.Chat{ID: utils.Config.Chat}})
+		err := utils.Bot.Ban(&tele.Chat{ID: utils.Config.Chat}, &tele.ChatMember{User: &tele.User{ID: user.UserID}, RestrictedUntil: time.Now().Unix() + 3600})
+		if err != nil {
+			return err
 		}
 	}
 	return nil

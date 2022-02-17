@@ -174,30 +174,16 @@ func CheckPoint(update *tele.Update) error {
 		update.Message.SenderChat.ID != Config.Channel {
 		return Bot.Delete(update.Message)
 	}
-	if update.Message.Chat.ID == Config.Chat {
-		LastChatMessageID = update.Message.ID
-	}
 	for _, user := range RestrictedUsers {
-		if update.Message.ReplyTo != nil && update.Message.ReplyTo.ID == user.WelcomeMessageID {
-			delete := DB.Delete(CheckPointRestrict{UserID: update.Message.Sender.ID})
+		if update.Message.Sender.ID != user.UserID {
+			continue
+		}
+		if update.Message.ReplyTo != nil && update.Message.ReplyTo.ID == WelcomeMessageID {
+			delete := DB.Delete(&CheckPointRestrict{UserID: update.Message.Sender.ID})
 			if delete.Error != nil {
 				return delete.Error
 			}
-			find := DB.Find(&RestrictedUsers)
-			if find.Error != nil {
-				return find.Error
-			}
-			if DB.First(&CheckPointRestrict{WelcomeMessageID: user.WelcomeMessageID}).RowsAffected == 0 {
-				if WelcomeMessageID == user.WelcomeMessageID {
-					WelcomeMessageID = 0
-				}
-				return Bot.Delete(&tele.Message{ID: user.WelcomeMessageID, Chat: &tele.Chat{ID: Config.Chat}})
-			}
-			restricted := DB.Find(&RestrictedUsers)
-			if restricted.Error != nil {
-				log.Println(restricted.Error)
-			}
-		} else if update.Message.Sender.ID == user.UserID {
+		} else {
 			return Bot.Delete(update.Message)
 		}
 	}
