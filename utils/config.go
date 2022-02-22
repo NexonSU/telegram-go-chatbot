@@ -9,6 +9,8 @@ import (
 
 type Configuration struct {
 	Token             string   `json:"token"`
+	AppID             int      `json:"app_id"`
+	AppHash           string   `json:"app_hash"`
 	BotApiUrl         string   `json:"bot_api_url"`
 	AllowedUpdates    []string `json:"allowed_updates"`
 	Listen            string   `json:"listen"`
