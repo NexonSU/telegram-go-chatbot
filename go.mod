@@ -3,8 +3,8 @@ module github.com/NexonSU/telegram-go-chatbot
 go 1.17
 
 require (
-	github.com/arran4/golang-ical v0.0.0-20220115055431-e3ae8290e7b8
-	github.com/chai2010/webp v1.1.0
+	github.com/arran4/golang-ical v0.0.0-20220220103556-c519bf07e7e6
+	github.com/chai2010/webp v1.1.1
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fogleman/gg v1.3.0
 	github.com/go-echarts/go-echarts/v2 v2.2.4
@@ -14,8 +14,8 @@ require (
 	github.com/u2takey/ffmpeg-go v0.4.0
 	github.com/valyala/fastjson v1.6.3
 	gopkg.in/telebot.v3 v3.0.0
-	gorm.io/driver/sqlite v1.2.6
-	gorm.io/gorm v1.22.5
+	gorm.io/driver/sqlite v1.3.1
+	gorm.io/gorm v1.23.1
 	mvdan.cc/xurls/v2 v2.3.0
 )
 
@@ -39,7 +39,7 @@ require (
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.20.0 // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
-	golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8 // indirect
+	golang.org/x/image v0.0.0-20211028202545-6944b10bf410 // indirect
 	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect
