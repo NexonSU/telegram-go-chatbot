@@ -30,7 +30,7 @@ func Meow(context tele.Context) error {
 		if err != nil {
 			return err
 		}
-		messageObject := tg.Message{ID: utils.RandInt(1, 16219)}
+		messageObject := tg.Message{ID: utils.RandInt(20, 16000)}
 		buf := bin.Buffer{}
 		messageObject.AsInputMessageID().Encode(&buf)
 		message, err := tg.DecodeInputMessage(&buf)
@@ -52,16 +52,16 @@ func Meow(context tele.Context) error {
 		messageSend := tg.Message{}
 		messageSend.Decode(&buf)
 		media, _ := messageSend.GetMedia()
+		if media == nil {
+			return nil
+		}
 		media.Encode(&buf)
 		messageMediaDocument := &tg.MessageMediaDocument{}
 		messageMediaDocument.Decode(&buf)
 		documentClass, _ := messageMediaDocument.GetDocument()
-		documentClass.Encode(&buf)
-		document := tg.Document{}
-		document.Decode(&buf)
-		document.AsInput().Encode(&buf)
+		document, _ := documentClass.AsNotEmpty()
 
-		_, err = sender.Resolve(context.Chat().Username).Document(ctx, &document)
+		_, err = sender.Resolve(context.Chat().Username).Document(ctx, document.AsInput())
 		if err != nil {
 			return err
 		}
