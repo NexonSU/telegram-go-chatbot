@@ -1,6 +1,7 @@
 package utils
 
 import (
+	tdctx "context"
 	"encoding/json"
 	"fmt"
 	"html"
@@ -10,13 +11,17 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gotd/contrib/bg"
+	"github.com/gotd/td/telegram"
 	tele "gopkg.in/telebot.v3"
 	"gorm.io/gorm/clause"
 )
 
-var Bot = BotInit()
+var Bot = botInit()
+var GotdClient *telegram.Client
+var GotdContext tdctx.Context
 
-func BotInit() tele.Bot {
+func botInit() tele.Bot {
 	if Config.Token == "" {
 		log.Fatal("Telegram Bot token not found in config.json")
 	}
@@ -59,6 +64,32 @@ func BotInit() tele.Bot {
 	return *Bot
 }
 
+func gotdClientInit() error {
+	if Config.AppID == 0 || Config.AppHash == "" {
+		return nil
+	}
+	client := telegram.NewClient(Config.AppID, Config.AppHash, telegram.Options{})
+	return client.Run(tdctx.Background(), func(ctx tdctx.Context) error {
+		stop, err := bg.Connect(client)
+		if err != nil {
+			return err
+		}
+		defer func() { _ = stop() }()
+
+		_, err = client.Auth().Bot(ctx, Bot.Token)
+		if err != nil {
+			return err
+		}
+
+		GotdClient = client
+		GotdContext = ctx
+
+		for {
+			time.Sleep(time.Second * time.Duration(60))
+		}
+	})
+}
+
 func ErrorReporting(err error, context tele.Context) {
 	_, fn, line, _ := runtime.Caller(1)
 	log.Printf("[%s:%d] %v", fn, line, err)
@@ -77,7 +108,7 @@ func ErrorReporting(err error, context tele.Context) {
 	Bot.Send(tele.ChatID(Config.SysAdmin), text)
 }
 
-func GatherData(update *tele.Update) error {
+func gatherData(update *tele.Update) error {
 	if update.Message == nil || update.Message.Sender == nil {
 		return nil
 	}
@@ -163,7 +194,7 @@ words:
 	return nil
 }
 
-func CheckPoint(update *tele.Update) error {
+func checkPoint(update *tele.Update) error {
 	if update.Message == nil || update.Message.Sender == nil {
 		return nil
 	}
@@ -194,9 +225,11 @@ func init() {
 	Bot.OnError = ErrorReporting
 
 	Bot.Poller = tele.NewMiddlewarePoller(Bot.Poller, func(upd *tele.Update) bool {
-		GatherData(upd)
-		CheckPoint(upd)
+		gatherData(upd)
+		checkPoint(upd)
 
 		return true
 	})
+
+	go gotdClientInit()
 }
