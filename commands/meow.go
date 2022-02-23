@@ -9,19 +9,19 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
+var channel *tg.Channel
+
 //Reply with GIF from Pan Kotek's channel
 func Meow(context tele.Context) error {
 	api := utils.GotdClient.API()
-	sender := message.NewSender(api)
 
 	//get channel object
-	channelResolve, err := api.ContactsResolveUsername(utils.GotdContext, "imacat")
-	if err != nil {
-		return err
-	}
-	channel, _ := channelResolve.MapChats().AsChannel().First()
-	if err != nil {
-		return err
+	if channel == nil {
+		channelResolve, err := api.ContactsResolveUsername(utils.GotdContext, "imacat")
+		if err != nil {
+			return err
+		}
+		channel = channelResolve.GetChats()[0].(*tg.Channel)
 	}
 	//prepare message query
 	messagesQuery := []tg.InputMessageClass{}
@@ -46,7 +46,8 @@ func Meow(context tele.Context) error {
 		messageMediaClass, check := mc.(*tg.Message).GetMedia()
 		if check && reflect.TypeOf(messageMediaClass) == reflect.TypeOf(&tg.MessageMediaDocument{}) {
 			document, _ := messageMediaClass.(*tg.MessageMediaDocument).GetDocument()
-			_, err = sender.Resolve(context.Chat().Username).Document(utils.GotdContext, document.(*tg.Document).AsInput())
+			sender := message.NewSender(api)
+			_, err = sender.Resolve(context.Chat().Username).Reply(context.Message().ID).Document(utils.GotdContext, document.(*tg.Document).AsInput())
 			if err != nil {
 				return err
 			}
