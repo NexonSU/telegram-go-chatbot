@@ -61,8 +61,8 @@ func welcomeMessageUpdate() error {
 			return err
 		}
 		utils.WelcomeMessageID = m.ID
-	} else if welcomeMessageText != fmt.Sprintf("Привет%v!\n%v", welcomeMessageUsers, welcomeGet.Data) {
-		welcomeMessageText = fmt.Sprintf("Привет%v!\n%v", welcomeMessageUsers, welcomeGet.Data)
+	} else if welcomeMessageText != fmt.Sprintf("Привет%v\n%v", welcomeMessageUsers, welcomeGet.Data) {
+		welcomeMessageText = fmt.Sprintf("Привет%v\n%v", welcomeMessageUsers, welcomeGet.Data)
 		_, err := utils.Bot.Edit(&tele.Message{ID: utils.WelcomeMessageID, Chat: &tele.Chat{ID: utils.Config.Chat}}, welcomeMessageText, &tele.SendOptions{DisableWebPagePreview: true})
 		if err != nil {
 			return err
