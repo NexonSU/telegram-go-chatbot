@@ -87,7 +87,7 @@ func Cur(context tele.Context) error {
 		return context.Reply("Конвертация валют не настроена")
 	}
 	if len(context.Args()) != 3 {
-		return context.Reply("Пример использования:\n/cur {количество} {EUR/USD/RUB} {EUR/USD/RUB}")
+		return context.Reply("Пример использования:\n/cur 1 USD RUB")
 	}
 	amount, err := strconv.ParseFloat(context.Args()[0], 64)
 	if err != nil {
