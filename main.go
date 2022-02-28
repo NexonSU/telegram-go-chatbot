@@ -17,7 +17,7 @@ func main() {
 	moder := utils.Bot.Group()
 	moder.Use(utils.Whitelist(append(append(utils.Config.Admins, utils.Config.Moders...), utils.Config.SysAdmin)...))
 	chats := utils.Bot.Group()
-	chats.Use(utils.Whitelist(append(append(utils.Config.Admins, utils.Config.Moders...), utils.Config.SysAdmin, utils.Config.Chat)...))
+	chats.Use(utils.Whitelist(append(append(utils.Config.Admins, utils.Config.Moders...), utils.Config.SysAdmin, utils.Config.Chat, utils.Config.ReserveChat)...))
 	chato := utils.Bot.Group()
 	chato.Use(utils.Whitelist(utils.Config.Chat))
 	comms := utils.Bot.Group()
@@ -66,9 +66,9 @@ func main() {
 	chats.Handle("/mywarns", commands.Mywarns)
 	chats.Handle("/blessing", commands.Blessing)
 	chats.Handle("/suicide", commands.Blessing)
-	chats.Handle("/anekdot", commands.Anekdot)
-	chats.Handle("/bashorg", commands.Bashorg)
-	chats.Handle("/meow", commands.Meow)
+	chato.Handle("/anekdot", commands.Anekdot)
+	chato.Handle("/bashorg", commands.Bashorg)
+	chato.Handle("/meow", commands.Meow)
 
 	//stats commands
 	chats.Handle("/stats", stats.Stats)
@@ -85,11 +85,11 @@ func main() {
 	moder.Handle("/pidorlist", pidor.Pidorlist)
 
 	//duel commands and buttons
-	chato.Handle("/russianroulette", duel.Request)
-	chato.Handle("/duel", duel.Request)
+	chats.Handle("/russianroulette", duel.Request)
+	chats.Handle("/duel", duel.Request)
 	chats.Handle("/duelstats", duel.Duelstats)
-	chato.Handle(&duel.AcceptButton, duel.Accept)
-	chato.Handle(&duel.DenyButton, duel.Deny)
+	chats.Handle(&duel.AcceptButton, duel.Accept)
+	chats.Handle(&duel.DenyButton, duel.Deny)
 
 	//repost channel post to chat
 	chann.Handle(tele.OnChannelPost, utils.Repost)

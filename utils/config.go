@@ -17,6 +17,7 @@ type Configuration struct {
 	EndpointPublicURL string   `json:"endpoint_public_url"`
 	MaxConnections    int      `json:"max_connections"`
 	Chat              int64    `json:"chat"`
+	ReserveChat       int64    `json:"reserve_chat"`
 	CommentChat       int64    `json:"comment_chat"`
 	StreamChannel     int64    `json:"stream_channel"`
 	Channel           int64    `json:"channel"`
