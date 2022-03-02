@@ -119,9 +119,9 @@ func gatherData(update *tele.Update) error {
 	if UserResult.Error != nil {
 		return UserResult.Error
 	}
-	if update.Message.Sender.IsBot || update.Message.Chat.ID != Config.Chat && update.Message.Chat.ID != Config.ReserveChat {
-		return nil
-	}
+	//if update.Message.Sender.IsBot || update.Message.Chat.ID != Config.Chat && update.Message.Chat.ID != Config.ReserveChat {
+	//return nil
+	//}
 	//Message insert
 	var Message Message
 	Message.ID = update.Message.ID
