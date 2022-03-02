@@ -220,8 +220,10 @@ func Repost(context tele.Context) error {
 	}
 
 	var ChatMessage *tele.Message
-	ChatMessage, err = Bot.Copy(&tele.Chat{ID: Config.Chat}, context.Message())
-	Forward.History = append(Forward.History, ForwardHistory{context.Message().ID, ChatMessage.ID})
+	if Config.Chat != -1001597398983 {
+		ChatMessage, err = Bot.Copy(&tele.Chat{ID: Config.Chat}, context.Message())
+		Forward.History = append(Forward.History, ForwardHistory{context.Message().ID, ChatMessage.ID})
+	}
 	if Config.StreamChannel != 0 && strings.Contains(context.Text(), "zavtracast/live") {
 		ChatMessage, err2 = Bot.Copy(&tele.Chat{ID: Config.StreamChannel}, context.Message())
 		Forward.StreamHistory = append(Forward.StreamHistory, ForwardHistory{context.Message().ID, ChatMessage.ID})
