@@ -1,10 +1,11 @@
 package commands
 
 import (
+	"bytes"
 	"reflect"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"github.com/gotd/td/telegram/message"
+	"github.com/gotd/td/telegram/downloader"
 	"github.com/gotd/td/tg"
 	tele "gopkg.in/telebot.v3"
 )
@@ -38,7 +39,8 @@ func Meow(context tele.Context) error {
 	if err != nil {
 		return err
 	}
-	//search gif
+	//search and download gif
+	buf := bytes.Buffer{}
 	for _, mc := range messagesResult.(*tg.MessagesChannelMessages).Messages {
 		if reflect.TypeOf(mc) != reflect.TypeOf(&tg.Message{}) {
 			continue
@@ -46,12 +48,10 @@ func Meow(context tele.Context) error {
 		messageMediaClass, check := mc.(*tg.Message).GetMedia()
 		if check && reflect.TypeOf(messageMediaClass) == reflect.TypeOf(&tg.MessageMediaDocument{}) {
 			document, _ := messageMediaClass.(*tg.MessageMediaDocument).GetDocument()
-			sender := message.NewSender(api)
-			_, err = sender.Resolve(context.Chat().Username).Reply(context.Message().ID).Document(utils.GotdContext, document.(*tg.Document).AsInput())
-			if err != nil {
-				return err
-			}
-			break
+			docFile, _ := document.AsNotEmpty()
+			fileName, _ := docFile.MapAttributes().AsDocumentAttributeFilename().First()
+			downloader.NewDownloader().Download(api, docFile.AsInputDocumentFileLocation()).Stream(utils.GotdContext, &buf)
+			return context.Reply(&tele.Document{FileName: fileName.FileName, File: tele.File{FileReader: &buf}})
 		} else {
 			continue
 		}
