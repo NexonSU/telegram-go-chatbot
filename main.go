@@ -66,9 +66,9 @@ func main() {
 	chats.Handle("/mywarns", commands.Mywarns)
 	chats.Handle("/blessing", commands.Blessing)
 	chats.Handle("/suicide", commands.Blessing)
-	chato.Handle("/anekdot", commands.Anekdot)
-	chato.Handle("/bashorg", commands.Bashorg)
-	chato.Handle("/meow", commands.Meow)
+	moder.Handle("/anekdot", commands.Anekdot)
+	moder.Handle("/bashorg", commands.Bashorg)
+	moder.Handle("/meow", commands.Meow)
 
 	//stats commands
 	chats.Handle("/stats", stats.Stats)
