@@ -16,8 +16,10 @@ import (
 func UserJoin(context tele.Context) error {
 	//joined user
 	User := context.ChatMember().NewChatMember.User
-	//kick user
-	return utils.Bot.Unban(&tele.Chat{ID: utils.Config.Chat}, User)
+	//if this is zavtrachat, then kick user
+	if context.Chat().ID == -1001597398983 {
+		return utils.Bot.Unban(&tele.Chat{ID: utils.Config.Chat}, User)
+	}
 	//CAS ban check
 	httpClient := &http.Client{Timeout: 10 * time.Second}
 	httpResponse, err := httpClient.Get(fmt.Sprintf("https://api.cas.chat/check?user_id=%v", User.ID))

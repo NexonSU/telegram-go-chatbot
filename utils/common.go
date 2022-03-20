@@ -167,7 +167,7 @@ var AlbumMessages []*tele.Message
 func Repost(context tele.Context) error {
 	var err error
 	var err2 error
-	if context.Message().AlbumID != "" {
+	if context.Message().AlbumID != "" && Config.Chat != -1001597398983 {
 		AlbumMessages = append(AlbumMessages, context.Message())
 		if context.Message().Caption != "" {
 			Forward.Caption = context.Message().Caption
