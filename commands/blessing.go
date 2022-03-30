@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
@@ -41,5 +42,15 @@ func Blessing(context tele.Context) error {
 	if err != nil {
 		return err
 	}
-	return context.Send(fmt.Sprintf("<code>💥 %v выбрал лёгкий путь.\nРеспавн через %v мин.</code>", utils.UserFullName(context.Sender()), duelist.Deaths))
+	reason := []string{
+		"выбрал лёгкий путь",
+		"сыграл в ящик",
+		"слил своё HP до нуля",
+		"приказал долго жить",
+		"покинул этот скорбный мир",
+		"пагиб",
+		"разбежавшись прыгнул со скалы",
+		"разогнал RTX 4090 Ti",
+	}
+	return context.Send(fmt.Sprintf("<code>💥 %v %v.\nРеспавн через %v мин.</code>", utils.UserFullName(context.Sender()), reason[rand.Intn(len(reason))], duelist.Deaths))
 }
