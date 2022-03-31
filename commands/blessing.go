@@ -51,6 +51,8 @@ func Blessing(context tele.Context) error {
 		"пагиб",
 		"разбежавшись прыгнул со скалы",
 		"разогнал RTX 4090 Ti",
+		"принял ислам",
+		"пьёт чай и кушоет конфеты, никакова суецыда",
 	}
 	return context.Send(fmt.Sprintf("<code>💥 %v %v.\nРеспавн через %v мин.</code>", utils.UserFullName(context.Sender()), reason[rand.Intn(len(reason))], duelist.Deaths))
 }
