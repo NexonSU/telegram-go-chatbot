@@ -46,14 +46,26 @@ func Kill(context tele.Context) error {
 	if result.Error != nil {
 		return err
 	}
-	ChatMember.RestrictedUntil = time.Now().Add(time.Second * time.Duration(60*duelist.Deaths)).Unix()
+	duration := utils.RandInt(1, duelist.Deaths+1)
+	prependText := ""
+	if utils.RandInt(0, 100) >= 98 {
+		duration = duration * 10
+		prependText = "критически "
+		if command == "/bless" {
+			prependText = "очень "
+		}
+	}
+	if duration > 600 {
+		duration = 600
+	}
+	ChatMember.RestrictedUntil = time.Now().Add(time.Second * time.Duration(60*duration)).Unix()
 	err = utils.Bot.Restrict(context.Chat(), ChatMember)
 	if err != nil {
 		return err
 	}
-	text := fmt.Sprintf("💥 %v пристрелил %v.\n%v отправился на респавн на %v мин.", utils.UserFullName(context.Sender()), utils.UserFullName(&target), utils.UserFullName(&target), duelist.Deaths)
+	text := fmt.Sprintf("💥 %v %vпристрелил %v.\n%v отправился на респавн на %v мин.", utils.UserFullName(context.Sender()), prependText, utils.UserFullName(&target), utils.UserFullName(&target), duration)
 	if command == "/bless" {
-		text = fmt.Sprintf("🤫 %v попросил %v помолчать %v минут.", utils.UserFullName(context.Sender()), utils.UserFullName(&target), duelist.Deaths)
+		text = fmt.Sprintf("🤫 %v %vпопросил %v помолчать %v минут.", utils.UserFullName(context.Sender()), prependText, utils.UserFullName(&target), duration)
 	}
 	return context.Send(text)
 }
