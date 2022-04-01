@@ -37,7 +37,16 @@ func Blessing(context tele.Context) error {
 	if result.Error != nil {
 		return result.Error
 	}
-	ChatMember.RestrictedUntil = time.Now().Add(time.Second * time.Duration(60*duelist.Deaths)).Unix()
+	duration := utils.RandInt(1, duelist.Deaths+1)
+	prependText := ""
+	if utils.RandInt(0, 100) >= 98 {
+		duration = duration * 10
+		prependText = "критически "
+	}
+	if duration > 600 {
+		duration = 600
+	}
+	ChatMember.RestrictedUntil = time.Now().Add(time.Second * time.Duration(60*duration)).Unix()
 	err = utils.Bot.Restrict(context.Chat(), ChatMember)
 	if err != nil {
 		return err
@@ -54,5 +63,5 @@ func Blessing(context tele.Context) error {
 		"принял ислам",
 		"пьёт чай и кушоет конфеты, никакова суецыда",
 	}
-	return context.Send(fmt.Sprintf("<code>💥 %v %v.\nРеспавн через %v мин.</code>", utils.UserFullName(context.Sender()), reason[rand.Intn(len(reason))], duelist.Deaths))
+	return context.Send(fmt.Sprintf("<code>💥 %v %v%v.\nРеспавн через %v мин.</code>", utils.UserFullName(context.Sender()), prependText, reason[rand.Intn(len(reason))], duration))
 }
