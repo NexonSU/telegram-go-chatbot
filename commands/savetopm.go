@@ -16,5 +16,5 @@ func SaveToPM(context tele.Context) error {
 	if err != nil {
 		return context.Reply(fmt.Sprintf("Не удалось отправить сообщение в ЛС:\n<code>%v</code>\nБот должен быть запущен и разблокирован в личке.", err.Error()))
 	}
-	return context.Reply("Отправил сообщение тебе в личку, проверяй.")
+	return context.Delete()
 }
