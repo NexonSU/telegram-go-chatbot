@@ -10,7 +10,7 @@ import (
 //Resend post on user request
 func SaveToPM(context tele.Context) error {
 	if context.Message() == nil || context.Message().ReplyTo == nil {
-		return context.Reply("Пример использования:\n/savetopm в ответ на какое-либо сообщение")
+		return context.Reply("Пример использования:\n/savetopm в ответ на какое-либо сообщение\nБот должен быть запущен и разблокирован в личке.")
 	}
 	_, err := utils.Bot.Copy(context.Sender(), context.Message().ReplyTo)
 	if err != nil {
