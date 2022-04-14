@@ -38,13 +38,11 @@ func Blessing(context tele.Context) error {
 		return result.Error
 	}
 	duration := utils.RandInt(1, duelist.Deaths+1)
+	duration += 10
 	prependText := ""
-	if utils.RandInt(0, 100) >= 98 {
+	if utils.RandInt(0, 100) >= 90 {
 		duration = duration * 10
 		prependText = "критически "
-	}
-	if duration > 600 {
-		duration = 600
 	}
 	ChatMember.RestrictedUntil = time.Now().Add(time.Second * time.Duration(60*duration)).Unix()
 	err = utils.Bot.Restrict(context.Chat(), ChatMember)
