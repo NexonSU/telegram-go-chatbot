@@ -39,7 +39,7 @@ func MentionUser(user *tele.User) string {
 }
 
 func RandInt(min int, max int) int {
-	b, err := rand.Int(rand.Reader, big.NewInt(int64(max)))
+	b, err := rand.Int(rand.Reader, big.NewInt(int64(max+1)))
 	if err != nil {
 		return 0
 	}
