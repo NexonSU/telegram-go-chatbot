@@ -100,6 +100,7 @@ func Blessing(context tele.Context) error {
 		"застрял в геометрии",
 		"встретил геймбрейкинг баг",
 		"жрал капусту, когда есть картошка",
+		"спросил \"А что случилось?\"",
 	}
 	return context.Send(fmt.Sprintf("<code>💥 %v %v%v.\nРеспавн через %v мин.</code>", utils.UserFullName(context.Sender()), prependText, reason[rand.Intn(len(reason))], duration))
 }
