@@ -19,7 +19,7 @@ func main() {
 	chats := utils.Bot.Group()
 	chats.Use(utils.Whitelist(append(append(utils.Config.Admins, utils.Config.Moders...), utils.Config.SysAdmin, utils.Config.Chat, utils.Config.ReserveChat)...))
 	chato := utils.Bot.Group()
-	chato.Use(utils.Whitelist(utils.Config.Chat))
+	chato.Use(utils.Whitelist(utils.Config.ReserveChat))
 	comms := utils.Bot.Group()
 	comms.Use(utils.Whitelist(utils.Config.CommentChat))
 	chann := utils.Bot.Group()
