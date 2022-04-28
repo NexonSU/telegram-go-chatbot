@@ -18,6 +18,9 @@ func SaveToPM(context tele.Context) error {
 	var err error
 	if context.Message().ReplyTo.Media() != nil {
 		msgID, chatID := context.Message().ReplyTo.MessageSig()
+		if context.Message().ReplyTo.Caption != "" {
+			link = fmt.Sprintf("%v\n\n%v", context.Message().ReplyTo.Caption, link)
+		}
 		params := map[string]string{
 			"chat_id":      context.Sender().Recipient(),
 			"from_chat_id": strconv.FormatInt(chatID, 10),
