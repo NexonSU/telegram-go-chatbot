@@ -10,6 +10,10 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+var firstSuicide int64
+var burst int
+var lastVideoSent int64
+
 //Kill user on /blessing, /suicide
 func Blessing(context tele.Context) error {
 	err := context.Delete()
@@ -119,5 +123,20 @@ func Blessing(context tele.Context) error {
 		"совершил равноценный обмен",
 		"перепутал красный и синий провод",
 	}
-	return context.Send(fmt.Sprintf("<code>💥 %v %v%v.\nРеспавн через %v мин.</code>", utils.UserFullName(context.Sender()), prependText, reason[rand.Intn(len(reason))], duration))
+	burst++
+	if time.Now().Unix() > firstSuicide+120 {
+		firstSuicide = time.Now().Unix()
+		burst = 1
+	}
+	if burst > 3 && time.Now().Unix() > lastVideoSent+3600 {
+		lastVideoSent = time.Now().Unix()
+		return context.Send(&tele.Video{
+			File: tele.File{
+				FileID: "BAACAgIAAx0CReJGYgABAlMuYnagTilFaB8ke8Rw-dYLbfJ6iF8AAicYAAIlxrlLY9ah2fUtR40kBA",
+			},
+			Caption: fmt.Sprintf("<code>💥 %v %v%v.\nРеспавн через %v мин.</code>", utils.UserFullName(context.Sender()), prependText, reason[rand.Intn(len(reason))], duration),
+		})
+	} else {
+		return context.Send(fmt.Sprintf("<code>💥 %v %v%v.\nРеспавн через %v мин.</code>", utils.UserFullName(context.Sender()), prependText, reason[rand.Intn(len(reason))], duration))
+	}
 }
