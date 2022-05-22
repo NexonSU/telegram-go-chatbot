@@ -1,36 +1,42 @@
 package commands
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
+
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 	tele "gopkg.in/telebot.v3"
 	"gorm.io/gorm/clause"
 )
 
 //Kill user on /kill
 func Kill(context tele.Context) error {
+	// prt will replace fmt package to format text according plurals defined in utils package
+	// If no plural rule matched it will be ignored and processed as usual formatting
+	prt := message.NewPrinter(language.Russian)
+
 	command := "/bless"
 	if context.Text()[1:5] == "kill" {
 		command = "/kill"
 	}
 	if (context.Message().ReplyTo == nil && len(context.Args()) != 1) || (context.Message().ReplyTo != nil && len(context.Args()) != 0) {
-		return context.Reply(fmt.Sprintf("Пример использования: <code>%v {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>%v</code>", command, command))
+		return context.Reply(prt.Sprintf("Пример использования: <code>%v {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>%v</code>", command, command))
 	}
 	target, _, err := utils.FindUserInMessage(context)
 	if err != nil {
-		return context.Reply(fmt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
+		return context.Reply(prt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
 	}
 	ChatMember, err := utils.Bot.ChatMemberOf(context.Chat(), &target)
 	if err != nil {
-		return context.Reply(fmt.Sprintf("Ошибка определения пользователя чата:\n<code>%v</code>", err.Error()))
+		return context.Reply(prt.Sprintf("Ошибка определения пользователя чата:\n<code>%v</code>", err.Error()))
 	}
 	if context.Message().ReplyTo != nil {
 		utils.Bot.Delete(context.Message().ReplyTo)
 	}
 	if ChatMember.Role == "administrator" || ChatMember.Role == "creator" {
-		return context.Send(fmt.Sprintf("<code>👻 %v возродился у костра.</code>", utils.UserFullName(&target)))
+		return context.Send(prt.Sprintf("<code>👻 %v возродился у костра.</code>", utils.UserFullName(&target)))
 	}
 	var duelist utils.Duelist
 	result := utils.DB.Model(utils.Duelist{}).Where(target.ID).First(&duelist)
@@ -61,9 +67,9 @@ func Kill(context tele.Context) error {
 	if err != nil {
 		return err
 	}
-	text := fmt.Sprintf("💥 %v %vпристрелил %v.\n%v отправился на респавн на %v мин.", utils.UserFullName(context.Sender()), prependText, utils.UserFullName(&target), utils.UserFullName(&target), duration)
+	text := prt.Sprintf("💥 %v %vпристрелил %v.\n%v отправился на респавн на %d мин.", utils.UserFullName(context.Sender()), prependText, utils.UserFullName(&target), utils.UserFullName(&target), duration)
 	if command == "/bless" {
-		text = fmt.Sprintf("🤫 %v %vпопросил %v помолчать %v минут.", utils.UserFullName(context.Sender()), prependText, utils.UserFullName(&target), duration)
+		text = prt.Sprintf("🤫 %v %vпопросил %v помолчать %d минут.", utils.UserFullName(context.Sender()), prependText, utils.UserFullName(&target), duration)
 	}
 	return context.Send(text)
 }

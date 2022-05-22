@@ -1,7 +1,8 @@
 package commands
 
 import (
-	"fmt"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 	"math/rand"
 	"time"
 
@@ -16,6 +17,10 @@ var lastVideoSent int64
 
 //Kill user on /blessing, /suicide
 func Blessing(context tele.Context) error {
+	// prt will replace fmt package to format text according plurals defined in utils package
+	// If no plural rule matched it will be ignored and processed as usual formatting
+	prt := message.NewPrinter(language.Russian)
+
 	err := context.Delete()
 	if err != nil {
 		return err
@@ -25,7 +30,7 @@ func Blessing(context tele.Context) error {
 		return err
 	}
 	if ChatMember.Role == "administrator" || ChatMember.Role == "creator" {
-		return context.Send(fmt.Sprintf("<code>👻 %v возродился у костра.</code>", utils.UserFullName(context.Sender())))
+		return context.Send(prt.Sprintf("<code>👻 %v возродился у костра.</code>", utils.UserFullName(context.Sender())))
 	}
 	var duelist utils.Duelist
 	result := utils.DB.Model(utils.Duelist{}).Where(context.Sender().ID).First(&duelist)
@@ -138,9 +143,9 @@ func Blessing(context tele.Context) error {
 			File: tele.File{
 				FileID: "BAACAgIAAx0CReJGYgABAlMuYnagTilFaB8ke8Rw-dYLbfJ6iF8AAicYAAIlxrlLY9ah2fUtR40kBA",
 			},
-			Caption: fmt.Sprintf("<code>💥 %v %v%v.\nРеспавн через %v мин.</code>", utils.UserFullName(context.Sender()), prependText, reason[rand.Intn(len(reason))], duration),
+			Caption: prt.Sprintf("<code>💥 %v %v%v.\nРеспавн через %d мин.</code>", utils.UserFullName(context.Sender()), prependText, reason[rand.Intn(len(reason))], duration),
 		})
 	} else {
-		return context.Send(fmt.Sprintf("<code>💥 %v %v%v.\nРеспавн через %v мин.</code>", utils.UserFullName(context.Sender()), prependText, reason[rand.Intn(len(reason))], duration))
+		return context.Send(prt.Sprintf("<code>💥 %v %v%v.\nРеспавн через %d мин.</code>", utils.UserFullName(context.Sender()), prependText, reason[rand.Intn(len(reason))], duration))
 	}
 }

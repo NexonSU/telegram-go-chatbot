@@ -1,15 +1,21 @@
 package duel
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
+
+	"golang.org/x/text/language"
+	plurals "golang.org/x/text/message"
 	tele "gopkg.in/telebot.v3"
 	"gorm.io/gorm/clause"
 )
 
 func Accept(context tele.Context) error {
+	// prt will replace fmt package to format text according plurals defined in utils package
+	// If no plural rule matched it will be ignored and processed as usual formatting
+	prt := plurals.NewPrinter(language.Russian)
+
 	message := context.Message()
 	victim := message.Entities[0].User
 	if victim.ID != context.Sender().ID {
@@ -27,13 +33,13 @@ func Accept(context tele.Context) error {
 	success := []string{"%v остаётся в живых. Хм... может порох отсырел?", "В воздухе повисла тишина. %v остаётся в живых.", "%v сегодня заново родился.", "%v остаётся в живых. Хм... я ведь зарядил его?", "%v остаётся в живых. Прикольно, а давай проверим на ком-нибудь другом?"}
 	invincible := []string{"пуля отскочила от головы %v и улетела в другой чат.", "%v похмурил брови и отклеил расплющенную пулю со своей головы.", "но ничего не произошло. %v взглянул на револьвер, он был неисправен.", "пуля прошла навылет, но не оставила каких-либо следов на %v."}
 	fail := []string{"мозги %v разлетелись по чату!", "%v упал со стула и его кровь растеклась по месседжу.", "%v замер и спустя секунду упал на стол.", "пуля едва не задела кого-то из участников чата! А? Что? А, %v мёртв, да.", "и в воздухе повисла тишина. Все начали оглядываться, когда %v уже был мёртв."}
-	prefix := fmt.Sprintf("Дуэль! %v против %v!\n", utils.MentionUser(player), utils.MentionUser(victim))
-	_, err = utils.Bot.Edit(message, fmt.Sprintf("%vЗаряжаю один патрон в револьвер и прокручиваю барабан.", prefix), &tele.SendOptions{ReplyMarkup: nil})
+	prefix := prt.Sprintf("Дуэль! %v против %v!\n", utils.MentionUser(player), utils.MentionUser(victim))
+	_, err = utils.Bot.Edit(message, prt.Sprintf("%vЗаряжаю один патрон в револьвер и прокручиваю барабан.", prefix), &tele.SendOptions{ReplyMarkup: nil})
 	if err != nil {
 		return err
 	}
 	time.Sleep(time.Second * 2)
-	_, err = utils.Bot.Edit(message, fmt.Sprintf("%vКладу револьвер на стол и раскручиваю его.", prefix))
+	_, err = utils.Bot.Edit(message, prt.Sprintf("%vКладу револьвер на стол и раскручиваю его.", prefix))
 	if err != nil {
 		return err
 	}
@@ -41,21 +47,21 @@ func Accept(context tele.Context) error {
 	if utils.RandInt(1, 360)%2 == 0 {
 		player, victim = victim, player
 	}
-	_, err = utils.Bot.Edit(message, fmt.Sprintf("%vРевольвер останавливается на %v, первый ход за ним.", prefix, utils.MentionUser(victim)))
+	_, err = utils.Bot.Edit(message, prt.Sprintf("%vРевольвер останавливается на %v, первый ход за ним.", prefix, utils.MentionUser(victim)))
 	if err != nil {
 		return err
 	}
 	bullet := utils.RandInt(1, 6)
 	for i := 1; i <= bullet; i++ {
 		time.Sleep(time.Second * 2)
-		prefix = fmt.Sprintf("Дуэль! %v против %v, раунд %v:\n%v берёт револьвер, приставляет его к голове и...\n", utils.MentionUser(player), utils.MentionUser(victim), i, utils.MentionUser(victim))
+		prefix = prt.Sprintf("Дуэль! %v против %v, раунд %v:\n%v берёт револьвер, приставляет его к голове и...\n", utils.MentionUser(player), utils.MentionUser(victim), i, utils.MentionUser(victim))
 		_, err := utils.Bot.Edit(message, prefix)
 		if err != nil {
 			return err
 		}
 		if bullet != i {
 			time.Sleep(time.Second * 2)
-			_, err := utils.Bot.Edit(message, fmt.Sprintf("%v🍾 %v", prefix, fmt.Sprintf(success[utils.RandInt(0, len(success)-1)], utils.MentionUser(victim))))
+			_, err := utils.Bot.Edit(message, prt.Sprintf("%v🍾 %v", prefix, prt.Sprintf(success[utils.RandInt(0, len(success)-1)], utils.MentionUser(victim))))
 			if err != nil {
 				return err
 			}
@@ -72,17 +78,17 @@ func Accept(context tele.Context) error {
 		return err
 	}
 	if (PlayerChatMember.Role == "creator" || PlayerChatMember.Role == "administrator") && (VictimChatMember.Role == "creator" || VictimChatMember.Role == "administrator") {
-		_, err = utils.Bot.Edit(message, fmt.Sprintf("%vПуля отскакивает от головы %v и летит в голову %v.", prefix, utils.MentionUser(victim), utils.MentionUser(player)))
+		_, err = utils.Bot.Edit(message, prt.Sprintf("%vПуля отскакивает от головы %v и летит в голову %v.", prefix, utils.MentionUser(victim), utils.MentionUser(player)))
 		if err != nil {
 			return err
 		}
 		time.Sleep(time.Second * 2)
-		_, err = utils.Bot.Edit(message, fmt.Sprintf("%vПуля отскакивает от головы %v и летит в голову %v.", prefix, utils.MentionUser(player), utils.MentionUser(victim)))
+		_, err = utils.Bot.Edit(message, prt.Sprintf("%vПуля отскакивает от головы %v и летит в голову %v.", prefix, utils.MentionUser(player), utils.MentionUser(victim)))
 		if err != nil {
 			return err
 		}
 		time.Sleep(time.Second * 2)
-		_, err = utils.Bot.Edit(message, fmt.Sprintf("%vПуля отскакивает от головы %v и летит в мою голову... блять.", prefix, utils.MentionUser(victim)))
+		_, err = utils.Bot.Edit(message, prt.Sprintf("%vПуля отскакивает от головы %v и летит в мою голову... блять.", prefix, utils.MentionUser(victim)))
 		if err != nil {
 			return err
 		}
@@ -90,7 +96,7 @@ func Accept(context tele.Context) error {
 		return err
 	}
 	if utils.IsAdmin(victim.ID) {
-		_, err = utils.Bot.Edit(message, fmt.Sprintf("%v😈 Наводит револьвер на %v и стреляет.", prefix, utils.MentionUser(player)))
+		_, err = utils.Bot.Edit(message, prt.Sprintf("%v😈 Наводит револьвер на %v и стреляет.", prefix, utils.MentionUser(player)))
 		if err != nil {
 			return err
 		}
@@ -114,26 +120,26 @@ func Accept(context tele.Context) error {
 		if err != nil {
 			return err
 		}
-		_, err = utils.Bot.Edit(message, fmt.Sprintf("%v😈 Наводит револьвер на %v и стреляет.\nЯ хз как это объяснить, но %v победитель!\n%v отправился на респавн на %v мин.", prefix, utils.MentionUser(player), utils.MentionUser(victim), utils.MentionUser(player), duelist.Deaths))
+		_, err = utils.Bot.Edit(message, prt.Sprintf("%v😈 Наводит револьвер на %v и стреляет.\nЯ хз как это объяснить, но %v победитель!\n%v отправился на респавн на %d мин.", prefix, utils.MentionUser(player), utils.MentionUser(victim), utils.MentionUser(player), duelist.Deaths))
 		if err != nil {
 			return err
 		}
 		return err
 	}
 	if VictimChatMember.Role == "creator" || VictimChatMember.Role == "administrator" {
-		prefix = fmt.Sprintf("%v💥 %v", prefix, fmt.Sprintf(invincible[utils.RandInt(0, len(invincible)-1)], utils.MentionUser(victim)))
+		prefix = prt.Sprintf("%v💥 %v", prefix, prt.Sprintf(invincible[utils.RandInt(0, len(invincible)-1)], utils.MentionUser(victim)))
 		_, err := utils.Bot.Edit(message, prefix)
 		if err != nil {
 			return err
 		}
 		time.Sleep(time.Second * 2)
-		_, err = utils.Bot.Edit(message, fmt.Sprintf("%v\nПохоже, у нас ничья.", prefix))
+		_, err = utils.Bot.Edit(message, prt.Sprintf("%v\nПохоже, у нас ничья.", prefix))
 		if err != nil {
 			return err
 		}
 		return err
 	}
-	prefix = fmt.Sprintf("%v💥 %v", prefix, fmt.Sprintf(fail[utils.RandInt(0, len(fail)-1)], utils.MentionUser(victim)))
+	prefix = prt.Sprintf("%v💥 %v", prefix, prt.Sprintf(fail[utils.RandInt(0, len(fail)-1)], utils.MentionUser(victim)))
 	_, err = utils.Bot.Edit(message, prefix)
 	if err != nil {
 		return err
@@ -158,7 +164,7 @@ func Accept(context tele.Context) error {
 	if err != nil {
 		return err
 	}
-	_, err = utils.Bot.Edit(message, fmt.Sprintf("%v\nПобедитель дуэли: %v.\n%v отправился на респавн на %v мин.", prefix, utils.MentionUser(player), utils.MentionUser(victim), VictimDuelist.Deaths))
+	_, err = utils.Bot.Edit(message, prt.Sprintf("%v\nПобедитель дуэли: %v.\n%v отправился на респавн на %d мин.", prefix, utils.MentionUser(player), utils.MentionUser(victim), VictimDuelist.Deaths))
 	if err != nil {
 		return err
 	}
