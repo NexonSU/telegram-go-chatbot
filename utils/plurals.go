@@ -116,7 +116,7 @@ func init() {
 		log.Printf("Failed to created plurals template with error: %s\n Failing back to default format", err)
 	}
 
-	err = message.Set(language.Russian, "%v. %v - %d раз\n",
+	err = message.Set(language.Russian, "За всё время ты был пидором дня — %d раз!",
 		plural.Selectf(1, "%d",
 			plural.One, "За всё время ты был пидором дня — %d раз!",
 			plural.Few, "За всё время ты был пидором дня — %d раза!",
