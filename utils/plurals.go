@@ -44,7 +44,6 @@ func init() {
 
 	err = message.Set(language.Russian, "У тебя %d предупреждений.",
 		plural.Selectf(1, "%d",
-			plural.Zero, "У тебя нет предупреждений.",
 			plural.One, "У тебя %d предупреждение.",
 			plural.Few, "У тебя %d предупреждения.",
 			plural.Many, "У тебя %d предупреждений.",
@@ -77,7 +76,6 @@ func init() {
 
 	err = message.Set(language.Russian, "%d смертей",
 		plural.Selectf(1, "%d",
-			plural.Zero, "%d смертей",
 			plural.One, "%d смерть",
 			plural.Few, "%d смерти",
 			plural.Many, "%d смертей",
@@ -89,7 +87,6 @@ func init() {
 
 	err = message.Set(language.Russian, "%d побед",
 		plural.Selectf(1, "%d",
-			plural.Zero, "%d побед",
 			plural.One, "%d победа",
 			plural.Few, "%d победы",
 			plural.Many, "%d побед",
@@ -101,7 +98,6 @@ func init() {
 
 	err = message.Set(language.Russian, "%v. %v - %d раз\n",
 		plural.Selectf(3, "%d",
-			plural.Zero, "%v. %v - %d раз\n",
 			plural.One, "%v. %v - %d раз\n",
 			plural.Few, "%v. %v - %d раза\n",
 			plural.Many, "%v. %v - %d раз\n",
@@ -112,7 +108,6 @@ func init() {
 
 	err = message.Set(language.Russian, "В этом году ты был пидором дня — %d раз",
 		plural.Selectf(1, "%d",
-			plural.Zero, "В этом году ты был пидором дня — %d раз",
 			plural.One, "В этом году ты был пидором дня — %d раз",
 			plural.Few, "В этом году ты был пидором дня — %d раза",
 			plural.Many, "В этом году ты был пидором дня — %d раз",
@@ -123,7 +118,6 @@ func init() {
 
 	err = message.Set(language.Russian, "%v. %v - %d раз\n",
 		plural.Selectf(1, "%d",
-			plural.Zero, "За всё время ты был пидором дня — %d раз!",
 			plural.One, "За всё время ты был пидором дня — %d раз!",
 			plural.Few, "За всё время ты был пидором дня — %d раза!",
 			plural.Many, "За всё время ты был пидором дня — %d раз!",
@@ -134,7 +128,6 @@ func init() {
 
 	err = message.Set(language.Russian, "\nВсего участников — %d",
 		plural.Selectf(1, "%d",
-			plural.Zero, "\nВсего %d участников",
 			plural.One, "\nВсего %d участник",
 			plural.Few, "\nВсего %d участника",
 			plural.Many, "\nВсего %d участников",
