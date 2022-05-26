@@ -11,6 +11,9 @@ import (
 )
 
 func main() {
+	//Initializing Bot
+	utils.BotInit()
+
 	//limiting bot use
 	admin := utils.Bot.Group()
 	admin.Use(utils.Whitelist(append(utils.Config.Admins, utils.Config.SysAdmin)...))

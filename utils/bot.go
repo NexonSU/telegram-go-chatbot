@@ -17,13 +17,15 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-var Bot = botInit()
+var Bot tele.Bot
 var GotdClient *telegram.Client
 var GotdContext tdctx.Context
 
-func botInit() tele.Bot {
+// BotInit initializes Telegram Bot
+// Moved from auto init to manual init to make the code in utils package testable
+func BotInit() {
 	if Config.Token == "" {
-		log.Fatal("Telegram Bot token not found in config.json")
+		log.Fatal("Telegram bot token not found in config.json")
 	}
 	if Config.Chat == 0 {
 		log.Fatal("Chat username not found in config.json")
@@ -52,16 +54,16 @@ func botInit() tele.Bot {
 			AllowedUpdates: Config.AllowedUpdates,
 		}
 	}
-	var Bot, err = tele.NewBot(Settings)
+	var bot, err = tele.NewBot(Settings)
 	if err != nil {
 		log.Println(Config.BotApiUrl)
 		log.Fatal(err)
 	}
 	if Config.SysAdmin != 0 {
-		Bot.Send(tele.ChatID(Config.SysAdmin), fmt.Sprintf("%v has finished starting up.", MentionUser(Bot.Me)))
+		bot.Send(tele.ChatID(Config.SysAdmin), fmt.Sprintf("%v has finished starting up.", MentionUser(bot.Me)))
 	}
 
-	return *Bot
+	Bot = *bot
 }
 
 func gotdClientInit() error {
