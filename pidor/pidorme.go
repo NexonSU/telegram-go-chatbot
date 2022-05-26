@@ -22,7 +22,7 @@ func Pidorme(context tele.Context) error {
 	pidor.UserID = context.Sender().ID
 	utils.DB.Model(&utils.PidorStats{}).Where(pidor).Where("date BETWEEN ? AND ?", time.Date(time.Now().Year(), 1, 1, 0, 0, 0, 0, time.Local), time.Now()).Count(&countYear)
 	utils.DB.Model(&utils.PidorStats{}).Where(pidor).Count(&countAlltime)
-	thisYear := prt.Sprintln("В этом году ты был пидором дня — %d раз", countYear)
-	total := prt.Sprintln("За всё время ты был пидором дня — %d раз!", countAlltime)
+	thisYear := prt.Sprintf("В этом году ты был пидором дня — %d раз", countYear)
+	total := prt.Sprintf("За всё время ты был пидором дня — %d раз!", countAlltime)
 	return context.Reply(prt.Sprintf("%s\n%s", thisYear, total))
 }
