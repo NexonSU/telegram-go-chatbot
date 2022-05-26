@@ -1,7 +1,8 @@
 package pidor
 
 import (
-	"fmt"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	tele "gopkg.in/telebot.v3"
@@ -9,6 +10,10 @@ import (
 
 //Send top 10 pidors of all time on /pidorall
 func Pidorall(context tele.Context) error {
+	// prt will replace fmt package to format text according plurals defined in utils package
+	// If no plural rule matched it will be ignored and processed as usual formatting
+	prt := message.NewPrinter(language.Russian)
+
 	var i = 0
 	var username string
 	var count int64
@@ -20,9 +25,9 @@ func Pidorall(context tele.Context) error {
 			return err
 		}
 		i++
-		pidorall += fmt.Sprintf("%v. %v - %v раз(а)\n", i, username, count)
+		pidorall += prt.Sprintf("%v. %v - %d раз\n", i, username, count)
 	}
 	utils.DB.Model(utils.PidorList{}).Count(&count)
-	pidorall += fmt.Sprintf("\nВсего участников — %v", count)
+	pidorall += prt.Sprintf("\nВсего участников — %v", count)
 	return context.Reply(pidorall)
 }

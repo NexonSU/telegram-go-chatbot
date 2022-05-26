@@ -21,7 +21,7 @@ func Pidor(context tele.Context) error {
 	}
 	currentTime := time.Now().In(location)
 	if currentTime.Hour() >= 22 || currentTime.Hour() < 8 {
-		
+
 		return context.Reply("Команда /pidor доступна только с 8 часов утра до 22 часов вечера по МСК.")
 	}
 	if busy["pidor"] {

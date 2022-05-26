@@ -1,7 +1,8 @@
 package pidor
 
 import (
-	"fmt"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 	"strconv"
 	"time"
 
@@ -11,6 +12,10 @@ import (
 
 //Send top 10 pidors of year on /pidorstats
 func Pidorstats(context tele.Context) error {
+	// prt will replace fmt package to format text according plurals defined in utils package
+	// If no plural rule matched it will be ignored and processed as usual formatting
+	prt := message.NewPrinter(language.Russian)
+
 	var i = 0
 	var year = time.Now().Year()
 	var username string
@@ -35,9 +40,9 @@ func Pidorstats(context tele.Context) error {
 			return err
 		}
 		i++
-		pidorall += fmt.Sprintf("%v. %v - %v раз(а)\n", i, username, count)
+		pidorall += prt.Sprintf("%v. %v - %d раз\n", i, username, count)
 	}
 	utils.DB.Model(utils.PidorList{}).Count(&count)
-	pidorall += fmt.Sprintf("\nВсего участников — %v", count)
+	pidorall += prt.Sprintf("\nВсего участников — %d", count)
 	return context.Reply(pidorall)
 }
