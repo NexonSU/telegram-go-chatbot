@@ -131,6 +131,7 @@ func Blessing(context tele.Context) error {
 		"приставил пистолет к виску и крикнул PERUSONA",
 		"приставил пистолет к виску и попытался призвать персону",
 		"ушёл искать 228922",
+		"Ⓘ Данное сообщение доступно только для пользователей с подпиской Telegram Premium",
 	}
 	burst++
 	if time.Now().Unix() > firstSuicide+120 {
