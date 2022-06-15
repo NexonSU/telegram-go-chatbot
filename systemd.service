@@ -1,0 +1,16 @@
+[Unit]
+Description=Chat Telegram bot
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+Type=simple
+ExecStart=telegram-go-chatbot
+Restart=on-failure
+RestartSec=2
+TimeoutStopSec=5
+User=telegram-go-chatbot
+WorkingDirectory=/home/telegram-go-chatbot
+
+[Install]
+WantedBy=multi-user.target
