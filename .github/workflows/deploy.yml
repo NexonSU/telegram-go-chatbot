@@ -10,9 +10,12 @@ jobs:
   Deploy:
     runs-on: bots
     steps:
-    - run: sudo useradd zavtrachat_bot
-    - run: sudo mkdir /home/zavtrachat_bot
+    - run: sudo useradd -m zavtrachat_bot &>/dev/null
+    - run: pwd
+    - run: ls
     - run: cd ${GITHUB_WORKSPACE}
+    - run: pwd
+    - run: ls
     - run: sudo cp -rfu checkpoint /home/zavtrachat_bot/
     - run: sudo cp -rfu commands /home/zavtrachat_bot/
     - run: sudo cp -rfu duel /home/zavtrachat_bot/
