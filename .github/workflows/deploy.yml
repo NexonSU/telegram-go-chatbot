@@ -20,6 +20,7 @@ jobs:
 		- run: sudo cp -rfu stats /home/zavtrachat_bot/
 		- run: sudo cp -rfu utils /home/zavtrachat_bot/
 		- run: sudo cp -fu go.mod /home/zavtrachat_bot/
+		- run: sudo cp -fu go.sum /home/zavtrachat_bot/
 		- run: sudo cp -fu main.go /home/zavtrachat_bot/
 		- run: sudo cp -fu zavtrachat_bot.service /lib/systemd/system/
 		- run: sudo chown -R zavtrachat_bot /home/zavtrachat_bot
