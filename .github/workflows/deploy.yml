@@ -23,7 +23,7 @@ jobs:
       run: sudo cp -rfu files /home/telegram-go-chatbot/
     - name: Create systemd service
       run: |
-        sudo cp -fu systemd.service /lib/systemd/system/
+        sudo cp -fu systemd.service /lib/systemd/system/telegram-go-chatbot.service
         sudo systemctl daemon-reload
     - name: Restarting telegram-go-chatbot service
       run: sudo systemctl restart telegram-go-chatbot
