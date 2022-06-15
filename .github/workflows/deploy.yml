@@ -1,29 +1,29 @@
 name: Deploy
 on:
-	push:
-		branches:
-		- main
-	pull_request:
-		branches:
-		- main
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
 jobs:
-	Deploy:
-		runs-on: bots
-		steps:
-		- run: sudo useradd zavtrachat_bot
-		- run: sudo mkdir /home/zavtrachat_bot
-		- run: sudo cp -rfu checkpoint /home/zavtrachat_bot/
-		- run: sudo cp -rfu commands /home/zavtrachat_bot/
-		- run: sudo cp -rfu duel /home/zavtrachat_bot/
-		- run: sudo cp -rfu files /home/zavtrachat_bot/
-		- run: sudo cp -rfu pidor /home/zavtrachat_bot/
-		- run: sudo cp -rfu stats /home/zavtrachat_bot/
-		- run: sudo cp -rfu utils /home/zavtrachat_bot/
-		- run: sudo cp -fu go.mod /home/zavtrachat_bot/
-		- run: sudo cp -fu go.sum /home/zavtrachat_bot/
-		- run: sudo cp -fu main.go /home/zavtrachat_bot/
-		- run: sudo cp -fu zavtrachat_bot.service /lib/systemd/system/
-		- run: sudo chown -R zavtrachat_bot /home/zavtrachat_bot
-		- run: sudo chmod -R 775 /home/zavtrachat_bot
-		- run: sudo systemctl daemon-reload
-		- run: sudo systemctl restart zavtrachat_bot
+  Deploy:
+    runs-on: bots
+    steps:
+    - run: sudo useradd zavtrachat_bot
+    - run: sudo mkdir /home/zavtrachat_bot
+    - run: sudo cp -rfu checkpoint /home/zavtrachat_bot/
+    - run: sudo cp -rfu commands /home/zavtrachat_bot/
+    - run: sudo cp -rfu duel /home/zavtrachat_bot/
+    - run: sudo cp -rfu files /home/zavtrachat_bot/
+    - run: sudo cp -rfu pidor /home/zavtrachat_bot/
+    - run: sudo cp -rfu stats /home/zavtrachat_bot/
+    - run: sudo cp -rfu utils /home/zavtrachat_bot/
+    - run: sudo cp -fu go.mod /home/zavtrachat_bot/
+    - run: sudo cp -fu go.sum /home/zavtrachat_bot/
+    - run: sudo cp -fu main.go /home/zavtrachat_bot/
+    - run: sudo cp -fu zavtrachat_bot.service /lib/systemd/system/
+    - run: sudo chown -R zavtrachat_bot /home/zavtrachat_bot
+    - run: sudo chmod -R 775 /home/zavtrachat_bot
+    - run: sudo systemctl daemon-reload
+    - run: sudo systemctl restart zavtrachat_bot
