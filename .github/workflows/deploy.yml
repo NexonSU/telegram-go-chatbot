@@ -11,6 +11,7 @@ jobs:
     runs-on: bots
     steps:
     - run: sudo useradd -m zavtrachat_bot &>/dev/null
+      continue-on-error: true
     - run: pwd
     - run: ls
     - run: cd ${GITHUB_WORKSPACE}
