@@ -12,6 +12,7 @@ jobs:
     steps:
     - run: sudo useradd zavtrachat_bot
     - run: sudo mkdir /home/zavtrachat_bot
+    - run: cd ${GITHUB_WORKSPACE}
     - run: sudo cp -rfu checkpoint /home/zavtrachat_bot/
     - run: sudo cp -rfu commands /home/zavtrachat_bot/
     - run: sudo cp -rfu duel /home/zavtrachat_bot/
