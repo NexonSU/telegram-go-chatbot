@@ -1,10 +1,11 @@
 package commands
 
 import (
-	"golang.org/x/text/language"
-	"golang.org/x/text/message"
 	"math/rand"
 	"time"
+
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	tele "gopkg.in/telebot.v3"
@@ -12,6 +13,7 @@ import (
 )
 
 var firstSuicide int64
+var lastSuicide int64
 var burst int
 var lastVideoSent int64
 
@@ -49,7 +51,12 @@ func Blessing(context tele.Context) error {
 	duration := utils.RandInt(1, duelist.Deaths+1)
 	duration += 10
 	prependText := ""
-	if utils.RandInt(0, 100) >= 90 {
+	additionalChance := int(time.Now().Unix() - lastSuicide)
+	if additionalChance > 3600 {
+		additionalChance = 3600
+	}
+	additionalChance = (3600 - additionalChance) / 360
+	if utils.RandInt(0, 100) >= 90-additionalChance {
 		duration = duration * 10
 		prependText = "критически "
 	}
@@ -146,6 +153,7 @@ func Blessing(context tele.Context) error {
 		firstSuicide = time.Now().Unix()
 		burst = 1
 	}
+	lastSuicide = time.Now().Unix()
 	if burst > 3 && time.Now().Unix() > lastVideoSent+3600 {
 		lastVideoSent = time.Now().Unix()
 		return context.Send(&tele.Video{
