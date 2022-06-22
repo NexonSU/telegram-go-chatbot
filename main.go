@@ -1,13 +1,13 @@
 package main
 
 import (
+	tele "github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/checkpoint"
 	"github.com/NexonSU/telegram-go-chatbot/commands"
 	"github.com/NexonSU/telegram-go-chatbot/duel"
 	"github.com/NexonSU/telegram-go-chatbot/pidor"
 	"github.com/NexonSU/telegram-go-chatbot/stats"
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	tele "gopkg.in/telebot.v3"
 )
 
 func main() {

@@ -3,10 +3,10 @@ package commands
 import (
 	"bytes"
 
+	tele "github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	"github.com/chai2010/webp"
 	"github.com/fogleman/gg"
-	tele "gopkg.in/telebot.v3"
 )
 
 //Write username on bonk picture and send to target

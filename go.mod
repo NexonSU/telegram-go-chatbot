@@ -3,6 +3,7 @@ module github.com/NexonSU/telegram-go-chatbot
 go 1.17
 
 require (
+	github.com/NexonSU/telebot v0.0.0-20220622192058-1fb6fd86661c
 	github.com/arran4/golang-ical v0.0.0-20220220103556-c519bf07e7e6
 	github.com/chai2010/webp v1.1.1
 	github.com/dustin/go-humanize v1.0.0
@@ -16,7 +17,6 @@ require (
 	github.com/u2takey/ffmpeg-go v0.4.0
 	github.com/valyala/fastjson v1.6.3
 	golang.org/x/text v0.3.7
-	gopkg.in/telebot.v3 v3.0.0
 	gorm.io/driver/sqlite v1.3.1
 	gorm.io/gorm v1.23.1
 	mvdan.cc/xurls/v2 v2.3.0

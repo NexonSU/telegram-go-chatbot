@@ -1,6 +1,6 @@
 package commands
 
-import tele "gopkg.in/telebot.v3"
+import tele "github.com/NexonSU/telebot"
 
 //Send shrug in chat on /shrug
 func Shrug(context tele.Context) error {

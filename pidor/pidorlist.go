@@ -3,8 +3,8 @@ package pidor
 import (
 	"strconv"
 
+	tele "github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	tele "gopkg.in/telebot.v3"
 )
 
 //List add pidors from DB on /pidorlist

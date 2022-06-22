@@ -1,6 +1,6 @@
 package checkpoint
 
-import tele "gopkg.in/telebot.v3"
+import tele "github.com/NexonSU/telebot"
 
 func ChatMemberUpdate(context tele.Context) error {
 	Old := context.ChatMember().OldChatMember

@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"reflect"
 
+	tele "github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	"github.com/gotd/td/telegram/downloader"
 	"github.com/gotd/td/tg"
-	tele "gopkg.in/telebot.v3"
 )
 
 var channel *tg.Channel

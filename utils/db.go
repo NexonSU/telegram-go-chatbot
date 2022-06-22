@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	tele "gopkg.in/telebot.v3"
+	tele "github.com/NexonSU/telebot"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"

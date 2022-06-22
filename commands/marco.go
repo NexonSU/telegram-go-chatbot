@@ -1,6 +1,6 @@
 package commands
 
-import tele "gopkg.in/telebot.v3"
+import tele "github.com/NexonSU/telebot"
 
 //Reply "Polo!" on "marco"
 func Marco(context tele.Context) error {

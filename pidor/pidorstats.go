@@ -1,13 +1,14 @@
 package pidor
 
 import (
-	"golang.org/x/text/language"
-	"golang.org/x/text/message"
 	"strconv"
 	"time"
 
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
+
+	tele "github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	tele "gopkg.in/telebot.v3"
 )
 
 //Send top 10 pidors of year on /pidorstats

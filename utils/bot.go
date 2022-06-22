@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
+	tele "github.com/NexonSU/telebot"
 	"github.com/gotd/contrib/bg"
 	"github.com/gotd/td/telegram"
-	tele "gopkg.in/telebot.v3"
 	"gorm.io/gorm/clause"
 )
 

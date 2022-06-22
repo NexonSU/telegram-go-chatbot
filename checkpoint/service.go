@@ -6,8 +6,8 @@ import (
 	"time"
 	"unicode/utf8"
 
+	tele "github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	tele "gopkg.in/telebot.v3"
 )
 
 var welcomeMessageText = ""

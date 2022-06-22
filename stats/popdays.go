@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"time"
 
+	tele "github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
-	tele "gopkg.in/telebot.v3"
 )
 
 func PopDaysBarChart(from time.Time, to time.Time, context tele.Context) *charts.Bar {

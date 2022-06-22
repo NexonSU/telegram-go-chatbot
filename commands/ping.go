@@ -1,6 +1,6 @@
 package commands
 
-import tele "gopkg.in/telebot.v3"
+import tele "github.com/NexonSU/telebot"
 
 //Reply "Pong!" on /ping
 func Ping(context tele.Context) error {

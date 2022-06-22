@@ -5,9 +5,9 @@ import (
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 
+	tele "github.com/NexonSU/telebot"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
-	tele "gopkg.in/telebot.v3"
 	"gorm.io/gorm/clause"
 )
 
