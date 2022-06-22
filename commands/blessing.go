@@ -56,9 +56,13 @@ func Blessing(context tele.Context) error {
 		additionalChance = 3600
 	}
 	additionalChance = (3600 - additionalChance) / 360
+	if context.Sender().IsPremium {
+		duration = duration * 10
+		prependText += "премиально "
+	}
 	if utils.RandInt(0, 100) >= 90-additionalChance {
 		duration = duration * 10
-		prependText = "критически "
+		prependText += "критически "
 	}
 	ChatMember.RestrictedUntil = time.Now().Add(time.Second * time.Duration(60*duration)).Unix()
 	err = utils.Bot.Restrict(context.Chat(), ChatMember)
