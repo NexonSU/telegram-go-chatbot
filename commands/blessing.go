@@ -57,7 +57,7 @@ func Blessing(context tele.Context) error {
 	}
 	additionalChance = (3600 - additionalChance) / 360
 	if context.Sender().IsPremium {
-		duration = duration * 10
+		duration = duration * 2
 		prependText += "премиально "
 	}
 	if utils.RandInt(0, 100) >= 90-additionalChance {
