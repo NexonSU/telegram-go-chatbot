@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -149,126 +148,16 @@ func GetUserFromDB(findstring string) (tele.User, error) {
 	return user, err
 }
 
-type ForwardHistory struct {
-	ChannelMessageID int
-	ChatMessageID    int
-}
-type ForwardMesssage struct {
-	AlbumID       string
-	Caption       string
-	History       []ForwardHistory
-	StreamHistory []ForwardHistory
-}
-
-var Forward ForwardMesssage
-var AlbumMessages []*tele.Message
-
-//Repost channel post to chat
-func Repost(context tele.Context) error {
-	var err error
-	var err2 error
-	if context.Message().AlbumID != "" {
-		AlbumMessages = append(AlbumMessages, context.Message())
-		if context.Message().Caption != "" {
-			Forward.Caption = context.Message().Caption
-		}
-		if context.Message().AlbumID != Forward.AlbumID {
-			Forward.AlbumID = context.Message().AlbumID
-			time.Sleep(5 * time.Second)
-			sort.SliceStable(AlbumMessages, func(i, j int) bool {
-				return AlbumMessages[i].ID < AlbumMessages[j].ID
-			})
-			var Album []tele.Inputtable
-			for i, message := range AlbumMessages {
-				switch {
-				case context.Message().Audio != nil:
-					message.Audio.Caption = ""
-					if i == 0 {
-						message.Audio.Caption = Forward.Caption
-					}
-					Album = append(Album, message.Audio)
-				case context.Message().Document != nil:
-					message.Document.Caption = ""
-					if i == 0 {
-						message.Document.Caption = Forward.Caption
-					}
-					Album = append(Album, message.Document)
-				case context.Message().Photo != nil:
-					message.Photo.Caption = ""
-					if i == 0 {
-						message.Photo.Caption = Forward.Caption
-					}
-					Album = append(Album, message.Photo)
-				case context.Message().Video != nil:
-					message.Video.Caption = ""
-					if i == 0 {
-						message.Video.Caption = Forward.Caption
-					}
-					Album = append(Album, message.Video)
-				}
-			}
-			ChatMessage, err := Bot.SendAlbum(&tele.Chat{ID: Config.Chat}, Album)
-			for i, message := range AlbumMessages {
-				Forward.History = append(Forward.History, ForwardHistory{message.ID, ChatMessage[i].ID})
-			}
-			Forward.AlbumID = ""
-			AlbumMessages = []*tele.Message{}
-			Forward.Caption = ""
-			return err
-		}
-		return nil
-	}
-
-	var ChatMessage *tele.Message
-	ChatMessage, err = Bot.Copy(&tele.Chat{ID: Config.Chat}, context.Message())
-	Forward.History = append(Forward.History, ForwardHistory{context.Message().ID, ChatMessage.ID})
+//Forward channel post to chat
+func ForwardPost(context tele.Context) error {
+	_, err := Bot.Forward(&tele.Chat{ID: Config.Chat}, context.Message())
 	if Config.StreamChannel != 0 && strings.Contains(context.Text(), "zavtracast/live") {
-		ChatMessage, err2 = Bot.Copy(&tele.Chat{ID: Config.StreamChannel}, context.Message())
-		Forward.StreamHistory = append(Forward.StreamHistory, ForwardHistory{context.Message().ID, ChatMessage.ID})
+		_, err = Bot.Forward(&tele.Chat{ID: Config.StreamChannel}, context.Message())
 	}
-	if err2 != nil {
-		err = err2
+	if err != nil {
+		return err
 	}
-	return err
-}
-
-//Edit reposted post
-func EditRepost(context tele.Context) error {
-	var err error
-	var err2 error
-	for _, ForwardHistory := range Forward.History {
-		if ForwardHistory.ChannelMessageID == context.Message().ID {
-			if context.Message().Media() != nil {
-				_, err = Bot.Edit(&tele.Message{ID: ForwardHistory.ChatMessageID, Chat: &tele.Chat{ID: Config.Chat}}, context.Message().Media())
-				_, err2 = Bot.EditCaption(&tele.Message{ID: ForwardHistory.ChatMessageID, Chat: &tele.Chat{ID: Config.Chat}}, GetHtmlText(*context.Message()))
-			} else {
-				_, err = Bot.Edit(&tele.Message{ID: ForwardHistory.ChatMessageID, Chat: &tele.Chat{ID: Config.Chat}}, GetHtmlText(*context.Message()))
-			}
-		}
-	}
-	if Config.StreamChannel != 0 && strings.Contains(context.Text(), "zavtracast/live") {
-		forwarded := false
-		for _, ForwardHistory := range Forward.StreamHistory {
-			if ForwardHistory.ChannelMessageID == context.Message().ID {
-				forwarded = true
-				if context.Message().Media() != nil {
-					_, err = Bot.Edit(&tele.Message{ID: ForwardHistory.ChatMessageID, Chat: &tele.Chat{ID: Config.StreamChannel}}, context.Message().Media())
-					_, err2 = Bot.EditCaption(&tele.Message{ID: ForwardHistory.ChatMessageID, Chat: &tele.Chat{ID: Config.StreamChannel}}, GetHtmlText(*context.Message()))
-				} else {
-					_, err = Bot.Edit(&tele.Message{ID: ForwardHistory.ChatMessageID, Chat: &tele.Chat{ID: Config.StreamChannel}}, GetHtmlText(*context.Message()))
-				}
-			}
-		}
-		if !forwarded {
-			var ChatMessage *tele.Message
-			ChatMessage, err2 = Bot.Copy(&tele.Chat{ID: Config.StreamChannel}, context.Message())
-			Forward.StreamHistory = append(Forward.StreamHistory, ForwardHistory{context.Message().ID, ChatMessage.ID})
-		}
-	}
-	if err2 != nil {
-		err = err2
-	}
-	return err
+	return nil
 }
 
 //Remove message

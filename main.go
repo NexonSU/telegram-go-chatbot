@@ -100,8 +100,7 @@ func main() {
 	chats.Handle(&duel.DenyButton, duel.Deny)
 
 	//repost channel post to chat
-	chann.Handle(tele.OnChannelPost, utils.Repost)
-	chann.Handle(tele.OnEditedChannelPost, utils.EditRepost)
+	chann.Handle(tele.OnChannelPost, utils.ForwardPost)
 
 	//spam filter in comment chat
 	comms.Handle(tele.OnText, checkpoint.SpamFilter)
