@@ -51,6 +51,11 @@ func PopDaysBarChart(from time.Time, to time.Time, context tele.Context) *charts
 		Messages = append(Messages, opts.BarData{Value: MessagesCount, Name: fmt.Sprintf("%v", MessagesCount)})
 	}
 
+	if len(Weekdays) == 0 {
+		Weekdays = append(Weekdays, "NULL")
+		Messages = append(Messages, opts.BarData{Value: 0, Name: fmt.Sprintf("%v", 0)})
+	}
+
 	Weekdays = append(Weekdays, Weekdays[0])
 	Messages = append(Messages, Messages[0])
 	Weekdays = Weekdays[1:]
