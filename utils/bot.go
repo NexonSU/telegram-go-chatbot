@@ -64,6 +64,17 @@ func BotInit() {
 	}
 
 	Bot = *bot
+
+	Bot.OnError = ErrorReporting
+
+	Bot.Poller = tele.NewMiddlewarePoller(Bot.Poller, func(upd *tele.Update) bool {
+		gatherData(upd)
+		checkPoint(upd)
+
+		return true
+	})
+
+	go gotdClientInit()
 }
 
 func gotdClientInit() error {
@@ -221,17 +232,4 @@ func checkPoint(update *tele.Update) error {
 		}
 	}
 	return nil
-}
-
-func init() {
-	Bot.OnError = ErrorReporting
-
-	Bot.Poller = tele.NewMiddlewarePoller(Bot.Poller, func(upd *tele.Update) bool {
-		gatherData(upd)
-		checkPoint(upd)
-
-		return true
-	})
-
-	go gotdClientInit()
 }
