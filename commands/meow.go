@@ -3,6 +3,7 @@ package commands
 import (
 	"bytes"
 	"reflect"
+	"strings"
 
 	tele "github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/utils"
@@ -47,11 +48,24 @@ func Meow(context tele.Context) error {
 		}
 		messageMediaClass, check := mc.(*tg.Message).GetMedia()
 		if check && reflect.TypeOf(messageMediaClass) == reflect.TypeOf(&tg.MessageMediaDocument{}) {
-			document, _ := messageMediaClass.(*tg.MessageMediaDocument).GetDocument()
-			docFile, _ := document.AsNotEmpty()
-			fileName, _ := docFile.MapAttributes().AsDocumentAttributeFilename().First()
+			document, check := messageMediaClass.(*tg.MessageMediaDocument).GetDocument()
+			if !check {
+				continue
+			}
+			docFile, check := document.AsNotEmpty()
+			if !check {
+				continue
+			}
+			fileNameObj, check := docFile.MapAttributes().AsDocumentAttributeFilename().First()
+			filename := fileNameObj.FileName
+			if !check {
+				filename = strings.ReplaceAll(docFile.MimeType, "/", ".")
+			}
+			if docFile.MimeType == "video/quicktime" {
+				continue
+			}
 			downloader.NewDownloader().Download(api, docFile.AsInputDocumentFileLocation()).Stream(utils.GotdContext, &buf)
-			return context.Reply(&tele.Document{FileName: fileName.FileName, File: tele.File{FileReader: &buf}})
+			return context.Reply(&tele.Document{FileName: filename, File: tele.File{FileReader: &buf}})
 		} else {
 			continue
 		}
