@@ -46,7 +46,7 @@ func RemoveWord(context tele.Context) error {
 func Stats(context tele.Context) error {
 	selected := "Stats"
 	graphs := []string{"Activity", "MostActiveToday", "PopDays", "PopHours", "PopWords", "TopUsers"}
-	if len(context.Args()) > 1 {
+	if len(context.Args()) > 0 {
 		for _, graph := range graphs {
 			if strings.EqualFold(graph, context.Args()[0]) {
 				selected = graph
