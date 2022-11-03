@@ -99,7 +99,8 @@ func Stats(context tele.Context) error {
 	if err := chromedp.Run(ctx, chromedp.Tasks{
 		chromedp.Emulate(device.Reset),
 		chromedp.Navigate("file:///" + filepath),
-		chromedp.EmulateViewport(width, 0, chromedp.EmulateScale(1.9)),
+		chromedp.EmulateViewport(width, 0),
+		chromedp.Sleep(time.Second),
 		chromedp.FullScreenshot(&buf, 100),
 	}); err != nil {
 		return err
