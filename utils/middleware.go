@@ -1,7 +1,7 @@
 package utils
 
 import (
-	tele "github.com/NexonSU/telebot"
+	tele "gopkg.in/telebot.v3"
 )
 
 type RestrictConfig struct {

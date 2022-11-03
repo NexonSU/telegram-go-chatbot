@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	tele "github.com/NexonSU/telebot"
 	"github.com/gotd/contrib/bg"
 	"github.com/gotd/td/telegram"
+	tele "gopkg.in/telebot.v3"
 	"gorm.io/gorm/clause"
 )
 
@@ -34,6 +34,7 @@ func BotInit() {
 		URL:       Config.BotApiUrl,
 		Token:     Config.Token,
 		ParseMode: tele.ModeHTML,
+		OnError:   ErrorReporting,
 		Poller: &tele.LongPoller{
 			Timeout:        10 * time.Second,
 			AllowedUpdates: Config.AllowedUpdates,
@@ -64,8 +65,6 @@ func BotInit() {
 	}
 
 	Bot = *bot
-
-	Bot.OnError = ErrorReporting
 
 	Bot.Poller = tele.NewMiddlewarePoller(Bot.Poller, func(upd *tele.Update) bool {
 		gatherData(upd)

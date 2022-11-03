@@ -1,6 +1,6 @@
 package pidor
 
-import tele "github.com/NexonSU/telebot"
+import tele "gopkg.in/telebot.v3"
 
 //Send pidor rules on /pidorules
 func Pidorules(context tele.Context) error {

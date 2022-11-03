@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	tele "github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/utils"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Adds nope text to DB

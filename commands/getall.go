@@ -1,8 +1,8 @@
 package commands
 
 import (
-	tele "github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/utils"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Send list of Gets to user on /getall

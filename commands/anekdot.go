@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	tele "github.com/NexonSU/telebot"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Send text in chat on /say

@@ -10,7 +10,7 @@ import (
 	"time"
 	"unicode/utf16"
 
-	tele "github.com/NexonSU/telebot"
+	tele "gopkg.in/telebot.v3"
 )
 
 var WelcomeMessageID int

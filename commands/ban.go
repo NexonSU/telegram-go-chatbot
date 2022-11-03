@@ -3,8 +3,8 @@ package commands
 import (
 	"fmt"
 
-	tele "github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/utils"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Ban user on /ban

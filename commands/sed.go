@@ -3,7 +3,7 @@ package commands
 import (
 	"strings"
 
-	tele "github.com/NexonSU/telebot"
+	tele "gopkg.in/telebot.v3"
 )
 
 // Sed Replace text in target message

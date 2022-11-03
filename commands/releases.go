@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	tele "github.com/NexonSU/telebot"
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	ical "github.com/arran4/golang-ical"
+	tele "gopkg.in/telebot.v3"
 )
 
 //Send releases of 2 weeks on /releases

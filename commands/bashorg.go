@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	tele "github.com/NexonSU/telebot"
+	tele "gopkg.in/telebot.v3"
 )
 
 var lastBash string
