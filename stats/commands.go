@@ -2,15 +2,26 @@ package stats
 
 import (
 	"bytes"
+	cntx "context"
 	"fmt"
-	"strconv"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
+	"github.com/chromedp/chromedp"
+	"github.com/chromedp/chromedp/device"
 	"github.com/go-echarts/go-echarts/v2/components"
 	tele "gopkg.in/telebot.v3"
 )
+
+var ctx cntx.Context
+
+func init() {
+	ctx, _ = chromedp.NewContext(
+		cntx.Background(),
+	)
+}
 
 func RemoveWord(context tele.Context) error {
 	if len(context.Args()) != 1 {
@@ -35,20 +46,9 @@ func RemoveWord(context tele.Context) error {
 func Stats(context tele.Context) error {
 	selected := "Stats"
 	graphs := []string{"Activity", "MostActiveToday", "PopDays", "PopHours", "PopWords", "TopUsers"}
-	days := 30
-	if len(context.Args()) >= 1 {
-		var err error
-		days, err = strconv.Atoi(context.Args()[0])
-		if err != nil {
-			return context.Reply("Ошибка определения дней.")
-		}
-		if days == 2077 {
-			return context.Reply(&tele.Video{File: tele.File{FileID: "BAACAgIAAx0CRXO-MQADWWB4LQABzrOqWPkq-JXIi4TIixY4dwACPw4AArBgwUt5sRu-_fDR5x4E"}})
-		}
-	}
-	if len(context.Args()) == 2 {
+	if len(context.Args()) > 1 {
 		for _, graph := range graphs {
-			if strings.EqualFold(graph, context.Args()[1]) {
+			if strings.EqualFold(graph, context.Args()[0]) {
 				selected = graph
 			}
 		}
@@ -56,10 +56,13 @@ func Stats(context tele.Context) error {
 			return context.Reply("Доступные графики:\n<pre>" + strings.Join(graphs, ", ") + "</pre>")
 		}
 	}
-	days = days * -1
-	from := time.Now().AddDate(0, 0, days)
+	from := time.Now().AddDate(0, -1, 0)
 	to := time.Now().Add(time.Hour * 24)
-	f := new(bytes.Buffer)
+	filename := fmt.Sprintf("%v_%v_%v-%v.html", selected, context.Chat().ID, from.Format("02.01.2006"), time.Now().Format("02.01.2006"))
+	filepath := os.TempDir() + "/" + filename
+	f, _ := os.Create(filepath)
+
+	width := int64(900)
 
 	switch selected {
 	case "Activity":
@@ -75,6 +78,7 @@ func Stats(context tele.Context) error {
 	case "TopUsers":
 		TopUsersBarChart(from, to, context).Render(f)
 	case "Stats":
+		width = 1900
 		page := components.NewPage()
 		page.SetLayout(components.PageFlexLayout)
 		page.PageTitle = fmt.Sprintf("%v stats since %v to %v", context.Chat().Title, from.Format("02.01.2006"), to.Format("02.01.2006"))
@@ -91,10 +95,17 @@ func Stats(context tele.Context) error {
 	default:
 		return nil
 	}
-	return context.Reply(&tele.Document{
-		File: tele.File{
-			FileReader: f,
-		},
-		FileName: fmt.Sprintf("%v %v %v - %v.html", selected, context.Chat().Username, from.Format("02.01.2006"), time.Now().Format("02.01.2006")),
-	})
+	var buf []byte
+	if err := chromedp.Run(ctx, chromedp.Tasks{
+		chromedp.Emulate(device.Reset),
+		chromedp.Navigate("file:///" + filepath),
+		chromedp.EmulateViewport(width, 0, chromedp.EmulateScale(1.9)),
+		chromedp.FullScreenshot(&buf, 100),
+	}); err != nil {
+		return err
+	}
+
+	os.Remove(filepath)
+
+	return context.Reply(&tele.Photo{File: tele.File{FileReader: bytes.NewBuffer(buf)}})
 }

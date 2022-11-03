@@ -40,6 +40,7 @@ func PopHoursBarChart(from time.Time, to time.Time, context tele.Context) *chart
 		charts.WithInitializationOpts(opts.Initialization{PageTitle: fmt.Sprintf("%v Popular Hours since %v to %v", context.Chat().Title, from.Format("02.01.2006"), to.Format("02.01.2006")), Theme: "shine"}),
 		charts.WithTitleOpts(opts.Title{
 			Title: "Popular hours",
+			Left:  "center",
 		}),
 		charts.WithTooltipOpts(opts.Tooltip{
 			Show:    true,

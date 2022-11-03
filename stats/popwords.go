@@ -38,6 +38,7 @@ func PopWordsWcChart(from time.Time, to time.Time, context tele.Context) *charts
 		charts.WithTooltipOpts(opts.Tooltip{Show: true}),
 		charts.WithTitleOpts(opts.Title{
 			Title: "Popular words",
+			Left:  "center",
 		}))
 
 	wc.AddSeries("Popular words", WCData).

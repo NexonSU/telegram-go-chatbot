@@ -48,11 +48,11 @@ func UserActivityLineChart(from time.Time, to time.Time, context tele.Context) *
 	line := charts.NewLine()
 	// set some global options like Title/Legend/ToolTip or anything else
 	line.SetGlobalOptions(
-		charts.WithDataZoomOpts(opts.DataZoom{XAxisIndex: 0, Start: 0, End: 100, Type: "slider"}),
-		charts.WithLegendOpts(opts.Legend{Show: true}),
+		charts.WithLegendOpts(opts.Legend{Show: true, Left: "50"}),
 		charts.WithInitializationOpts(opts.Initialization{PageTitle: fmt.Sprintf("%v Chat Activity since %v to %v", context.Chat().Title, from.Format("02.01.2006"), to.Format("02.01.2006")), Theme: "shine"}),
 		charts.WithTitleOpts(opts.Title{
 			Title: "User activity",
+			Left:  "center",
 		}),
 		charts.WithYAxisOpts(opts.YAxis{
 			Name: "Messages",

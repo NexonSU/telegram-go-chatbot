@@ -68,6 +68,7 @@ func PopDaysBarChart(from time.Time, to time.Time, context tele.Context) *charts
 		charts.WithInitializationOpts(opts.Initialization{PageTitle: fmt.Sprintf("%v Popular Days of Week since %v to %v", context.Chat().Title, from.Format("02.01.2006"), to.Format("02.01.2006")), Theme: "shine"}),
 		charts.WithTitleOpts(opts.Title{
 			Title: "Popular days of week",
+			Left:  "center",
 		}),
 		charts.WithTooltipOpts(opts.Tooltip{
 			Show:    true,

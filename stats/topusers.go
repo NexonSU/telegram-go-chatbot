@@ -47,14 +47,10 @@ func TopUsersBarChart(from time.Time, to time.Time, context tele.Context) *chart
 		charts.WithInitializationOpts(opts.Initialization{PageTitle: fmt.Sprintf("%v Top Users since %v to %v", context.Chat().Title, from.Format("02.01.2006"), to.Format("02.01.2006")), Theme: "shine"}),
 		charts.WithTitleOpts(opts.Title{
 			Title: "Top users",
+			Left:  "center",
 		}),
 		charts.WithTooltipOpts(opts.Tooltip{
-			Show:    true,
-			Trigger: "axis",
-			AxisPointer: &opts.AxisPointer{
-				Type: "cross",
-				Snap: true,
-			},
+			Show: true,
 		}),
 		charts.WithXAxisOpts(opts.XAxis{
 			Type: "value",
