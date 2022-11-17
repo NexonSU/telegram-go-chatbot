@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 
@@ -31,11 +30,11 @@ func GenerateMaps() error {
 	client := cmc.NewClient(&cmc.Config{ProAPIKey: utils.Config.CurrencyKey})
 	CryptoMap, err = client.Cryptocurrency.Map(&cmc.MapOptions{ListingStatus: "active,untracked"})
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
 	FiatMap, err = client.Fiat.Map(&cmc.FiatMapOptions{IncludeMetals: true})
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
 	JokeMap = append(JokeMap, JokeMapStruct{symbol: "COC", name: "Cup Of Coffee", amount: 300.0})
 	JokeMap = append(JokeMap, JokeMapStruct{symbol: "DSHK", name: "Doshirak", amount: 50.0})
@@ -81,7 +80,7 @@ func GetIdName(ID string) string {
 	return ""
 }
 
-//Reply currency "cur"
+// Reply currency "cur"
 func Cur(context tele.Context) error {
 	if utils.Config.CurrencyKey == "" {
 		return context.Reply("Конвертация валют не настроена")
