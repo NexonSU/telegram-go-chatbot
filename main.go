@@ -74,9 +74,9 @@ func main() {
 	chats.Handle("/suicide", commands.Blessing)
 	chats.Handle("/isekai", commands.Blessing)
 	chats.Handle("/testrandom", commands.TestRandom)
-	moder.Handle("/anekdot", commands.Anekdot)
-	moder.Handle("/bashorg", commands.Bashorg)
-	moder.Handle("/meow", commands.Meow)
+	chats.Handle("/anekdot", commands.Anekdot)
+	chats.Handle("/bashorg", commands.Bashorg)
+	chats.Handle("/meow", commands.Meow)
 
 	//stats commands
 	chats.Handle("/stats", stats.Stats)
