@@ -104,6 +104,12 @@ func Accept(context tele.Context) error {
 			if ricochetVictim.Role == "member" {
 				VictimChatMember = ricochetVictim
 				victim = ricochetVictim.User
+				prefix = prt.Sprintf("%vПуля отскакивает от головы %v и летит в голову %v.", prefix, utils.MentionUser(player), utils.MentionUser(victim))
+				_, err = utils.Bot.Edit(message, prefix)
+				if err != nil {
+					return err
+				}
+				player = context.Bot().Me
 				break
 			}
 		}

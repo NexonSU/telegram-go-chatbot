@@ -77,7 +77,6 @@ func main() {
 	chats.Handle("/anekdot", commands.Anekdot)
 	chats.Handle("/bashorg", commands.Bashorg)
 	chats.Handle("/meow", commands.Meow)
-	chats.Handle("/test", commands.Test)
 
 	//stats commands
 	chats.Handle("/stats", stats.Stats)
