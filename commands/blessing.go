@@ -17,11 +17,14 @@ var lastSuicide int64
 var burst int
 var lastVideoSent int64
 
-//Kill user on /blessing, /suicide
+// Kill user on /blessing, /suicide
 func Blessing(context tele.Context) error {
 	// prt will replace fmt package to format text according plurals defined in utils package
 	// If no plural rule matched it will be ignored and processed as usual formatting
 	prt := message.NewPrinter(language.Russian)
+
+	victim := context.Sender()
+	ricochetText := ""
 
 	err := context.Delete()
 	if err != nil {
@@ -32,7 +35,25 @@ func Blessing(context tele.Context) error {
 		return err
 	}
 	if ChatMember.Role == "administrator" || ChatMember.Role == "creator" {
-		return context.Send(prt.Sprintf("<code>👻 %v возродился у костра.</code>", utils.UserFullName(context.Sender())))
+		var ricochetVictim *tele.ChatMember
+		var lastMessage utils.Message
+		for i := 1; i < 100; i++ {
+			lastMessage = utils.Message{}
+			result := utils.DB.Where(utils.Message{ChatID: context.Chat().ID}).Order("id desc").Offset(i).Last(&lastMessage)
+			if result.Error != nil {
+				continue
+			}
+			ricochetVictim = &tele.ChatMember{}
+			ricochetVictim, err = utils.Bot.ChatMemberOf(context.Chat(), &tele.User{ID: lastMessage.UserID})
+			if err != nil {
+				continue
+			}
+			if ricochetVictim.Role == "member" {
+				victim = ricochetVictim.User
+				ChatMember = ricochetVictim
+				ricochetText = prt.Sprintf("<code>💥 Пуля отскакивает от головы %v и летит в голову %v.\n", utils.MentionUser(context.Sender()), utils.MentionUser(victim))
+			}
+		}
 	}
 	var duelist utils.Duelist
 	result := utils.DB.Model(utils.Duelist{}).Where(context.Sender().ID).First(&duelist)
@@ -167,9 +188,9 @@ func Blessing(context tele.Context) error {
 			File: tele.File{
 				FileID: "BAACAgIAAx0CReJGYgABAlMuYnagTilFaB8ke8Rw-dYLbfJ6iF8AAicYAAIlxrlLY9ah2fUtR40kBA",
 			},
-			Caption: prt.Sprintf("<code>💥 %v %v%v.\nРеспавн через %d мин.</code>", utils.UserFullName(context.Sender()), prependText, reason[rand.Intn(len(reason))], duration),
+			Caption: prt.Sprintf("<code>%v💥 %v %v%v.\nРеспавн через %d мин.</code>", ricochetText, utils.UserFullName(victim), prependText, reason[rand.Intn(len(reason))], duration),
 		})
 	} else {
-		return context.Send(prt.Sprintf("<code>💥 %v %v%v.\nРеспавн через %d мин.</code>", utils.UserFullName(context.Sender()), prependText, reason[rand.Intn(len(reason))], duration))
+		return context.Send(prt.Sprintf("<code>%v💥 %v %v%v.\nРеспавн через %d мин.</code>", ricochetText, utils.UserFullName(victim), prependText, reason[rand.Intn(len(reason))], duration))
 	}
 }
