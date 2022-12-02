@@ -51,7 +51,7 @@ func Accept(context tele.Context) error {
 	if err != nil {
 		return err
 	}
-	bullet := utils.RandInt(1, 6)
+	bullet := utils.RandInt(1, 5)
 	for i := 1; i <= bullet; i++ {
 		time.Sleep(time.Second * 2)
 		prefix = prt.Sprintf("Дуэль! %v против %v, раунд %v:\n%v берёт револьвер, приставляет его к голове и...\n", utils.MentionUser(player), utils.MentionUser(victim), i, utils.MentionUser(victim))

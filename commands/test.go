@@ -21,6 +21,9 @@ func Test(context tele.Context) error {
 		if err != nil {
 			continue
 		}
+		if ricochetVictim.Role == "member" {
+			return context.Reply(fmt.Sprint(ricochetVictim.User))
+		}
 	}
-	return context.Reply(fmt.Sprint(ricochetVictim.User))
+	return context.Reply("can't find member user")
 }
