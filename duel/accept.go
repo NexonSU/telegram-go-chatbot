@@ -91,7 +91,7 @@ func Accept(context tele.Context) error {
 		var ricochetVictim *tele.ChatMember
 		var lastMessage utils.Message
 		for i := 1; i < 100; i++ {
-			result := utils.DB.Where(utils.Message{ChatID: context.Chat().ID}).Order("id desc").Group("user_id").Offset(i).Last(&lastMessage)
+			result := utils.DB.Where(utils.Message{ChatID: context.Chat().ID}).Order("id desc").Offset(i).Last(&lastMessage)
 			if result.Error != nil {
 				continue
 			}

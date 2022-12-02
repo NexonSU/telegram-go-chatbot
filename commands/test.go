@@ -13,7 +13,7 @@ func Test(context tele.Context) error {
 	var message utils.Message
 	var err error
 	for i := 1; i < 100; i++ {
-		result := utils.DB.Where(utils.Message{ChatID: context.Chat().ID}).Order("id desc").Group("user_id").Offset(i).Last(&message)
+		result := utils.DB.Where(utils.Message{ChatID: context.Chat().ID}).Order("id desc").Offset(i).Last(&message)
 		if result.Error != nil {
 			continue
 		}
