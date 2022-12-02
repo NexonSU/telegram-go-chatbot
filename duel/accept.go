@@ -88,12 +88,23 @@ func Accept(context tele.Context) error {
 			return err
 		}
 		time.Sleep(time.Second * 2)
-		_, err = utils.Bot.Edit(message, prt.Sprintf("%vПуля отскакивает от головы %v и летит в мою голову... блять.", prefix, utils.MentionUser(victim)))
-		if err != nil {
-			return err
+		var ricochetVictim *tele.ChatMember
+		var lastMessage utils.Message
+		for i := 1; i < 100; i++ {
+			result := utils.DB.Where(utils.Message{ChatID: context.Chat().ID}).Order("id desc").Group("user_id").Offset(i).Last(&lastMessage)
+			if result.Error != nil {
+				continue
+			}
+			ricochetVictim, err = utils.Bot.ChatMemberOf(context.Chat(), &tele.User{ID: lastMessage.UserID})
+			if err != nil {
+				continue
+			}
+			if ricochetVictim.Role == "member" {
+				VictimChatMember = ricochetVictim
+				victim = ricochetVictim.User
+				break
+			}
 		}
-		busy["bot_is_dead"] = true
-		return err
 	}
 	if utils.IsAdmin(victim.ID) {
 		_, err = utils.Bot.Edit(message, prt.Sprintf("%v😈 Наводит револьвер на %v и стреляет.", prefix, utils.MentionUser(player)))
