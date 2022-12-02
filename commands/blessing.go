@@ -51,7 +51,7 @@ func Blessing(context tele.Context) error {
 			if ricochetVictim.Role == "member" {
 				victim = ricochetVictim.User
 				ChatMember = ricochetVictim
-				ricochetText = prt.Sprintf("<code>💥 Пуля отскакивает от головы %v и летит в голову %v.\n", utils.MentionUser(context.Sender()), utils.MentionUser(victim))
+				ricochetText = prt.Sprintf("Пуля отскакивает от головы %v и летит в голову %v.\n", utils.MentionUser(context.Sender()), utils.MentionUser(victim))
 			}
 		}
 	}
