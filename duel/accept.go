@@ -88,6 +88,11 @@ func Accept(context tele.Context) error {
 			return err
 		}
 		time.Sleep(time.Second * 2)
+		_, err = utils.Bot.Edit(message, prt.Sprintf("%vПуля отскакивает от головы %v и летит в голову %v.", prefix, utils.MentionUser(victim), utils.MentionUser(player)))
+		if err != nil {
+			return err
+		}
+		time.Sleep(time.Second * 2)
 		var ricochetVictim *tele.ChatMember
 		var lastMessage utils.Message
 		for i := 1; i < 100; i++ {
