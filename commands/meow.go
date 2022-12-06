@@ -13,7 +13,7 @@ import (
 
 var channel *tg.Channel
 
-//Reply with GIF from Pan Kotek's channel
+// Reply with GIF from Pan Kotek's channel
 func Meow(context tele.Context) error {
 	api := utils.GotdClient.API()
 
@@ -27,7 +27,7 @@ func Meow(context tele.Context) error {
 	}
 	//prepare message query
 	messagesQuery := []tg.InputMessageClass{}
-	firstMessageId := utils.RandInt(15, 16000)
+	firstMessageId := utils.RandInt(15, 17500)
 	for message_id := firstMessageId; message_id < firstMessageId+10; message_id++ {
 		messageObject := tg.Message{ID: message_id}
 		messagesQuery = append(messagesQuery, messageObject.AsInputMessageID())
