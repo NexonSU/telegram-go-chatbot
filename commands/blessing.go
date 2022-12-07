@@ -88,6 +88,9 @@ func Blessing(context tele.Context) error {
 	if duration >= 1400 && duration <= 1500 {
 		duration = 1488
 	}
+	if ricochetText != "" {
+		duration = 1
+	}
 	ChatMember.RestrictedUntil = time.Now().Add(time.Second * time.Duration(60*duration)).Unix()
 	err = utils.Bot.Restrict(context.Chat(), ChatMember)
 	if err != nil {
