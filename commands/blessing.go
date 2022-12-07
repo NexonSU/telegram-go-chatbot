@@ -175,6 +175,7 @@ func Blessing(context tele.Context) error {
 		"получил пизды от Олега Тинькова",
 		"оказался фанатом Феррари",
 		"попытался убраться дома, а потом понял что the biggest garbage - он сам",
+		"был найден милфами в радиусе 3км",
 	}
 	burst++
 	if time.Now().Unix() > firstSuicide+120 {
