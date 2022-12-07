@@ -148,7 +148,7 @@ func GetUserFromDB(findstring string) (tele.User, error) {
 	return user, err
 }
 
-//Forward channel post to chat
+// Forward channel post to chat
 func ForwardPost(context tele.Context) error {
 	_, err := Bot.Forward(&tele.Chat{ID: Config.Chat}, context.Message())
 	if Config.StreamChannel != 0 && strings.Contains(context.Text(), "zavtracast/live") {
@@ -160,7 +160,7 @@ func ForwardPost(context tele.Context) error {
 	return nil
 }
 
-//Remove message
+// Remove message
 func Remove(context tele.Context) error {
 	return context.Delete()
 }
@@ -169,6 +169,12 @@ func GetNope() string {
 	var nope Nope
 	DB.Model(Nope{}).Order("RANDOM()").First(&nope)
 	return nope.Text
+}
+
+func GetBless() string {
+	var bless Bless
+	DB.Model(Bless{}).Order("RANDOM()").First(&bless)
+	return bless.Text
 }
 
 func GetHtmlText(message tele.Message) string {

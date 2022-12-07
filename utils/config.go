@@ -2,7 +2,6 @@ package utils
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"os"
 )
@@ -45,7 +44,7 @@ func ConfigInit(file string) Configuration {
 		Config.BotApiUrl = "https://api.telegram.org"
 		Config.AllowedUpdates = []string{"message", "channel_post", "callback_query", "chat_member"}
 		jsonData, _ := json.MarshalIndent(Config, "", "\t")
-		_ = ioutil.WriteFile(file, jsonData, 0600)
+		_ = os.WriteFile(file, jsonData, 0600)
 		log.Fatal(err)
 	}
 	return Config
