@@ -44,6 +44,7 @@ func main() {
 	moder.Handle("/kill", commands.Kill)
 	moder.Handle("/bless", commands.Kill)
 	moder.Handle("/addnope", commands.AddNope)
+	moder.Handle("/addbless", commands.AddBless)
 	moder.Handle("/setgetowner", commands.SetGetOwner)
 	moder.Handle("/addantispam", checkpoint.AddAntispam)
 	moder.Handle("/listantispam", checkpoint.ListAntispam)
