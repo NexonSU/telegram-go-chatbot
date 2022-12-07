@@ -2,7 +2,6 @@ package commands
 
 import (
 	"io"
-	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strings"
@@ -13,7 +12,7 @@ import (
 
 var lastBash string
 
-//Send text in chat on /say
+// Send text in chat on /say
 func Bashorg(context tele.Context) error {
 	httpClient := &http.Client{Timeout: 10 * time.Second}
 	httpResponse, err := httpClient.Get("https://bash.im/forweb/?u")
@@ -23,7 +22,7 @@ func Bashorg(context tele.Context) error {
 	defer func(Body io.ReadCloser) {
 		Body.Close()
 	}(httpResponse.Body)
-	html, err := ioutil.ReadAll(httpResponse.Body)
+	html, err := io.ReadAll(httpResponse.Body)
 	if err != nil {
 		return err
 	}

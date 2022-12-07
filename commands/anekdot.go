@@ -2,7 +2,6 @@ package commands
 
 import (
 	"io"
-	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strings"
@@ -11,7 +10,7 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-//Send text in chat on /say
+// Send text in chat on /say
 func Anekdot(context tele.Context) error {
 	httpClient := &http.Client{Timeout: 10 * time.Second}
 	httpResponse, err := httpClient.Get("https://www.anekdot.ru/rss/randomu.html")
@@ -21,7 +20,7 @@ func Anekdot(context tele.Context) error {
 	defer func(Body io.ReadCloser) {
 		Body.Close()
 	}(httpResponse.Body)
-	html, err := ioutil.ReadAll(httpResponse.Body)
+	html, err := io.ReadAll(httpResponse.Body)
 	if err != nil {
 		return err
 	}
