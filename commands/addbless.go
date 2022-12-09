@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	tele "gopkg.in/telebot.v3"
@@ -15,10 +14,10 @@ func AddBless(context tele.Context) error {
 		return context.Reply("Пример использования: <code>/addbless {текст}</code>\nИли отправь в ответ на сообщение с текстом <code>/addbless</code>")
 	}
 	if context.Message().ReplyTo == nil {
-		bless.Text = strings.ToLower(context.Data())
+		bless.Text = context.Data()
 	} else {
 		if context.Message().ReplyTo.Text != "" {
-			bless.Text = strings.ToLower(context.Message().ReplyTo.Text)
+			bless.Text = context.Message().ReplyTo.Text
 		} else {
 			return context.Reply("Я не смог найти текст в указанном сообщении.")
 		}
