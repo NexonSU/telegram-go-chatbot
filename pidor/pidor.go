@@ -64,7 +64,7 @@ func Pidor(context tele.Context) error {
 			}
 			go func() {
 				time.Sleep(duration)
-				context.Send(message)
+				context.Send(message, &tele.SendOptions{DisableNotification: true})
 			}()
 		}
 	} else {
