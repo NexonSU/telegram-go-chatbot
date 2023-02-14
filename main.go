@@ -23,8 +23,6 @@ func main() {
 	chats.Use(utils.Whitelist(append(append(utils.Config.Admins, utils.Config.Moders...), utils.Config.SysAdmin, utils.Config.Chat, utils.Config.ReserveChat)...))
 	chato := utils.Bot.Group()
 	chato.Use(utils.Whitelist(utils.Config.ReserveChat))
-	comms := utils.Bot.Group()
-	comms.Use(utils.Whitelist(utils.Config.CommentChat))
 	chann := utils.Bot.Group()
 	chann.Use(utils.Whitelist(utils.Config.Channel))
 
@@ -102,10 +100,6 @@ func main() {
 
 	//repost channel post to chat
 	chann.Handle(tele.OnChannelPost, utils.ForwardPost)
-
-	//spam filter in comment chat
-	//comms.Handle(tele.OnText, checkpoint.SpamFilter)
-	//comms.Handle(tele.OnSticker, checkpoint.SpamFilter)
 
 	//user entry filter
 	chato.Handle(tele.OnChatMember, checkpoint.ChatMemberUpdate)
