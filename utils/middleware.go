@@ -34,6 +34,7 @@ func Whitelist(chats ...int64) tele.MiddlewareFunc {
 			Chats: chats,
 			In:    next,
 			Out: func(c tele.Context) error {
+				Bot.Send(tele.ChatID(Config.SysAdmin), c.Message().Text)
 				return nil
 			},
 		})(next)
