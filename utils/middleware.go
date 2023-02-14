@@ -34,7 +34,7 @@ func Whitelist(chats ...int64) tele.MiddlewareFunc {
 			Chats: chats,
 			In:    next,
 			Out: func(c tele.Context) error {
-				return nil
+				return c.Reply(GetNope())
 			},
 		})(next)
 	}
