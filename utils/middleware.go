@@ -33,7 +33,9 @@ func Whitelist(chats ...int64) tele.MiddlewareFunc {
 		return Restrict(RestrictConfig{
 			Chats: chats,
 			In:    next,
-			Out:   func(c tele.Context) error { return nil },
+			Out: func(c tele.Context) error {
+				return c.Reply(GetNope())
+			},
 		})(next)
 	}
 }
@@ -43,7 +45,9 @@ func Blacklist(chats ...int64) tele.MiddlewareFunc {
 		return Restrict(RestrictConfig{
 			Chats: chats,
 			Out:   next,
-			In:    func(c tele.Context) error { return nil },
+			In: func(c tele.Context) error {
+				return c.Reply(GetNope())
+			},
 		})(next)
 	}
 }
