@@ -150,6 +150,9 @@ func GetUserFromDB(findstring string) (tele.User, error) {
 
 // Forward channel post to chat
 func ForwardPost(context tele.Context) error {
+	if context.Message().Chat.ID != Config.Channel {
+		return nil
+	}
 	_, err := Bot.Forward(&tele.Chat{ID: Config.Chat}, context.Message())
 	if Config.StreamChannel != 0 && strings.Contains(context.Text(), "zavtracast/live") {
 		_, err = Bot.Forward(&tele.Chat{ID: Config.StreamChannel}, context.Message())
