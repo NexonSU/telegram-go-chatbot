@@ -104,8 +104,8 @@ func main() {
 	chann.Handle(tele.OnChannelPost, utils.ForwardPost)
 
 	//spam filter in comment chat
-	comms.Handle(tele.OnText, checkpoint.SpamFilter)
-	comms.Handle(tele.OnSticker, checkpoint.SpamFilter)
+	//comms.Handle(tele.OnText, checkpoint.SpamFilter)
+	//comms.Handle(tele.OnSticker, checkpoint.SpamFilter)
 
 	//user entry filter
 	chato.Handle(tele.OnChatMember, checkpoint.ChatMemberUpdate)
