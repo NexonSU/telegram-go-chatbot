@@ -15,7 +15,7 @@ func AddNope(context tele.Context) error {
 		return context.Reply("Пример использования: <code>/addnope {текст}</code>\nИли отправь в ответ на сообщение с текстом <code>/addnope</code>")
 	}
 	if context.Message().ReplyTo == nil {
-		nope.Text = strings.ToLower(context.Data())
+		nope.Text = strings.TrimPrefix(context.Text(), strings.Split(context.Text(), " ")[0]+" ")
 	} else {
 		if context.Message().ReplyTo.Text != "" {
 			nope.Text = strings.ToLower(context.Message().ReplyTo.Text)
@@ -23,9 +23,9 @@ func AddNope(context tele.Context) error {
 			return context.Reply("Я не смог найти текст в указанном сообщении.")
 		}
 	}
-	result := utils.DB.Create(&nope)
-	if result.Error != nil {
-		return context.Reply(fmt.Sprintf("Не удалось добавить nope, ошибка:\n<code>%v</code>", result.Error.Error()))
-	}
+	//result := utils.DB.Create(&nope)
+	//if result.Error != nil {
+	//	return context.Reply(fmt.Sprintf("Не удалось добавить nope, ошибка:\n<code>%v</code>", result.Error.Error()))
+	//}
 	return context.Reply(fmt.Sprintf("Nope добавлен как <code>%v</code>.", nope.Text))
 }
