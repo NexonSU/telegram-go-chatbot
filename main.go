@@ -99,7 +99,7 @@ func main() {
 	chats.Handle(&duel.DenyButton, duel.Deny)
 
 	//repost channel post to chat
-	chann.Handle(tele.OnChannelPost, utils.ForwardPost)
+	utils.Bot.Handle(tele.OnChannelPost, utils.ForwardPost)
 
 	//user entry filter
 	chato.Handle(tele.OnChatMember, checkpoint.ChatMemberUpdate)
