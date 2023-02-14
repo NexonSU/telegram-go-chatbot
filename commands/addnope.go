@@ -8,7 +8,7 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-//Adds nope text to DB
+// Adds nope text to DB
 func AddNope(context tele.Context) error {
 	var nope utils.Nope
 	if (context.Message().ReplyTo == nil && len(context.Args()) == 0) || (context.Message().ReplyTo != nil && len(context.Args()) != 0) {
@@ -22,9 +22,6 @@ func AddNope(context tele.Context) error {
 		} else {
 			return context.Reply("Я не смог найти текст в указанном сообщении.")
 		}
-	}
-	if len([]rune(nope.Text)) > 50 {
-		return context.Reply("Nope не может быть длиннее 50 символов.")
 	}
 	result := utils.DB.Create(&nope)
 	if result.Error != nil {
