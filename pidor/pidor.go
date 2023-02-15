@@ -15,16 +15,6 @@ func Pidor(context tele.Context) error {
 	if context.Message().Private() {
 		return nil
 	}
-	return context.Reply("Я сломался, зайдите позже.")
-	location, err := time.LoadLocation("Europe/Moscow")
-	if err != nil {
-		return context.Reply("Локация Москва не найдена. В какой мы рельности Морти?")
-	}
-	currentTime := time.Now().In(location)
-	if currentTime.Hour() >= 22 || currentTime.Hour() < 8 {
-
-		return context.Reply("Команда /pidor доступна только с 8 часов утра до 22 часов вечера по МСК.")
-	}
 	if busy["pidor"] {
 		return context.Reply("Команда занята. Попробуйте позже.")
 	}
