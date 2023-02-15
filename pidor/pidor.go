@@ -15,6 +15,7 @@ func Pidor(context tele.Context) error {
 	if context.Message().Private() {
 		return nil
 	}
+	return context.Reply("Я сломался, зайдите позже.")
 	location, err := time.LoadLocation("Europe/Moscow")
 	if err != nil {
 		return context.Reply("Локация Москва не найдена. В какой мы рельности Морти?")
