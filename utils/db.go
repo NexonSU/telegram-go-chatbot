@@ -4,8 +4,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/glebarez/sqlite"
 	tele "gopkg.in/telebot.v3"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
