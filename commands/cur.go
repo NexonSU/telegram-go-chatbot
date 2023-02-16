@@ -37,8 +37,8 @@ func GenerateMaps() error {
 		return err
 	}
 	JokeMap = append(JokeMap, JokeMapStruct{symbol: "COC", name: "Cup Of Coffee", amount: 300.0})
-	JokeMap = append(JokeMap, JokeMapStruct{symbol: "DSHK", name: "Doshirak", amount: 50.0})
-	JokeMap = append(JokeMap, JokeMapStruct{symbol: "DOSH", name: "Doshirak", amount: 50.0})
+	JokeMap = append(JokeMap, JokeMapStruct{symbol: "DSHK", name: "Doshirak", amount: 71.0})
+	JokeMap = append(JokeMap, JokeMapStruct{symbol: "DOSH", name: "Doshirak", amount: 71.0})
 	return nil
 }
 
