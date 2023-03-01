@@ -7,12 +7,13 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
+var c = gogpt.NewClient(Config.OpenAIKey)
+var ctx = cntx.Background()
+
 func ChatGPT(context tele.Context) error {
 	if context.Message().ReplyTo == nil || context.Message().ReplyTo.Sender.ID != Bot.Me.ID || context.Message().Text[:1] == "/" {
 		return nil
 	}
-	c := gogpt.NewClient(Config.OpenAIKey)
-	ctx := cntx.Background()
 
 	req := gogpt.ChatCompletionRequest{
 		Model:    gogpt.GPT3Dot5Turbo,
