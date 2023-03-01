@@ -16,7 +16,7 @@ func ChatGPT(context tele.Context) error {
 
 	req := gogpt.ChatCompletionRequest{
 		Model:    gogpt.GPT3Dot5Turbo,
-		Messages: []gogpt.ChatCompletionMessage{{Role: "user", Content: context.Message().Text + ". Ответь кратко, пожалуйста."}},
+		Messages: []gogpt.ChatCompletionMessage{{Role: "user", Content: context.Message().Text}},
 	}
 	resp, err := c.CreateChatCompletion(ctx, req)
 	if err != nil {
