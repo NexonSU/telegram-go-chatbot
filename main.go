@@ -98,6 +98,9 @@ func main() {
 	chats.Handle(&duel.AcceptButton, duel.Accept)
 	chats.Handle(&duel.DenyButton, duel.Deny)
 
+	//chatgpt
+	chats.Handle(tele.OnText, utils.ChatGPT)
+
 	//repost channel post to chat
 	utils.Bot.Handle(tele.OnChannelPost, utils.ForwardPost)
 

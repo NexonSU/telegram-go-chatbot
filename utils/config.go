@@ -24,6 +24,7 @@ type Configuration struct {
 	Moders            []int64  `json:"moders"`
 	SysAdmin          int64    `json:"sysadmin"`
 	CurrencyKey       string   `json:"currency_key"`
+	OpenAIKey         string   `json:"openai_key"`
 	ReleasesUrl       string   `json:"releases_url"`
 }
 

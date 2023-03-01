@@ -47,6 +47,7 @@ require (
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/mattn/go-sqlite3 v1.14.15 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/sashabaranov/go-gpt3 v1.3.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/u2takey/go-utils v0.3.1 // indirect
 	go.opentelemetry.io/otel v1.11.1 // indirect
