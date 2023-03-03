@@ -47,7 +47,7 @@ func ChatGPT(context tele.Context) error {
 
 	req := gogpt.ChatCompletionRequest{
 		Model:    gogpt.GPT3Dot5Turbo,
-		Messages: append([]gogpt.ChatCompletionMessage{{Role: "system", Content: "ты отвечаешь всегда максимально кратко"}}, messages...),
+		Messages: append([]gogpt.ChatCompletionMessage{{Role: "system", Content: "ты отвечаешь всегда максимально кратко, одним предложением"}}, messages...),
 	}
 
 	resp, err := c.CreateChatCompletion(ctx, req)
