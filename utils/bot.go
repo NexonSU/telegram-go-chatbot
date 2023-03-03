@@ -112,6 +112,9 @@ func ErrorReporting(err error, context tele.Context) {
 	if strings.Contains(err.Error(), "message to delete not found") {
 		return
 	}
+	if strings.Contains(err.Error(), "context does not contain message") {
+		return
+	}
 	if context.Message() != nil {
 		MarshalledMessage, _ := json.MarshalIndent(context.Message(), "", "    ")
 		JsonMessage := html.EscapeString(string(MarshalledMessage))
