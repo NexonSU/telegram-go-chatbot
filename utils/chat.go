@@ -19,6 +19,10 @@ var ctx = cntx.Background()
 var botContexts []botcntx
 
 func ChatGPT(context tele.Context) error {
+	if context.Message().Text == "" {
+		return nil
+	}
+
 	if context.Message().ReplyTo == nil || context.Message().ReplyTo.Sender.ID != Bot.Me.ID || context.Message().Text[:1] == "/" {
 		if context.Message().Text[:5] != "/ask " {
 			return nil
