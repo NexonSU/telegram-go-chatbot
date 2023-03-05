@@ -2,6 +2,7 @@ package utils
 
 import (
 	cntx "context"
+	"strings"
 	"time"
 
 	gogpt "github.com/sashabaranov/go-gpt3"
@@ -19,7 +20,9 @@ var botContexts []botcntx
 
 func ChatGPT(context tele.Context) error {
 	if context.Message().ReplyTo == nil || context.Message().ReplyTo.Sender.ID != Bot.Me.ID || context.Message().Text[:1] == "/" {
-		return nil
+		if context.Message().Text[:5] != "/ask " {
+			return nil
+		}
 	}
 
 	location, err := time.LoadLocation("Europe/Moscow")
@@ -33,17 +36,23 @@ func ChatGPT(context tele.Context) error {
 
 	var messages []gogpt.ChatCompletionMessage
 
-	for i := range botContexts {
-		if botContexts[i].ID == context.Message().ReplyTo.ID {
-			messages = botContexts[i].Messages
+	if context.Message().ReplyTo != nil {
+		if context.Message().ReplyTo.Sender.ID == Bot.Me.ID {
+			for i := range botContexts {
+				if botContexts[i].ID == context.Message().ReplyTo.ID {
+					messages = botContexts[i].Messages
+				}
+			}
+
+			if len(messages) == 0 {
+				messages = append(messages, gogpt.ChatCompletionMessage{Role: "assistant", Content: context.Message().ReplyTo.Text})
+			}
+		} else {
+			messages = append(messages, gogpt.ChatCompletionMessage{Role: "user", Content: context.Message().ReplyTo.Text})
 		}
 	}
 
-	if len(messages) == 0 {
-		messages = append(messages, gogpt.ChatCompletionMessage{Role: "assistant", Content: context.Message().ReplyTo.Text})
-	}
-
-	messages = append(messages, gogpt.ChatCompletionMessage{Role: "user", Content: context.Message().Text})
+	messages = append(messages, gogpt.ChatCompletionMessage{Role: "user", Content: strings.Replace(context.Message().Text, "/ask ", "", 1)})
 
 	req := gogpt.ChatCompletionRequest{
 		Model:    gogpt.GPT3Dot5Turbo,

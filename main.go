@@ -100,6 +100,7 @@ func main() {
 
 	//chatgpt
 	chats.Handle(tele.OnText, utils.ChatGPT)
+	chats.Handle("/ask", utils.ChatGPT)
 
 	//repost channel post to chat
 	utils.Bot.Handle(tele.OnChannelPost, utils.ForwardPost)
