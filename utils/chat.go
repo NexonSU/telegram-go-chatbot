@@ -29,7 +29,7 @@ func ChatGPT(context tele.Context) error {
 	}
 	currentTime := time.Now().In(location)
 	if currentTime.Hour() > 7 && !IsAdminOrModer(context.Message().Sender.ID) {
-		//return nil
+		return nil
 	}
 
 	var messages []gogpt.ChatCompletionMessage
