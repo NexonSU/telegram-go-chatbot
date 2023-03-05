@@ -23,23 +23,30 @@ func ChatGPT(context tele.Context) error {
 		return nil
 	}
 
-	if context.Message().ReplyTo == nil || context.Message().ReplyTo.Sender.ID != Bot.Me.ID || context.Message().Text[:1] == "/" {
-		return nil
-	}
-
 	location, err := time.LoadLocation("Europe/Moscow")
 	if err != nil {
 		return context.Reply("Локация Москва не найдена. В какой мы рельности Морти?")
 	}
 	currentTime := time.Now().In(location)
 	if currentTime.Hour() > 7 && !IsAdminOrModer(context.Message().Sender.ID) {
-		return nil
+		//return nil
 	}
 
 	var messages []gogpt.ChatCompletionMessage
 
-	if context.Message().ReplyTo != nil {
-		if context.Message().ReplyTo.Sender.ID == Bot.Me.ID {
+	if strings.HasPrefix(context.Message().Text, "/ask ") {
+		if context.Message().ReplyTo != nil {
+			if context.Message().ReplyTo.Sender.ID == Bot.Me.ID {
+				messages = append(messages, gogpt.ChatCompletionMessage{Role: "assistant", Content: context.Message().ReplyTo.Text})
+			} else {
+				messages = append(messages, gogpt.ChatCompletionMessage{Role: "user", Content: context.Message().ReplyTo.Text})
+			}
+		}
+	} else {
+		if strings.HasPrefix(context.Message().Text, "/") {
+			return nil
+		}
+		if context.Message().ReplyTo != nil && context.Message().ReplyTo.Sender.ID == Bot.Me.ID {
 			for i := range botContexts {
 				if botContexts[i].ID == context.Message().ReplyTo.ID {
 					messages = botContexts[i].Messages
@@ -47,10 +54,10 @@ func ChatGPT(context tele.Context) error {
 			}
 
 			if len(messages) == 0 {
-				messages = append(messages, gogpt.ChatCompletionMessage{Role: "assistant", Content: context.Message().ReplyTo.Text})
+				return nil
 			}
 		} else {
-			messages = append(messages, gogpt.ChatCompletionMessage{Role: "user", Content: context.Message().ReplyTo.Text})
+			return nil
 		}
 	}
 
