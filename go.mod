@@ -13,6 +13,7 @@ require (
 	github.com/gotd/td v0.71.0
 	github.com/keighl/metabolize v0.0.0-20150915210303-97ab655d4034
 	github.com/miguelmota/go-coinmarketcap v0.1.8
+	github.com/sashabaranov/go-gpt3 v1.3.0
 	github.com/stretchr/testify v1.8.1
 	github.com/u2takey/ffmpeg-go v0.4.1
 	github.com/valyala/fastjson v1.6.3
@@ -47,7 +48,6 @@ require (
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/mattn/go-sqlite3 v1.14.15 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/sashabaranov/go-gpt3 v1.3.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/u2takey/go-utils v0.3.1 // indirect
 	go.opentelemetry.io/otel v1.11.1 // indirect
