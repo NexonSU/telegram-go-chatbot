@@ -24,7 +24,7 @@ func ChatGPT(context tele.Context) error {
 	}
 
 	if context.Message().ReplyTo == nil || context.Message().ReplyTo.Sender.ID != Bot.Me.ID || context.Message().Text[:1] == "/" {
-		if context.Message().Text[:5] != "/ask " {
+		if len(context.Message().Text) > 4 && context.Message().Text[:5] != "/ask " {
 			return nil
 		}
 	}
