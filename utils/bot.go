@@ -115,7 +115,7 @@ func ErrorReporting(err error, context tele.Context) {
 	if strings.Contains(err.Error(), "context does not contain message") {
 		return
 	}
-	if context.Message() != nil {
+	if context != nil && context.Message() != nil {
 		MarshalledMessage, _ := json.MarshalIndent(context.Message(), "", "    ")
 		JsonMessage := html.EscapeString(string(MarshalledMessage))
 		text += fmt.Sprintf("\n\nMessage:\n<pre>%v</pre>", JsonMessage)
