@@ -55,9 +55,9 @@ func Kill(context tele.Context) error {
 	prependText := ""
 	if utils.RandInt(0, 100) >= 90 {
 		duration = duration * 10
-		prependText = "критически "
+		prependText = "критически"
 		if command == "/bless" {
-			prependText = "очень "
+			prependText = "очень"
 		}
 	}
 	ChatMember.RestrictedUntil = time.Now().Add(time.Second * time.Duration(60*duration)).Unix()
@@ -65,12 +65,12 @@ func Kill(context tele.Context) error {
 	if err != nil {
 		return err
 	}
-	text := prt.Sprintf("💥 %v %vпристрелил %v.\n%v отправился на респавн на %d мин.", utils.UserFullName(context.Sender()), prependText, utils.UserFullName(&target), utils.UserFullName(&target), duration)
+	text := prt.Sprintf("💥 %v %v пристрелил %v.\n%v отправился на респавн на %d мин.", utils.UserFullName(context.Sender()), prependText, utils.UserFullName(&target), utils.UserFullName(&target), duration)
 	if command == "/bless" {
-		text = prt.Sprintf("🤫 %v %vпопросил %v помолчать %d минут.", utils.UserFullName(context.Sender()), prependText, utils.UserFullName(&target), duration)
+		text = prt.Sprintf("🤫 %v %v попросил %v помолчать %d минут.", utils.UserFullName(context.Sender()), prependText, utils.UserFullName(&target), duration)
 	}
 	if command == "/bite" {
-		text = prt.Sprintf("🤫 %v %v сделал кусь %v на %d минут.", utils.UserFullName(context.Sender()), prependText, utils.UserFullName(&target), duration)
+		text = prt.Sprintf("😼 %v %v сделал кусь %v.\n%v отправился на респавн на %d мин.", utils.UserFullName(context.Sender()), prependText, utils.UserFullName(&target), utils.UserFullName(&target), duration)
 	}
 	return context.Send(text)
 }
