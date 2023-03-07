@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-//Kill user on /kill
+// Kill user on /kill
 func Kill(context tele.Context) error {
 	// prt will replace fmt package to format text according plurals defined in utils package
 	// If no plural rule matched it will be ignored and processed as usual formatting
@@ -70,6 +70,9 @@ func Kill(context tele.Context) error {
 	text := prt.Sprintf("💥 %v %vпристрелил %v.\n%v отправился на респавн на %d мин.", utils.UserFullName(context.Sender()), prependText, utils.UserFullName(&target), utils.UserFullName(&target), duration)
 	if command == "/bless" {
 		text = prt.Sprintf("🤫 %v %vпопросил %v помолчать %d минут.", utils.UserFullName(context.Sender()), prependText, utils.UserFullName(&target), duration)
+	}
+	if command == "/bite" {
+		text = prt.Sprintf("🤫 %v %v сделал кусь %v на %d минут.", utils.UserFullName(context.Sender()), prependText, utils.UserFullName(&target), duration)
 	}
 	return context.Send(text)
 }
