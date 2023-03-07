@@ -47,6 +47,7 @@ func main() {
 		{tele.Command{Text: "marco", Description: "поло"}, commands.Marco, chats},
 		{tele.Command{Text: "me", Description: "аналог команды /me из IRC (/me пошел спать)"}, commands.Me, chats},
 		{tele.Command{Text: "meow", Description: "получить гифку с котиком"}, commands.Meow, chats},
+		{tele.Command{Text: "mlem", Description: "получить гифку с котиком"}, commands.Meow, chats},
 		{tele.Command{Text: "mywarns", Description: "посмотреть количество своих предупреждений"}, commands.Mywarns, chats},
 		{tele.Command{Text: "pidor", Description: "запустить игру \"Пидор Дня!\""}, pidor.Pidor, chats},
 		{tele.Command{Text: "pidorall", Description: "статистика \"Пидор Дня!\" за всё время"}, pidor.Pidorall, chats},
