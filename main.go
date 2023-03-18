@@ -70,6 +70,7 @@ func main() {
 		{tele.Command{Text: "suicide", Description: "устроиться в роскомнадзор"}, commands.Blessing, chats},
 		{tele.Command{Text: "testrandom", Description: "протестировать рандом бота"}, commands.TestRandom, chats},
 		{tele.Command{Text: "topm", Description: "сохранить пост в личку"}, commands.SaveToPM, chats},
+		{tele.Command{Text: "advice", Description: "получить совет"}, commands.Advice, chats},
 	}
 
 	commandAdminList := []commandList{
