@@ -68,7 +68,6 @@ func main() {
 		{tele.Command{Text: "slap", Description: "дать леща кому-нибудь"}, commands.Slap, chats},
 		{tele.Command{Text: "stats", Description: "статистика чата"}, stats.Stats, chats},
 		{tele.Command{Text: "suicide", Description: "устроиться в роскомнадзор"}, commands.Blessing, chats},
-		{tele.Command{Text: "testrandom", Description: "протестировать рандом бота"}, commands.TestRandom, chats},
 		{tele.Command{Text: "topm", Description: "сохранить пост в личку"}, commands.SaveToPM, chats},
 		{tele.Command{Text: "advice", Description: "получить совет"}, commands.Advice, chats},
 	}
@@ -99,6 +98,7 @@ func main() {
 		{tele.Command{Text: "unban", Description: "разбанить кого-нибудь"}, commands.Unban, moder},
 		{tele.Command{Text: "unmute", Description: "разглушить кого-нибудь"}, commands.Unmute, moder},
 		{tele.Command{Text: "warn", Description: "предупредить кого-нибудь"}, commands.Warn, moder},
+		{tele.Command{Text: "testrandom", Description: "протестировать рандом бота"}, commands.TestRandom, moder},
 	}
 
 	commandMemberArray := []tele.Command{}
