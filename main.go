@@ -77,7 +77,7 @@ func main() {
 		{tele.Command{Text: "kick", Description: "кикнуть кого-нибудь"}, commands.Kick, moder},
 		{tele.Command{Text: "bite", Description: "укусить кого-нибудь"}, commands.Kill, moder},
 		{tele.Command{Text: "kill", Description: "пристрелить кого-нибудь"}, commands.Kill, moder},
-		{tele.Command{Text: "listantispam", Description: "список антиспама"}, checkpoint.ListAntispam, moder},
+		//{tele.Command{Text: "listantispam", Description: "список антиспама"}, checkpoint.ListAntispam, moder},
 		{tele.Command{Text: "mute", Description: "заглушить кого-нибудь"}, commands.Mute, moder},
 		{tele.Command{Text: "pidordel", Description: "удалить игрока из \"Пидор Дня!\""}, pidor.Pidordel, moder},
 		{tele.Command{Text: "pidorlist", Description: "список всех игроков \"Пидор Дня!\""}, pidor.Pidorlist, moder},
@@ -92,13 +92,13 @@ func main() {
 		{tele.Command{Text: "bless", Description: "попросить помолчать кого-нибудь"}, commands.Kill, moder},
 		{tele.Command{Text: "convert", Description: "конвертировать файл, доппараметры: gif и ogg"}, commands.Convert, moder},
 		{tele.Command{Text: "debug", Description: "получить сообщение в виде JSON"}, commands.Debug, moder},
-		{tele.Command{Text: "delantispam", Description: "удалить из антиспама"}, checkpoint.DelAntispam, moder},
+		//{tele.Command{Text: "delantispam", Description: "удалить из антиспама"}, checkpoint.DelAntispam, moder},
 		{tele.Command{Text: "say", Description: "заставить бота сказать что-нибудь"}, commands.Say, moder},
 		{tele.Command{Text: "setgetowner", Description: "задать владельца гета"}, commands.SetGetOwner, moder},
 		{tele.Command{Text: "unban", Description: "разбанить кого-нибудь"}, commands.Unban, moder},
 		{tele.Command{Text: "unmute", Description: "разглушить кого-нибудь"}, commands.Unmute, moder},
 		{tele.Command{Text: "warn", Description: "предупредить кого-нибудь"}, commands.Warn, moder},
-		{tele.Command{Text: "testrandom", Description: "протестировать рандом бота"}, commands.TestRandom, moder},
+		//{tele.Command{Text: "testrandom", Description: "протестировать рандом бота"}, commands.TestRandom, moder},
 	}
 
 	commandMemberArray := []tele.Command{}
