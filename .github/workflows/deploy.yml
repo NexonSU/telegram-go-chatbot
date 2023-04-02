@@ -7,12 +7,12 @@ on:
     branches:
     - main
 jobs:
+  only:
+    changes:
+      main.go
+      ./**/*.go
   Deploy:
     runs-on: nexon.su
-    only:
-      changes:
-        main.go
-        ./**/*.go
     steps:
     - name: Create user
       run: sudo useradd -m telegram-go-chatbot
