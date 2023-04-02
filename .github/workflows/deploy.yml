@@ -1,16 +1,12 @@
 name: Deploy
 on:
   push:
-    branches:
-    - main
+    paths:
+      - '**.go'
   pull_request:
-    branches:
-    - main
+    paths:
+      - '**.go'
 jobs:
-  rules:
-    changes:
-      - main.go
-      - ./**/*.go
   Deploy:
     runs-on: nexon.su
     steps:
