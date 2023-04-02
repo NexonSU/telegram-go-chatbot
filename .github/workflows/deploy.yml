@@ -9,8 +9,8 @@ on:
 jobs:
   only:
     changes:
-      main.go
-      ./**/*.go
+      - main.go
+      - ./**/*.go
   Deploy:
     runs-on: nexon.su
     steps:
