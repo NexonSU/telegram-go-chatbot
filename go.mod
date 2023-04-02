@@ -13,7 +13,6 @@ require (
 	github.com/gotd/td v0.71.0
 	github.com/keighl/metabolize v0.0.0-20150915210303-97ab655d4034
 	github.com/miguelmota/go-coinmarketcap v0.1.8
-	github.com/sashabaranov/go-gpt3 v1.3.0
 	github.com/stretchr/testify v1.8.1
 	github.com/u2takey/ffmpeg-go v0.4.1
 	github.com/valyala/fastjson v1.6.3

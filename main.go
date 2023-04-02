@@ -56,7 +56,6 @@ func main() {
 		{tele.Command{Text: "pidorstats", Description: "статистика \"Пидор Дня!\" за год"}, pidor.Pidorstats, chats},
 		{tele.Command{Text: "pidorules", Description: "правила \"Пидор Дня!\""}, pidor.Pidorules, chats},
 		{tele.Command{Text: "anekdot", Description: "получить рандомный анекдот с anekdot.ru"}, commands.Anekdot, chats},
-		{tele.Command{Text: "ask", Description: "спросить у бота что-нибудь (c полуночи до 8 утра по МСК)"}, utils.ChatGPT, chats},
 		{tele.Command{Text: "bashorg", Description: "получить рандомную цитату с bash.org.ru"}, commands.Bashorg, chats},
 		{tele.Command{Text: "blessing", Description: "устроиться в роскомнадзор"}, commands.Blessing, chats},
 		{tele.Command{Text: "bonk", Description: "бонкнуть кого-нибудь"}, commands.Bonk, chats},
@@ -131,7 +130,6 @@ func main() {
 	//non-command handles
 	utils.Bot.Handle(&duel.AcceptButton, duel.Accept, chats)
 	utils.Bot.Handle(&duel.DenyButton, duel.Deny, chats)
-	utils.Bot.Handle(tele.OnText, utils.ChatGPT, chats)
 	utils.Bot.Handle(tele.OnChatMember, checkpoint.ChatMemberUpdate, chato)
 	utils.Bot.Handle(tele.OnUserJoined, utils.Remove, chato)
 	utils.Bot.Handle(tele.OnUserLeft, utils.Remove, chato)
