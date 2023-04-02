@@ -1,11 +1,18 @@
 name: Deploy
 on:
-  changes:
-    main.go
-    ./**/*.go
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
 jobs:
   Deploy:
     runs-on: nexon.su
+    only:
+      changes:
+        main.go
+        ./**/*.go
     steps:
     - name: Create user
       run: sudo useradd -m telegram-go-chatbot
