@@ -2,7 +2,7 @@
 Telegram chatbot.  
 Based on https://github.com/tucnak/telebot.  
 Ported from https://github.com/NexonSU/telegram-python-chatbot.
-# Quick Start
+# Quick Start 
 Create your bot at https://t.me/BotFather.  
 Start telegram-go-chatbot only once.  
 Edit config.json:
