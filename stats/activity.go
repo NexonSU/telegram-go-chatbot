@@ -46,7 +46,7 @@ func UserActivityLineChart(from time.Time, to time.Time, context tele.Context) *
 
 	// create a new line instance
 	line := charts.NewLine()
-	// set some global options like Title/Legend/ToolTip or anything else
+	// set some global options like Title/Legend/ToolTip  or anything else
 	line.SetGlobalOptions(
 		charts.WithLegendOpts(opts.Legend{Show: true, Left: "50"}),
 		charts.WithInitializationOpts(opts.Initialization{PageTitle: fmt.Sprintf("%v Chat Activity since %v to %v", context.Chat().Title, from.Format("02.01.2006"), to.Format("02.01.2006")), Theme: "shine"}),
