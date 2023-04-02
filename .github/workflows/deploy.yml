@@ -7,11 +7,11 @@ on:
     branches:
     - main
 jobs:
-  only:
-    changes:
-      - main.go
-      - ./**/*.go
   Deploy:
+    rules:
+      changes:
+        - main.go
+        - ./**/*.go
     runs-on: nexon.su
     steps:
     - name: Create user
