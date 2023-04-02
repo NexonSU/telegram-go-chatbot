@@ -98,7 +98,7 @@ func main() {
 		{tele.Command{Text: "unban", Description: "разбанить кого-нибудь"}, commands.Unban, moder},
 		{tele.Command{Text: "unmute", Description: "разглушить кого-нибудь"}, commands.Unmute, moder},
 		{tele.Command{Text: "warn", Description: "предупредить кого-нибудь"}, commands.Warn, moder},
-		//{tele.Command{Text: "testrandom", Description: "протестировать рандом бота"}, commands.TestRandom, moder},
+		//{tele.Command{Text: "testrandom", Description: "протестировать рандом бота "}, commands.TestRandom, moder}
 	}
 
 	commandMemberArray := []tele.Command{}
