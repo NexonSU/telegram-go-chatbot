@@ -60,7 +60,7 @@ func Convert(context tele.Context) error {
 		}
 		KwArgs = ffmpeg.KwArgs{"c:v": "libx264", "preset": "fast", "crf": 26, "timelimit": 900, "movflags": "+faststart", "c:a": "aac"}
 		if len(context.Args()) == 1 && context.Args()[0] == "gif" {
-			KwArgs = ffmpeg.KwArgs{"c:v": "libx264", "an": "", "preset": "fast", "crf": 26, "timelimit": 900, "movflags": "+faststart", "c:a": "aac"}
+			KwArgs = ffmpeg.KwArgs{"c:v": "libx264", "an": "", "preset": "fast", "crf": 26, "timelimit": 900, "movflags": "+faststart"}
 		}
 		if len(context.Args()) == 1 && context.Args()[0] == "mp3" {
 			context.Notify(tele.RecordingAudio)
