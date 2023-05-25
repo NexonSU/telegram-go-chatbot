@@ -9,7 +9,7 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-//Resend post on user request
+// Resend post on user request
 func SaveToPM(context tele.Context) error {
 	if context.Message() == nil || context.Message().ReplyTo == nil {
 		return context.Reply("Пример использования:\n/topm в ответ на какое-либо сообщение\nБот должен быть запущен и разблокирован в личке.")
@@ -29,7 +29,7 @@ func SaveToPM(context tele.Context) error {
 		}
 		_, err = utils.Bot.Raw("copyMessage", params)
 	} else {
-		_, err = utils.Bot.Send(context.Sender(), fmt.Sprintf("%v\n\n%v", context.Message().ReplyTo.Text, link))
+		_, err = utils.Bot.Send(context.Sender(), fmt.Sprintf("%v\n\n%v", context.Message().ReplyTo.Text, link), &tele.SendOptions{ParseMode: tele.ModeMarkdown})
 	}
 	if err != nil {
 		return context.Reply(fmt.Sprintf("Не удалось отправить сообщение в ЛС:\n<code>%v</code>\nБот должен быть запущен и разблокирован в личке.", err.Error()))
