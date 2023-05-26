@@ -69,6 +69,8 @@ func main() {
 		{tele.Command{Text: "suicide", Description: "устроиться в роскомнадзор"}, commands.Blessing, chats},
 		{tele.Command{Text: "topm", Description: "сохранить пост в личку"}, commands.SaveToPM, chats},
 		{tele.Command{Text: "advice", Description: "получить совет"}, commands.Advice, chats},
+		{tele.Command{Text: "convert", Description: "конвертировать файл, доппараметры: mp3,ogg,gif,audio,voice,animation"}, commands.Convert, chats},
+		{tele.Command{Text: "download", Description: "скачать файл"}, commands.Download, chats},
 	}
 
 	commandAdminList := []commandList{
@@ -89,7 +91,6 @@ func main() {
 		{tele.Command{Text: "addnope", Description: "добавить сообщение отказа по кнопке"}, commands.AddNope, moder},
 		{tele.Command{Text: "ban", Description: "забанить кого-нибудь"}, commands.Ban, moder},
 		{tele.Command{Text: "bless", Description: "попросить помолчать кого-нибудь"}, commands.Kill, moder},
-		{tele.Command{Text: "convert", Description: "конвертировать файл, доппараметры: mp3,ogg,gif,audio,voice,animation"}, commands.Convert, moder},
 		{tele.Command{Text: "debug", Description: "получить сообщение в виде JSON"}, commands.Debug, moder},
 		//{tele.Command{Text: "delantispam", Description: "удалить из антиспама"}, checkpoint.DelAntispam, moder},
 		{tele.Command{Text: "say", Description: "заставить бота сказать что-нибудь"}, commands.Say, moder},
