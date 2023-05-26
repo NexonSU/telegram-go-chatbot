@@ -3,7 +3,6 @@ package commands
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"fmt"
 	"os"
 	"os/exec"
 	"regexp"
@@ -62,7 +61,8 @@ func Download(context tele.Context) error {
 		formats := video.Formats.WithAudioChannels()
 
 		for i, _ := range formats {
-			if formats[i].ContentLength < 50000000 && formats[i].QualityLabel != "" && formats[i].ContentLength != 0 {
+			if (formats[i].ContentLength < 50000000 && formats[i].QualityLabel != "" && formats[i].ContentLength != 0) ||
+				(formats[0].QualityLabel == "720p" && video.Duration < 300000000000) {
 				format = &formats[i]
 				break
 			}
@@ -77,14 +77,6 @@ func Download(context tele.Context) error {
 			return err
 		}
 
-		filepath := fmt.Sprintf("%v_video.mp4", videoID)
-
-		file, err := os.Create(filepath)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-
 		return context.Reply(&tele.Video{
 			File:      tele.FromReader(stream),
 			MIME:      "video/mp4",
@@ -96,7 +88,7 @@ func Download(context tele.Context) error {
 				Height: int(video.Thumbnails[len(video.Thumbnails)-1].Height),
 				File:   tele.FromURL(video.Thumbnails[len(video.Thumbnails)-1].URL),
 			},
-			FileName: file.Name(),
+			FileName: videoID + ".mp4",
 		}, &tele.SendOptions{AllowWithoutReply: true})
 	}
 	if service == "twitter" {
