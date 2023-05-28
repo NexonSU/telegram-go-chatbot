@@ -219,13 +219,13 @@ func OnText(context tele.Context) error {
 	statsIncrease(1, startOfDay, int64(timeNow.Day()))
 	statsIncrease(2, startOfDay, int64(timeNow.Hour()))
 	statsIncrease(3, startOfDay, context.Sender().ID)
+	statsIncrease(5, startOfDay, int64(timeNow.Weekday()))
 	text := strings.ToLower(onlyWords.ReplaceAllString(context.Text(), ""))
 	for _, word := range strings.Split(text, " ") {
 		if len(word) > 2 {
 			statsIncrease(4, startOfDay, getWordID(word))
 		}
 	}
-	statsIncrease(5, startOfDay, int64(timeNow.Weekday()))
 	return nil
 }
 
