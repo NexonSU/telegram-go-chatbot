@@ -17,7 +17,7 @@ import (
 )
 
 var LastNonAdminChatMember = &tele.ChatMember{}
-var onlyWords = regexp.MustCompile(`[^\p{L} ]+`)
+var onlyWords = regexp.MustCompile(`[,.!?]+`)
 
 func UserFullName(user *tele.User) string {
 	fullname := user.FirstName
@@ -220,9 +220,12 @@ func OnText(context tele.Context) error {
 	statsIncrease(2, startOfDay, int64(timeNow.Hour()))
 	statsIncrease(3, startOfDay, context.Sender().ID)
 	statsIncrease(5, startOfDay, int64(timeNow.Weekday()))
+	if context.Text() == "" || string(context.Text()[0]) == "/" {
+		return nil
+	}
 	text := strings.ToLower(onlyWords.ReplaceAllString(context.Text(), ""))
 	for _, word := range strings.Split(text, " ") {
-		if len([]rune(word)) > 2 {
+		if len([]rune(word)) > 0 {
 			statsIncrease(4, startOfDay, getWordID(word))
 		}
 	}
