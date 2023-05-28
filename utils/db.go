@@ -51,35 +51,6 @@ type Bless struct {
 	Text string `gorm:"primaryKey"`
 }
 
-type WordStatsExclude struct {
-	Text string `gorm:"primaryKey"`
-}
-
-type Message struct {
-	ID       int   `gorm:"primaryKey"`
-	ChatID   int64 `gorm:"primaryKey"`
-	UserID   int64
-	Date     time.Time
-	ReplyTo  int
-	Text     string
-	FileType string
-	FileID   string
-}
-
-type Word struct {
-	ChatID int64
-	UserID int64
-	Date   time.Time
-	Text   string
-}
-
-type CheckPointRestrict struct {
-	UserID        int64 `gorm:"primaryKey"`
-	UserFirstName string
-	UserLastName  string
-	Since         int64
-}
-
 func DataBaseInit(file string) gorm.DB {
 	database, err := gorm.Open(
 		sqlite.Open(file),
@@ -92,7 +63,7 @@ func DataBaseInit(file string) gorm.DB {
 	}
 
 	//Create tables, if they not exists in DB
-	err = database.AutoMigrate(tele.User{}, Message{}, Word{}, Get{}, Warn{}, PidorStats{}, PidorList{}, Duelist{}, Bless{}, Nope{}, AntiSpam{}, CheckPointRestrict{}, WordStatsExclude{})
+	err = database.AutoMigrate(tele.User{}, Get{}, Warn{}, PidorStats{}, PidorList{}, Duelist{}, Bless{}, Nope{})
 	if err != nil {
 		log.Println(err)
 	}

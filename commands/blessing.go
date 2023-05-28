@@ -34,25 +34,9 @@ func Blessing(context tele.Context) error {
 		return err
 	}
 	if ChatMember.Role == "administrator" || ChatMember.Role == "creator" {
-		var ricochetVictim *tele.ChatMember
-		var lastMessage utils.Message
-		for i := 1; i < 100; i++ {
-			lastMessage = utils.Message{}
-			result := utils.DB.Where(utils.Message{ChatID: context.Chat().ID}).Order("id desc").Offset(i).Last(&lastMessage)
-			if result.Error != nil {
-				continue
-			}
-			ricochetVictim = &tele.ChatMember{}
-			ricochetVictim, err = utils.Bot.ChatMemberOf(context.Chat(), &tele.User{ID: lastMessage.UserID})
-			if err != nil {
-				continue
-			}
-			if ricochetVictim.Role == "member" {
-				victim = ricochetVictim.User
-				ChatMember = ricochetVictim
-				ricochetText = prt.Sprintf("Пуля отскакивает от головы %v и летит в голову %v.\n", utils.MentionUser(context.Sender()), utils.MentionUser(victim))
-			}
-		}
+		victim = utils.LastNonAdminChatMember.User
+		ChatMember = utils.LastNonAdminChatMember
+		ricochetText = prt.Sprintf("Пуля отскакивает от головы %v и летит в голову %v.\n", utils.MentionUser(context.Sender()), utils.MentionUser(victim))
 	}
 	var duelist utils.Duelist
 	result := utils.DB.Model(utils.Duelist{}).Where(context.Sender().ID).First(&duelist)

@@ -11,11 +11,10 @@ import (
 	"unicode/utf16"
 
 	tele "gopkg.in/telebot.v3"
+	"gorm.io/gorm/clause"
 )
 
-var WelcomeMessageID int
-var RestrictedUsers []CheckPointRestrict
-var WordStatsExcludes []WordStatsExclude
+var LastNonAdminChatMember = &tele.ChatMember{}
 
 func UserFullName(user *tele.User) string {
 	fullname := user.FirstName
@@ -168,6 +167,48 @@ func Remove(context tele.Context) error {
 	return context.Delete()
 }
 
+func OnChatMember(context tele.Context) error {
+	if context.Chat().ID == Config.ReserveChat {
+		return Bot.Unban(&tele.Chat{ID: context.Chat().ID}, context.ChatMember().NewChatMember.User)
+	}
+	//User update
+	UserResult := DB.Clauses(clause.OnConflict{
+		UpdateAll: true,
+	}).Create(context.ChatMember().NewChatMember.User)
+	if UserResult.Error != nil {
+		ErrorReporting(UserResult.Error, nil)
+	}
+	return nil
+}
+
+func OnUserJoined(context tele.Context) error {
+	if context.Chat().ID == Config.ReserveChat {
+		return context.Delete()
+	}
+	return nil
+}
+
+func OnUserLeft(context tele.Context) error {
+	if context.Chat().ID == Config.ReserveChat {
+		return context.Delete()
+	}
+	return nil
+}
+
+func OnText(context tele.Context) error {
+	if context.Chat().ID == Config.ReserveChat {
+		return context.Delete()
+	}
+	chatMember, err := Bot.ChatMemberOf(context.Chat(), context.Sender())
+	if err != nil {
+		ErrorReporting(err, nil)
+	}
+	if chatMember.Role == tele.Member {
+		LastNonAdminChatMember = chatMember
+	}
+	return nil
+}
+
 func GetNope() string {
 	var nope Nope
 	DB.Model(Nope{}).Order("RANDOM()").First(&nope)
@@ -246,9 +287,4 @@ func GetHtmlText(message tele.Message) string {
 	}
 
 	return textString
-}
-
-func init() {
-	//Word stats exclusion list
-	DB.Find(&WordStatsExcludes)
 }

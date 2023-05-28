@@ -4,11 +4,9 @@ import (
 	"log"
 	"sort"
 
-	"github.com/NexonSU/telegram-go-chatbot/checkpoint"
 	"github.com/NexonSU/telegram-go-chatbot/commands"
 	"github.com/NexonSU/telegram-go-chatbot/duel"
 	"github.com/NexonSU/telegram-go-chatbot/pidor"
-	"github.com/NexonSU/telegram-go-chatbot/stats"
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	tele "gopkg.in/telebot.v3"
 )
@@ -26,7 +24,7 @@ func main() {
 	admin := utils.Whitelist(append(utils.Config.Admins, utils.Config.SysAdmin)...)
 	moder := utils.Whitelist(append(append(utils.Config.Admins, utils.Config.Moders...), utils.Config.SysAdmin)...)
 	chats := utils.Whitelist(append(append(utils.Config.Admins, utils.Config.Moders...), utils.Config.SysAdmin, utils.Config.Chat, utils.Config.ReserveChat)...)
-	chato := utils.Whitelist(utils.Config.ReserveChat)
+	//chatr := utils.Whitelist(utils.Config.ReserveChat)
 	//chann := Whitelist(utils.Config.Channel)
 
 	commandMemberList := []commandList{
@@ -39,7 +37,6 @@ func main() {
 		//{tele.Command{Text: "admin", Description: "позвать админов"}, commands.Admin, chats},
 		{tele.Command{Text: "get", Description: "получить гет"}, commands.Get, chats},
 		{tele.Command{Text: "getall", Description: "получить список гетов"}, commands.Getall, chats},
-		{tele.Command{Text: "getspamchance", Description: "получить % вероятности спама"}, checkpoint.CommandGetSpamChance, moder},
 		{tele.Command{Text: "giveme", Description: "сохранить пост в личку"}, commands.SaveToPM, chats},
 		{tele.Command{Text: "google", Description: "загуглить что-нибудь"}, commands.Google, chats},
 		{tele.Command{Text: "hug", Description: "обнять кого-нибудь"}, commands.Hug, chats},
@@ -65,7 +62,6 @@ func main() {
 		{tele.Command{Text: "duelstats", Description: "посмотреть свою статистику дуэли"}, duel.Duelstats, chats},
 		{tele.Command{Text: "ping", Description: "понг"}, commands.Ping, chats},
 		{tele.Command{Text: "slap", Description: "дать леща кому-нибудь"}, commands.Slap, chats},
-		{tele.Command{Text: "stats", Description: "статистика чата"}, stats.Stats, chats},
 		{tele.Command{Text: "suicide", Description: "устроиться в роскомнадзор"}, commands.Blessing, chats},
 		{tele.Command{Text: "topm", Description: "сохранить пост в личку"}, commands.SaveToPM, chats},
 		{tele.Command{Text: "advice", Description: "получить совет"}, commands.Advice, chats},
@@ -82,9 +78,7 @@ func main() {
 		{tele.Command{Text: "mute", Description: "заглушить кого-нибудь"}, commands.Mute, moder},
 		{tele.Command{Text: "pidordel", Description: "удалить игрока из \"Пидор Дня!\""}, pidor.Pidordel, moder},
 		{tele.Command{Text: "pidorlist", Description: "список всех игроков \"Пидор Дня!\""}, pidor.Pidorlist, moder},
-		{tele.Command{Text: "removeword", Description: "удалить слово из статистики"}, stats.RemoveWord, admin},
 		{tele.Command{Text: "restart", Description: "перезапуск бота"}, commands.Restart, admin},
-		{tele.Command{Text: "addantispam", Description: "добавить в антиспам"}, checkpoint.AddAntispam, moder},
 		{tele.Command{Text: "resurrect", Description: "возродить кого-нибудь"}, commands.Revive, moder},
 		{tele.Command{Text: "revive", Description: "возродить кого-нибудь"}, commands.Revive, moder},
 		{tele.Command{Text: "addbless", Description: "добавить причину блесса"}, commands.AddBless, moder},
@@ -131,9 +125,10 @@ func main() {
 	//non-command handles
 	utils.Bot.Handle(&duel.AcceptButton, duel.Accept, chats)
 	utils.Bot.Handle(&duel.DenyButton, duel.Deny, chats)
-	utils.Bot.Handle(tele.OnChatMember, checkpoint.ChatMemberUpdate, chato)
-	utils.Bot.Handle(tele.OnUserJoined, utils.Remove, chato)
-	utils.Bot.Handle(tele.OnUserLeft, utils.Remove, chato)
+	utils.Bot.Handle(tele.OnChatMember, utils.OnChatMember, chats)
+	utils.Bot.Handle(tele.OnUserJoined, utils.OnUserJoined, chats)
+	utils.Bot.Handle(tele.OnUserLeft, utils.OnUserLeft, chats)
+	utils.Bot.Handle(tele.OnText, utils.OnText, chats)
 	utils.Bot.Handle(tele.OnQuery, commands.GetInline)
 	utils.Bot.Handle(tele.OnChannelPost, utils.ForwardPost)
 
