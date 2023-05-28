@@ -67,11 +67,7 @@ func DataBaseInit(file string) gorm.DB {
 	if err != nil {
 		log.Println(err)
 	}
-	database.Exec("DROP TABLE IF EXISTS anti_spams;")
-	database.Exec("DROP TABLE IF EXISTS check_point_restricts;")
-	database.Exec("DROP TABLE IF EXISTS messages;")
-	database.Exec("DROP TABLE IF EXISTS word_stats_excludes;")
-	database.Exec("DROP TABLE IF EXISTS words;")
+	database.Exec("VACUUM;")
 	return *database
 }
 
