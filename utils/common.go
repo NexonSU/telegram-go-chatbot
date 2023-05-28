@@ -5,11 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
 	"unicode/utf16"
 
+	"github.com/neonxp/StemmerRu"
 	tele "gopkg.in/telebot.v3"
 	"gorm.io/gorm/clause"
 )
@@ -196,9 +198,12 @@ func OnUserLeft(context tele.Context) error {
 }
 
 func OnText(context tele.Context) error {
+	//remove message from reservechat
 	if context.Chat().ID == Config.ReserveChat {
 		return context.Delete()
 	}
+
+	//update LastNonAdminChatMember
 	chatMember, err := Bot.ChatMemberOf(context.Chat(), context.Sender())
 	if err != nil {
 		ErrorReporting(err, nil)
@@ -206,7 +211,46 @@ func OnText(context tele.Context) error {
 	if chatMember.Role == tele.Member {
 		LastNonAdminChatMember = chatMember
 	}
+
+	//update StatsDays(1), StatsHours(2), StatsUsers(3), StatsWords(4)
+	statsIncrease(1, GetStartOfDay(), int64(time.Now().Day()))
+	statsIncrease(2, GetStartOfDay(), int64(time.Now().Hour()))
+	statsIncrease(3, GetStartOfDay(), context.Sender().ID)
+	text := strings.ToLower(regexp.MustCompile(`[^\p{L} ]+`).ReplaceAllString(context.Text(), ""))
+	for _, word := range strings.Split(text, " ") {
+		if len(word) > 2 {
+			statsIncrease(4, GetStartOfDay(), getWordID(word))
+		}
+	}
 	return nil
+}
+
+func statsIncrease(statType int64, dayTimestamp int64, contextID int64) {
+	if contextID == 0 {
+		return
+	}
+	if DB.Exec("UPDATE stats SET count = count + 1 WHERE context_id = ? AND stat_type = ? AND day_timestamp = ?;", contextID, statType, dayTimestamp).RowsAffected == 0 {
+		DB.Create(Stats{StatType: statType, DayTimestamp: dayTimestamp, ContextID: contextID, Count: 1})
+	}
+}
+
+func getWordID(searchWord string) int64 {
+	shortWord := StemmerRu.Stem(searchWord)
+	wordResult := StatsWords{}
+	if DB.Model(StatsWords{}).Select("id").Where("short_word = ?", shortWord).Find(&wordResult).RowsAffected == 0 {
+		wordResult.ShortWord = shortWord
+		wordResult.Word = searchWord
+		DB.Create(&wordResult)
+	}
+	return wordResult.ID
+}
+
+func GetStartOfDay() int64 {
+	unixTS := time.Now().Unix()
+	tm := time.Unix(unixTS, 0).In(time.Local)
+	hour, minute, second := tm.Clock()
+
+	return unixTS - int64(hour*3600+minute*60+second)
 }
 
 func GetNope() string {
