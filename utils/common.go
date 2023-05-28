@@ -212,9 +212,9 @@ func OnText(context tele.Context) error {
 		LastNonAdminChatMember = chatMember
 	}
 
-	//update StatsDays(1), StatsHours(2), StatsUsers(3), StatsWords(4)
-	statsIncrease(1, GetStartOfDay(), int64(time.Now().Day()))
-	statsIncrease(2, GetStartOfDay(), int64(time.Now().Hour()))
+	//update StatsDays(1), StatsHours(2), StatsUsers(3), StatsWords(4), StatsWeekday(5)
+	statsIncrease(1, GetStartOfDay(), int64(time.Now().Local().Day()))
+	statsIncrease(2, GetStartOfDay(), int64(time.Now().Local().Hour()))
 	statsIncrease(3, GetStartOfDay(), context.Sender().ID)
 	text := strings.ToLower(regexp.MustCompile(`[^\p{L} ]+`).ReplaceAllString(context.Text(), ""))
 	for _, word := range strings.Split(text, " ") {
@@ -222,6 +222,7 @@ func OnText(context tele.Context) error {
 			statsIncrease(4, GetStartOfDay(), getWordID(word))
 		}
 	}
+	statsIncrease(5, GetStartOfDay(), int64(time.Now().Local().Weekday()))
 	return nil
 }
 
@@ -246,7 +247,7 @@ func getWordID(searchWord string) int64 {
 }
 
 func GetStartOfDay() int64 {
-	unixTS := time.Now().Unix()
+	unixTS := time.Now().Local().Unix()
 	tm := time.Unix(unixTS, 0).In(time.Local)
 	hour, minute, second := tm.Clock()
 
