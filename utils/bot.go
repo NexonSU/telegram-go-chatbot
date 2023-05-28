@@ -62,6 +62,8 @@ func BotInit() {
 		bot.Send(tele.ChatID(Config.SysAdmin), fmt.Sprintf("%v has finished starting up.", MentionUser(bot.Me)))
 	}
 
+	Bot = *bot
+
 	go gotdClientInit()
 }
 
