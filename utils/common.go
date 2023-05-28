@@ -230,9 +230,6 @@ func OnText(context tele.Context) error {
 }
 
 func statsIncrease(statType int64, dayTimestamp int64, contextID int64) {
-	if contextID == 0 {
-		return
-	}
 	if DB.Exec("UPDATE stats SET count = count + 1 WHERE context_id = ? AND stat_type = ? AND day_timestamp = ?;", contextID, statType, dayTimestamp).RowsAffected == 0 {
 		DB.Create(Stats{StatType: statType, DayTimestamp: dayTimestamp, ContextID: contextID, Count: 1})
 	}
