@@ -34,6 +34,7 @@ func main() {
 		{tele.Command{Text: "sed", Description: "заменить текст типо как в sed"}, commands.Sed, chats},
 		{tele.Command{Text: "set", Description: "сохранить гет"}, commands.Set, chats},
 		{tele.Command{Text: "shrug", Description: "¯\\_(ツ)_/¯"}, commands.Shrug, chats},
+		{tele.Command{Text: "stats", Description: "статистика чата"}, commands.Stats, chats},
 		//{tele.Command{Text: "admin", Description: "позвать админов"}, commands.Admin, chats},
 		{tele.Command{Text: "get", Description: "получить гет"}, commands.Get, chats},
 		{tele.Command{Text: "getall", Description: "получить список гетов"}, commands.Getall, chats},
