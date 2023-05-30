@@ -95,11 +95,8 @@ func Download(context tele.Context) error {
 		}
 		defer ytdlpResult.Close()
 
-		filename := strings.Split(link, "/")[len(strings.Split(link, "/"))-1]
-		filename = strings.ReplaceAll(filename, "watch?v=", "")
-
 		buf := bytes.NewBuffer(nil)
-		outputArgs := ffmpeg.KwArgs{"map": "0", "format": "nut", "c:v": "libx264", "preset": "fast", "crf": 30, "timelimit": 900, "movflags": "+faststart", "c:a": "aac"}
+		outputArgs := ffmpeg.KwArgs{"map": "0", "format": "mp4", "c:v": "libx264", "preset": "fast", "crf": 30, "timelimit": 900, "movflags": "frag_keyframe+empty_moov+faststart", "c:a": "aac"}
 		err = ffmpeg.Input("pipe:").Output("pipe:", outputArgs).WithInput(ytdlpResult).WithOutput(buf, os.Stdout).Run()
 		if err != nil {
 			return err
@@ -111,7 +108,7 @@ func Download(context tele.Context) error {
 			Height:    int(result.Info.Height),
 			Width:     int(result.Info.Width),
 			Streaming: true,
-			FileName:  filename + ".mp4",
+			FileName:  result.Info.ID + ".mp4",
 		}, &tele.SendOptions{AllowWithoutReply: true})
 	}
 	if service == "twitter" {
