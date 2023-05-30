@@ -1,6 +1,7 @@
 package commands
 
 import (
+	cntx "context"
 	"crypto/md5"
 	"encoding/hex"
 	"os"
@@ -9,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly"
-	"github.com/kkdai/youtube/v2"
+	"github.com/wader/goutubedl"
 	tele "gopkg.in/telebot.v3"
 )
 
@@ -19,7 +20,7 @@ func Download(context tele.Context) error {
 		return context.Reply("Пример использования: <code>/download {ссылка на ютуб/твиттер}</code>\nИли отправь в ответ на какое-либо сообщение с ссылкой <code>/download</code>")
 	}
 
-	videoID := ""
+	link := ""
 	message := &tele.Message{}
 	service := ""
 
@@ -32,16 +33,11 @@ func Download(context tele.Context) error {
 	for _, entity := range message.Entities {
 		if entity.Type == tele.EntityURL {
 			text := message.EntityText(entity)
-			if strings.Contains(text, "youtu.be/") {
-				videoID = strings.Split(strings.Split(text, "youtu.be/")[1], "?")[0]
-				service = "youtube"
-			}
-			if strings.Contains(text, "watch?v=") {
-				videoID = strings.Split(strings.Split(text, "watch?v=")[1], "&")[0]
+			link = text
+			if strings.Contains(text, "youtu") {
 				service = "youtube"
 			}
 			if strings.Contains(text, "twitter.com/") {
-				videoID = text
 				service = "twitter"
 			}
 		}
@@ -50,49 +46,39 @@ func Download(context tele.Context) error {
 	context.Notify(tele.RecordingVideo)
 
 	if service == "youtube" {
-		client := youtube.Client{}
+		goutubedl.Path = "yt-dlp"
 
-		video, err := client.GetVideo(videoID)
+		result, err := goutubedl.New(cntx.Background(), link, goutubedl.Options{})
 		if err != nil {
 			return err
 		}
 
-		format := &youtube.Format{}
-		formats := video.Formats.WithAudioChannels()
-
-		for i, _ := range formats {
-			if (formats[i].ContentLength < 50000000 && formats[i].QualityLabel != "" && formats[i].ContentLength != 0) ||
-				(formats[0].QualityLabel == "720p" && video.Duration < 300000000000) {
-				format = &formats[i]
-				break
+		if result.Info.Filesize > 50000000 || result.Info.FilesizeApprox > 50000000 {
+			if !strings.Contains(link, "/clip/") {
+				return context.Reply("Видео больше 50МБ")
 			}
 		}
 
-		if format.ItagNo == 0 {
-			return context.Reply("Видео слишком большое для скачивания.")
-		}
-
-		stream, _, err := client.GetStream(video, format)
+		downloadResult, err := result.Download(cntx.Background(), "best")
 		if err != nil {
 			return err
 		}
+		defer downloadResult.Close()
+
+		filename := strings.Split(link, "/")[len(strings.Split(link, "/"))-1]
+		filename = strings.ReplaceAll(filename, "watch?v=", "")
 
 		return context.Reply(&tele.Video{
-			File:      tele.FromReader(stream),
+			File:      tele.FromReader(downloadResult),
 			MIME:      "video/mp4",
-			Height:    format.Height,
-			Width:     format.Width,
+			Height:    int(result.Info.Height),
+			Width:     int(result.Info.Width),
 			Streaming: true,
-			Thumbnail: &tele.Photo{
-				Width:  int(video.Thumbnails[len(video.Thumbnails)-1].Width),
-				Height: int(video.Thumbnails[len(video.Thumbnails)-1].Height),
-				File:   tele.FromURL(video.Thumbnails[len(video.Thumbnails)-1].URL),
-			},
-			FileName: videoID + ".mp4",
+			FileName:  filename + ".mp4",
 		}, &tele.SendOptions{AllowWithoutReply: true})
 	}
 	if service == "twitter" {
-		downloader := NewTwitterVideoDownloader(videoID)
+		downloader := NewTwitterVideoDownloader(link)
 		fileName := downloader.Download()
 		context.Reply(&tele.Video{
 			File:      tele.FromDisk(fileName),
