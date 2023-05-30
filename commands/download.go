@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"bytes"
 	cntx "context"
 	"crypto/md5"
 	"encoding/hex"
@@ -10,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly"
+	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"github.com/wader/goutubedl"
 	tele "gopkg.in/telebot.v3"
 )
@@ -53,23 +55,58 @@ func Download(context tele.Context) error {
 			return err
 		}
 
-		if result.Info.Filesize > 50000000 || result.Info.FilesizeApprox > 50000000 {
-			if !strings.Contains(link, "/clip/") {
-				return context.Reply("Видео больше 50МБ")
+		audioFormatIndex := 0
+
+		for i, format := range result.Formats() {
+			if format.Ext != "m4a" {
+				continue
+			}
+			if format.Filesize > result.Formats()[audioFormatIndex].Filesize {
+				audioFormatIndex = i
 			}
 		}
 
-		downloadResult, err := result.Download(cntx.Background(), "best")
+		formatID := "best"
+		var formatSize float64
+		audioFormat := result.Formats()[audioFormatIndex]
+
+		for _, format := range result.Formats() {
+			if format.Ext != "mp4" {
+				continue
+			}
+			filesize := format.Filesize + audioFormat.Filesize
+			if filesize < 50000000 && filesize > formatSize {
+				formatSize = filesize
+				formatID = format.FormatID + "+" + audioFormat.FormatID
+			}
+		}
+
+		if formatID == "best" {
+			if result.Info.Filesize > 50000000 || result.Info.FilesizeApprox > 50000000 {
+				if !strings.Contains(link, "/clip/") {
+					return context.Reply("Видео больше 50МБ")
+				}
+			}
+		}
+
+		ytdlpResult, err := result.Download(cntx.Background(), formatID)
 		if err != nil {
 			return err
 		}
-		defer downloadResult.Close()
+		defer ytdlpResult.Close()
 
 		filename := strings.Split(link, "/")[len(strings.Split(link, "/"))-1]
 		filename = strings.ReplaceAll(filename, "watch?v=", "")
 
+		buf := bytes.NewBuffer(nil)
+		outputArgs := ffmpeg.KwArgs{"map": "0", "format": "nut", "c:v": "libx264", "preset": "fast", "crf": 30, "timelimit": 900, "movflags": "+faststart", "c:a": "aac"}
+		err = ffmpeg.Input("pipe:").Output("pipe:", outputArgs).WithInput(ytdlpResult).WithOutput(buf, os.Stdout).Run()
+		if err != nil {
+			return err
+		}
+
 		return context.Reply(&tele.Video{
-			File:      tele.FromReader(downloadResult),
+			File:      tele.FromReader(buf),
 			MIME:      "video/mp4",
 			Height:    int(result.Info.Height),
 			Width:     int(result.Info.Width),
