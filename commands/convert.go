@@ -12,6 +12,12 @@ import (
 
 // Convert given file
 func Convert(context tele.Context) error {
+	if context.Message().ReplyTo == nil {
+		return context.Reply("Пример использования: <code>/convert</code> в ответ на какое-либо сообщение с медиа-файлом.\nДопольнительные параметры: gif,mp3,ogg.")
+	}
+	if context.Message().ReplyTo.Media() == nil {
+		return context.Reply("Какого-либо медиа файла нет в указанном сообщении.")
+	}
 	var err error
 	var fileName string
 	var mime string
