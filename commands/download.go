@@ -105,7 +105,7 @@ func Download(context tele.Context) error {
 		defer ytdlpResult.Close()
 
 		buf := bytes.NewBuffer(nil)
-		outputArgs := ffmpeg.KwArgs{"map": "0", "format": "mp4", "c:v": "libx264", "preset": "fast", "crf": 30, "timelimit": 900, "movflags": "frag_keyframe+empty_moov+faststart", "c:a": "aac"}
+		outputArgs := ffmpeg.KwArgs{"map": "0", "format": "mp4", "c:v": "libx264", "preset": "fast", "crf": 30, "movflags": "frag_keyframe+empty_moov+faststart", "c:a": "aac"}
 		err = ffmpeg.Input("pipe:").Output("pipe:", outputArgs).WithInput(ytdlpResult).WithOutput(buf, os.Stdout).Run()
 		if err != nil {
 			return err
@@ -143,7 +143,7 @@ func Download(context tele.Context) error {
 		}
 
 		buf := bytes.NewBuffer(nil)
-		outputArgs := ffmpeg.KwArgs{"map": "0", "format": "mp4", "c:v": "libx264", "preset": "fast", "crf": 30, "timelimit": 900, "movflags": "frag_keyframe+empty_moov+faststart", "c:a": "aac"}
+		outputArgs := ffmpeg.KwArgs{"map": "0", "format": "mp4", "c:v": "libx264", "preset": "fast", "crf": 26, "movflags": "frag_keyframe+empty_moov+faststart", "c:a": "aac"}
 		err = ffmpeg.Input("pipe:").Output("pipe:", outputArgs).WithInput(resp.Body).WithOutput(buf, os.Stdout).Run()
 		if err != nil {
 			return err
