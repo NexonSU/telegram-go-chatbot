@@ -5,8 +5,10 @@ import (
 	cntx "context"
 	"crypto/md5"
 	"encoding/hex"
+	"net/http"
 	"os"
 	"os/exec"
+	"path"
 	"regexp"
 	"strings"
 
@@ -36,11 +38,18 @@ func Download(context tele.Context) error {
 		if entity.Type == tele.EntityURL {
 			text := message.EntityText(entity)
 			link = text
-			if strings.Contains(text, "youtu") {
-				service = "youtube"
+			resp, err := http.Get(link)
+			if err != nil {
+				continue
 			}
-			if strings.Contains(text, "twitter.com/") {
+			defer resp.Body.Close()
+			switch {
+			case strings.Contains(text, "youtu"):
+				service = "youtube"
+			case strings.Contains(text, "twitter.com/"):
 				service = "twitter"
+			case strings.HasPrefix(resp.Header.Get("Content-Type"), "video"):
+				service = "file"
 			}
 		}
 	}
@@ -121,6 +130,31 @@ func Download(context tele.Context) error {
 			FileName:  fileName,
 		}, &tele.SendOptions{AllowWithoutReply: true})
 		return os.Remove(fileName)
+	}
+	if service == "file" {
+		resp, err := http.Get(link)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+
+		if resp.ContentLength > 50000000 {
+			return context.Reply("Файл больше 50МБ")
+		}
+
+		buf := bytes.NewBuffer(nil)
+		outputArgs := ffmpeg.KwArgs{"map": "0", "format": "mp4", "c:v": "libx264", "preset": "fast", "crf": 30, "timelimit": 900, "movflags": "frag_keyframe+empty_moov+faststart", "c:a": "aac"}
+		err = ffmpeg.Input("pipe:").Output("pipe:", outputArgs).WithInput(resp.Body).WithOutput(buf, os.Stdout).Run()
+		if err != nil {
+			return err
+		}
+
+		return context.Reply(&tele.Video{
+			File:      tele.FromReader(buf),
+			MIME:      "video/mp4",
+			Streaming: true,
+			FileName:  path.Base(link) + ".mp4",
+		}, &tele.SendOptions{AllowWithoutReply: true})
 	}
 	return context.Reply("Ссылка не найдена или сервис не поддерживается.")
 }
