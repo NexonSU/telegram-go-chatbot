@@ -48,6 +48,9 @@ func Convert(context tele.Context) error {
 			return context.Reply("Неподдерживаемая операция")
 		}
 	}
+	if arg == "sticker" && (context.Message().ReplyTo.Sticker.Animated || context.Message().ReplyTo.Sticker.Video) {
+		arg = "gif"
+	}
 	switch arg {
 	case "mp3", "audio":
 		KwArgs = ffmpeg.KwArgs{"map": "a:0", "format": "mp3", "c:a": "libmp3lame"}
