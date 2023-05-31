@@ -28,7 +28,7 @@ func Advice(context tele.Context) error {
 	var advice AdviceResp
 	err = json.NewDecoder(httpResponse.Body).Decode(&advice)
 	if err != nil {
-		return context.Reply("Ошибка получения совета: " + err.Error())
+		return err
 	}
 
 	return context.Reply(advice.Text)

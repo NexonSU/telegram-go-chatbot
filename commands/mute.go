@@ -7,18 +7,18 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-//Mute user on /mute
+// Mute user on /mute
 func Mute(context tele.Context) error {
 	if (context.Message().ReplyTo == nil && len(context.Args()) == 0) || (context.Message().ReplyTo != nil && len(context.Args()) > 1) {
 		return context.Reply("Пример использования: <code>/mute {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/mute</code>\nЕсли нужно замьютить на время, то добавь время в секундах через пробел.")
 	}
 	target, untildate, err := utils.FindUserInMessage(context)
 	if err != nil {
-		return context.Reply(fmt.Sprintf("Не удалось определить пользователя или время ограничения:\n<code>%v</code>", err.Error()))
+		return err
 	}
 	TargetChatMember, err := utils.Bot.ChatMemberOf(context.Chat(), &target)
 	if err != nil {
-		return context.Reply(fmt.Sprintf("Ошибка определения пользователя чата:\n<code>%v</code>", err.Error()))
+		return err
 	}
 	TargetChatMember.CanSendMessages = false
 	TargetChatMember.RestrictedUntil = untildate

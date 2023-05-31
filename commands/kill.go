@@ -24,11 +24,11 @@ func Kill(context tele.Context) error {
 	}
 	target, _, err := utils.FindUserInMessage(context)
 	if err != nil {
-		return context.Reply(prt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
+		return err
 	}
 	ChatMember, err := utils.Bot.ChatMemberOf(context.Chat(), &target)
 	if err != nil {
-		return context.Reply(prt.Sprintf("Ошибка определения пользователя чата:\n<code>%v</code>", err.Error()))
+		return err
 	}
 	if context.Message().ReplyTo != nil {
 		utils.Bot.Delete(context.Message().ReplyTo)
@@ -48,7 +48,7 @@ func Kill(context tele.Context) error {
 		UpdateAll: true,
 	}).Create(&duelist)
 	if result.Error != nil {
-		return err
+		return result.Error
 	}
 	duration := utils.RandInt(1, duelist.Deaths+1)
 	duration += 10

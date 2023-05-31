@@ -70,12 +70,10 @@ func Convert(context tele.Context) error {
 	buf := bytes.NewBuffer(nil)
 	fileReader, err := utils.Bot.File(media.MediaFile())
 	if err != nil {
-		context.Reply("Ошибка загрузки файла")
 		return err
 	}
 	err = ffmpeg.Input("pipe:").Output("pipe:", KwArgs).WithInput(fileReader).WithOutput(buf, os.Stdout).Run()
 	if err != nil {
-		context.Reply("Ошибка конвертации")
 		return err
 	}
 	return context.Reply(&tele.Document{

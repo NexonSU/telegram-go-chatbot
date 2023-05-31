@@ -7,12 +7,12 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-//Remove user in DB on /pidordel
+// Remove user in DB on /pidordel
 func Pidordel(context tele.Context) error {
 	var pidor utils.PidorList
 	user, _, err := utils.FindUserInMessage(context)
 	if err != nil {
-		return context.Reply(fmt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
+		return err
 	}
 	pidor = utils.PidorList(user)
 	result := utils.DB.Delete(&pidor)

@@ -96,6 +96,9 @@ func gotdClientInit() error {
 func ErrorReporting(err error, context tele.Context) {
 	_, fn, line, _ := runtime.Caller(1)
 	log.Printf("[%s:%d] %v", fn, line, err)
+	if context != nil && context.Message() != nil {
+		context.Reply(fmt.Sprintf("Ошибка: <code>%v</code>", err.Error()))
+	}
 	text := fmt.Sprintf("<pre>[%s:%d]\n%v</pre>", fn, line, strings.ReplaceAll(err.Error(), Config.Token, ""))
 	if strings.Contains(err.Error(), "specified new message content and reply markup are exactly the same") {
 		return

@@ -7,7 +7,7 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-//List add pidors from DB on /pidorlist
+// List add pidors from DB on /pidorlist
 func Pidorlist(context tele.Context) error {
 	var pidorlist string
 	var pidor utils.PidorList
@@ -23,7 +23,7 @@ func Pidorlist(context tele.Context) error {
 		if len(pidorlist) > 3900 {
 			_, err = utils.Bot.Send(context.Sender(), pidorlist)
 			if err != nil {
-				return context.Reply("Ошибка отправки списка. Убедитесь, что бот запущен и не заблокирован в личке.")
+				return err
 			}
 			pidorlist = ""
 		}

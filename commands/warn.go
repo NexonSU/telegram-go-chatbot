@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-//Send warning to user on /warn
+// Send warning to user on /warn
 func Warn(context tele.Context) error {
 	var warn utils.Warn
 	if (context.Message().ReplyTo == nil && len(context.Args()) != 1) || (context.Message().ReplyTo != nil && len(context.Args()) != 0) {
@@ -17,7 +17,7 @@ func Warn(context tele.Context) error {
 	}
 	target, _, err := utils.FindUserInMessage(context)
 	if err != nil {
-		return context.Reply(fmt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
+		return err
 	}
 	result := utils.DB.First(&warn, target.ID)
 	if result.RowsAffected != 0 {
@@ -35,7 +35,7 @@ func Warn(context tele.Context) error {
 		UpdateAll: true,
 	}).Create(&warn)
 	if result.Error != nil {
-		return context.Reply(fmt.Sprintf("Не удалось выдать предупреждение:\n<code>%v</code>.", result.Error))
+		return result.Error
 	}
 	if warn.Amount == 1 {
 		return context.Send(fmt.Sprintf("%v, у тебя 1 предупреждение.\nЕсль получишь 3 предупреждения за 2 недели, то будешь исключен из чата.", utils.UserFullName(&target)))
@@ -47,12 +47,12 @@ func Warn(context tele.Context) error {
 		untildate := time.Now().AddDate(0, 0, 7).Unix()
 		TargetChatMember, err := utils.Bot.ChatMemberOf(context.Chat(), &target)
 		if err != nil {
-			return context.Reply(fmt.Sprintf("Ошибка определения пользователя чата:\n<code>%v</code>", err.Error()))
+			return err
 		}
 		TargetChatMember.RestrictedUntil = untildate
 		err = utils.Bot.Ban(context.Chat(), TargetChatMember)
 		if err != nil {
-			return context.Reply(fmt.Sprintf("Ошибка бана пользователя:\n<code>%v</code>", err.Error()))
+			return err
 		}
 		return context.Reply(fmt.Sprintf("Пользователь <a href=\"tg://user?id=%v\">%v</a> забанен%v, т.к. набрал 3 предупреждения.", target.ID, utils.UserFullName(&target), utils.RestrictionTimeMessage(untildate)))
 	}

@@ -90,15 +90,15 @@ func Cur(context tele.Context) error {
 	}
 	amount, err := strconv.ParseFloat(context.Args()[0], 64)
 	if err != nil {
-		return context.Reply(fmt.Sprintf("Ошибка определения количества:\n<code>%v</code>", err))
+		return err
 	}
 	symbol, err := GetSymbolId(context.Args()[1])
 	if err != nil {
-		return context.Reply(err.Error())
+		return err
 	}
 	convert, err := GetSymbolId(context.Args()[2])
 	if err != nil {
-		return context.Reply(err.Error())
+		return err
 	}
 	for _, JokeFiat := range JokeMap {
 		if strings.ToUpper(context.Args()[1]) == JokeFiat.symbol {
@@ -108,7 +108,7 @@ func Cur(context tele.Context) error {
 	client := cmc.NewClient(&cmc.Config{ProAPIKey: utils.Config.CurrencyKey})
 	conversion, err := client.Tools.PriceConversion(&cmc.ConvertOptions{Amount: amount, ID: symbol, ConvertID: convert})
 	if err != nil {
-		return context.Reply(fmt.Sprintf("Ошибка при запросе: %v\nОнлайн-версия: https://coinmarketcap.com/ru/converter/", err.Error()), &tele.SendOptions{DisableWebPagePreview: true})
+		return err
 	}
 	resultAmount := conversion.Quote[convert].Price
 	resultName := GetIdName(convert)

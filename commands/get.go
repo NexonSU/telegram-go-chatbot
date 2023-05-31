@@ -10,7 +10,7 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-//Send Get to user on /get
+// Send Get to user on /get
 func Get(context tele.Context) error {
 	var get utils.Get
 	if len(context.Args()) == 0 {
@@ -59,7 +59,7 @@ func Get(context tele.Context) error {
 	}
 }
 
-//Answer on inline get query
+// Answer on inline get query
 func GetInline(context tele.Context) error {
 	var count int64
 	query := strings.ToLower(context.Query().Text)
@@ -69,7 +69,6 @@ func GetInline(context tele.Context) error {
 	gets := utils.DB.Limit(10).Model(utils.Get{}).Where("name LIKE ?", "%"+query+"%").Count(&count)
 	get_rows, err := gets.Rows()
 	if err != nil {
-		log.Println(err.Error())
 		return err
 	}
 	if count > 10 {
@@ -81,7 +80,6 @@ func GetInline(context tele.Context) error {
 		var get utils.Get
 		err := utils.DB.ScanRows(get_rows, &get)
 		if err != nil {
-			log.Println(err.Error())
 			return err
 		}
 		if get.Title == "" {

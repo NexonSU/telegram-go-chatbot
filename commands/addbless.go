@@ -27,7 +27,7 @@ func AddBless(context tele.Context) error {
 	}
 	result := utils.DB.Create(&bless)
 	if result.Error != nil {
-		return context.Reply(fmt.Sprintf("Не удалось добавить bless, ошибка:\n<code>%v</code>", result.Error.Error()))
+		return result.Error
 	}
 	return context.Reply(fmt.Sprintf("Bless добавлен как <code>%v</code>.", bless.Text))
 }

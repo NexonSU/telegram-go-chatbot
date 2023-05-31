@@ -48,7 +48,7 @@ func Request(context tele.Context) error {
 	}
 	target, _, err := utils.FindUserInMessage(context)
 	if err != nil {
-		return context.Reply(fmt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
+		return err
 	}
 	if target.ID == context.Sender().ID {
 		return context.Reply("Как ты себе это представляешь? Нет, нельзя вызвать на дуэль самого себя.")
@@ -58,7 +58,7 @@ func Request(context tele.Context) error {
 	}
 	ChatMember, err := utils.Bot.ChatMemberOf(context.Chat(), &target)
 	if err != nil {
-		return context.Reply(fmt.Sprintf("Ошибка определения пользователя чата:\n<code>%v</code>", err.Error()))
+		return err
 	}
 	log.Println(ChatMember)
 	if false {

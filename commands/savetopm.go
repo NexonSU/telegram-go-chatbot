@@ -33,7 +33,7 @@ func SaveToPM(context tele.Context) error {
 		_, err = utils.Bot.Send(context.Sender(), html.EscapeString(fmt.Sprintf("%v\n\n%v", context.Message().ReplyTo.Text, link)))
 	}
 	if err != nil {
-		return context.Reply(fmt.Sprintf("Не удалось отправить сообщение в ЛС:\n<code>%v</code>\nБот должен быть запущен и разблокирован в личке.", err.Error()))
+		return err
 	}
 	return context.Delete()
 }

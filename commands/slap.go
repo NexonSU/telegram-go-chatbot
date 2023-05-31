@@ -7,7 +7,7 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-//Send slap message on /slap
+// Send slap message on /slap
 func Slap(context tele.Context) error {
 	var action = "дал леща"
 	var target tele.User
@@ -16,7 +16,7 @@ func Slap(context tele.Context) error {
 	}
 	target, _, err := utils.FindUserInMessage(context)
 	if err != nil {
-		return context.Reply(fmt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
+		return err
 	}
 	return context.Send(fmt.Sprintf("👋 <b>%v</b> %v %v", utils.UserFullName(context.Sender()), action, utils.MentionUser(&target)))
 }

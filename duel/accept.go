@@ -120,7 +120,7 @@ func Accept(context tele.Context) error {
 			UpdateAll: true,
 		}).Create(&duelist)
 		if result.Error != nil {
-			return err
+			return result.Error
 		}
 		PlayerChatMember.RestrictedUntil = time.Now().Add(time.Second * time.Duration(60*duelist.Deaths)).Unix()
 		err = utils.Bot.Restrict(context.Message().Chat, PlayerChatMember)
@@ -164,7 +164,7 @@ func Accept(context tele.Context) error {
 		UpdateAll: true,
 	}).Create(&VictimDuelist)
 	if result.Error != nil {
-		return err
+		return result.Error
 	}
 	if player.IsBot {
 		VictimDuelist.Deaths = 1

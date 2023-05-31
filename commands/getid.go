@@ -7,7 +7,7 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-//Send userid on /getid
+// Send userid on /getid
 func Getid(context tele.Context) error {
 	if context.Message().ReplyTo != nil && context.Message().ReplyTo.OriginalSender != nil {
 		_, err := utils.Bot.Send(context.Sender(), fmt.Sprintf("Firstname: %v\nLastname: %v\nUsername: %v\nUserID: %v", context.Message().ReplyTo.OriginalSender.FirstName, context.Message().ReplyTo.OriginalSender.LastName, context.Message().ReplyTo.OriginalSender.Username, context.Message().ReplyTo.OriginalSender.ID))
@@ -20,7 +20,7 @@ func Getid(context tele.Context) error {
 	if len(context.Args()) == 1 {
 		target, _, err := utils.FindUserInMessage(context)
 		if err != nil {
-			return context.Reply(fmt.Sprintf("Не удалось определить пользователя:\n<code>%v</code>", err.Error()))
+			return err
 		}
 		_, err = utils.Bot.Send(context.Sender(), fmt.Sprintf("Firstname: %v\nLastname: %v\nUsername: %v\nUserID: %v", target.FirstName, target.LastName, target.Username, target.ID))
 		return err

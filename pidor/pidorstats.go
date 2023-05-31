@@ -11,7 +11,7 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-//Send top 10 pidors of year on /pidorstats
+// Send top 10 pidors of year on /pidorstats
 func Pidorstats(context tele.Context) error {
 	// prt will replace fmt package to format text according plurals defined in utils package
 	// If no plural rule matched it will be ignored and processed as usual formatting
@@ -24,7 +24,7 @@ func Pidorstats(context tele.Context) error {
 	if len(context.Args()) == 1 {
 		argYear, err := strconv.Atoi(context.Data())
 		if err != nil {
-			return context.Reply("Ошибка определения года.\nУкажите год с 2019.")
+			return err
 		}
 		if argYear == 2077 {
 			return context.Reply(&tele.Video{File: tele.File{FileID: "BAACAgIAAx0CRXO-MQADWWB4LQABzrOqWPkq-JXIi4TIixY4dwACPw4AArBgwUt5sRu-_fDR5x4E"}})
