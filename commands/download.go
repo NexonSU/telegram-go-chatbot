@@ -11,6 +11,7 @@ import (
 	"path"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/gocolly/colly"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
@@ -54,7 +55,16 @@ func Download(context tele.Context) error {
 		}
 	}
 
-	context.Notify(tele.RecordingVideo)
+	var done = make(chan bool)
+	go func() {
+		for {
+			context.Notify(tele.UploadingVideo)
+			time.Sleep(time.Second * 5)
+			<-done
+		}
+	}()
+
+	defaultKwArgs := ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": ""}
 
 	if service == "youtube" {
 		goutubedl.Path = "yt-dlp"
@@ -106,7 +116,7 @@ func Download(context tele.Context) error {
 
 		buf := bytes.NewBuffer(nil)
 		outputArgs := ffmpeg.KwArgs{"map": "0", "format": "mp4", "c:v": "libx264", "preset": "fast", "crf": 30, "movflags": "frag_keyframe+empty_moov+faststart", "c:a": "aac"}
-		err = ffmpeg.Input("pipe:").Output("pipe:", outputArgs).WithInput(ytdlpResult).WithOutput(buf, os.Stdout).Run()
+		err = ffmpeg.Input("pipe:").Output("pipe:", ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{defaultKwArgs, outputArgs})).WithInput(ytdlpResult).WithOutput(buf, os.Stdout).Run()
 		if err != nil {
 			return err
 		}
@@ -123,12 +133,14 @@ func Download(context tele.Context) error {
 	if service == "twitter" {
 		downloader := NewTwitterVideoDownloader(link)
 		fileName := downloader.Download()
+
 		context.Reply(&tele.Video{
 			File:      tele.FromDisk(fileName),
 			MIME:      "video/mp4",
 			Streaming: true,
 			FileName:  fileName,
 		}, &tele.SendOptions{AllowWithoutReply: true})
+
 		return os.Remove(fileName)
 	}
 	if service == "file" {
@@ -144,7 +156,7 @@ func Download(context tele.Context) error {
 
 		buf := bytes.NewBuffer(nil)
 		outputArgs := ffmpeg.KwArgs{"map": "0", "format": "mp4", "c:v": "libx264", "preset": "fast", "crf": 26, "movflags": "frag_keyframe+empty_moov+faststart", "c:a": "aac"}
-		err = ffmpeg.Input("pipe:").Output("pipe:", outputArgs).WithInput(resp.Body).WithOutput(buf, os.Stdout).Run()
+		err = ffmpeg.Input("pipe:").Output("pipe:", ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{defaultKwArgs, outputArgs})).WithInput(resp.Body).WithOutput(buf, os.Stdout).Run()
 		if err != nil {
 			return err
 		}

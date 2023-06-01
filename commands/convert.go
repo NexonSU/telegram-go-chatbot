@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
@@ -18,15 +19,14 @@ func Convert(context tele.Context) error {
 	if context.Message().ReplyTo.Media() == nil {
 		return context.Reply("Какого-либо медиа файла нет в указанном сообщении.")
 	}
-	var err error
-	var fileName string
-	var mime string
-	var KwArgs map[string]interface{}
+
 	media := context.Message().ReplyTo.Media()
-	KwArgs = ffmpeg.KwArgs{"loglevel": "debug", "map": "0", "format": "mp4", "c:v": "libx264", "preset": "fast", "crf": 26, "movflags": "frag_keyframe+empty_moov+faststart", "c:a": "aac"}
-	mime = "video/mp4"
-	fileName = media.MediaFile().FileID + ".mp4"
+	defaultKwArgs := ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": ""}
+	KwArgs := ffmpeg.KwArgs{"map": "0", "format": "mp4", "c:v": "libx264", "preset": "fast", "crf": 26, "movflags": "frag_keyframe+empty_moov+faststart", "c:a": "aac"}
+	mime := "video/mp4"
+	fileName := media.MediaFile().FileID + ".mp4"
 	arg := media.MediaType()
+	action := "upload_video"
 	if len(context.Args()) == 1 {
 		arg = strings.ToLower(context.Args()[0])
 		switch arg {
@@ -56,26 +56,40 @@ func Convert(context tele.Context) error {
 		KwArgs = ffmpeg.KwArgs{"map": "a:0", "format": "mp3", "c:a": "libmp3lame"}
 		mime = "audio/mp3"
 		fileName = media.MediaFile().FileID + ".mp3"
+		action = "upload_audio"
 	case "ogg", "voice":
 		KwArgs = ffmpeg.KwArgs{"map": "a:0", "format": "ogg", "c:a": "libopus"}
 		mime = "audio/ogg"
 		fileName = media.MediaFile().FileID + ".ogg"
+		action = "record_voice"
 	case "jpg", "photo", "sticker":
 		KwArgs = ffmpeg.KwArgs{"vf": "select=eq(n\\,0)", "format": "image2"}
 		mime = "image/jpeg"
 		fileName = media.MediaFile().FileID + ".jpg"
+		action = "upload_photo"
 	case "gif", "animation":
 		KwArgs = ffmpeg.KwArgs{"map": "v:0", "format": "mp4", "c:v": "libx264", "an": "", "preset": "fast", "crf": 26, "movflags": "frag_keyframe+empty_moov+faststart"}
 	}
+
+	var done = make(chan bool)
+	go func() {
+		for {
+			context.Notify(tele.ChatAction(action))
+			time.Sleep(time.Second * 4)
+			<-done
+		}
+	}()
+
 	buf := bytes.NewBuffer(nil)
 	fileReader, err := utils.Bot.File(media.MediaFile())
 	if err != nil {
 		return err
 	}
-	err = ffmpeg.Input("pipe:").Output("pipe:", KwArgs).WithInput(fileReader).WithOutput(buf, os.Stdout).Run()
+	err = ffmpeg.Input("pipe:").Output("pipe:", ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{defaultKwArgs, KwArgs})).WithInput(fileReader).WithOutput(buf, os.Stdout).Run()
 	if err != nil {
 		return err
 	}
+
 	return context.Reply(&tele.Document{
 		File:     tele.FromReader(buf),
 		MIME:     mime,
