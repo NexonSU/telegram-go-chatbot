@@ -78,7 +78,7 @@ func Download(context tele.Context) error {
 	}
 	defer ytdlpResult.Close()
 
-	filePath = fmt.Sprintf("%v/%v.%v", os.TempDir(), result.Info.ID, result.Info.Ext)
+	filePath = fmt.Sprintf("%v/%v.%v", os.TempDir(), result.Info.Title, result.Info.Ext)
 
 	f, err := os.Create(filePath)
 	if err != nil {
