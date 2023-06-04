@@ -88,14 +88,16 @@ func Convert(context tele.Context) error {
 	}()
 
 	buf := bytes.NewBuffer(nil)
-	fileReader, err := utils.Bot.File(media.MediaFile())
+	err := utils.Bot.Download(media.MediaFile(), "/tmp/"+media.MediaFile().FileID+".mp4")
 	if err != nil {
 		return err
 	}
-	err = ffmpeg.Input("pipe:").Output("pipe:", ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{defaultKwArgs, KwArgs})).WithInput(fileReader).WithOutput(buf, os.Stdout).Run()
+	err = ffmpeg.Input("/tmp/"+media.MediaFile().FileID+".mp4").Output("pipe:", ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{defaultKwArgs, KwArgs})).WithOutput(buf, os.Stdout).Run()
 	if err != nil {
 		return err
 	}
+
+	os.Remove("/tmp/" + media.MediaFile().FileID + ".mp4")
 
 	return context.Reply(&tele.Document{
 		File:     tele.FromReader(buf),

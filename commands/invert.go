@@ -20,13 +20,10 @@ func Invert(context tele.Context) error {
 	}
 	media := context.Message().ReplyTo.Media()
 	outputKwArgs := ffmpeg.KwArgs{"map": "0"}
-	inputKwArgs := ffmpeg.KwArgs{"map": "0"}
 	switch media.MediaType() {
 	case "video":
-		inputKwArgs = ffmpeg.KwArgs{"loglevel": "debug", "hide_banner": "", "format": "mp4"}
 		outputKwArgs = ffmpeg.KwArgs{"format": "mp4", "map": "0", "c:v": "libx264", "preset": "fast", "crf": 26, "movflags": "frag_keyframe+empty_moov+faststart", "c:a": "aac", "vf": "reverse", "af": "areverse"}
 	case "animation":
-		inputKwArgs = ffmpeg.KwArgs{"loglevel": "debug", "hide_banner": "", "format": "mp4"}
 		outputKwArgs = ffmpeg.KwArgs{"format": "mp4", "map": "v:0", "c:v": "libx264", "preset": "fast", "crf": 26, "movflags": "frag_keyframe+empty_moov+faststart", "vf": "reverse"}
 	default:
 		return context.Reply("Неподдерживаемая операция")
@@ -49,14 +46,16 @@ func Invert(context tele.Context) error {
 	}()
 
 	buf := bytes.NewBuffer(nil)
-	fileReader, err := utils.Bot.File(media.MediaFile())
+	err := utils.Bot.Download(media.MediaFile(), "/tmp/"+media.MediaFile().FileID+".mp4")
 	if err != nil {
 		return err
 	}
-	err = ffmpeg.Input("pipe:", inputKwArgs).Output("pipe:", outputKwArgs).WithInput(fileReader).WithOutput(buf, os.Stdout).Run()
+	err = ffmpeg.Input("/tmp/"+media.MediaFile().FileID+".mp4").Output("pipe:", outputKwArgs).WithOutput(buf, os.Stdout).Run()
 	if err != nil {
 		return err
 	}
+
+	os.Remove("/tmp/" + media.MediaFile().FileID + ".mp4")
 
 	return context.Reply(&tele.Document{
 		File:     tele.FromReader(buf),
