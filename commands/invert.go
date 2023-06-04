@@ -22,7 +22,7 @@ func Invert(context tele.Context) error {
 	outputKwArgs := ffmpeg.KwArgs{"map": "0"}
 	switch media.MediaType() {
 	case "video":
-		outputKwArgs = ffmpeg.KwArgs{"format": "mp4", "map": "0", "c:v": "libx264", "preset": "fast", "crf": 26, "movflags": "frag_keyframe+empty_moov+faststart", "c:a": "aac", "vf": "reverse", "af": "areverse"}
+		outputKwArgs = ffmpeg.KwArgs{"format": "mp4", "c:v": "libx264", "preset": "fast", "crf": 26, "movflags": "frag_keyframe+empty_moov+faststart", "c:a": "aac", "vf": "reverse", "af": "areverse"}
 	case "animation":
 		outputKwArgs = ffmpeg.KwArgs{"format": "mp4", "map": "v:0", "c:v": "libx264", "preset": "fast", "crf": 26, "movflags": "frag_keyframe+empty_moov+faststart", "vf": "reverse"}
 	default:

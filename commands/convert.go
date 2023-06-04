@@ -22,7 +22,7 @@ func Convert(context tele.Context) error {
 
 	media := context.Message().ReplyTo.Media()
 	defaultKwArgs := ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": ""}
-	KwArgs := ffmpeg.KwArgs{"map": "0", "format": "mp4", "c:v": "libx264", "preset": "fast", "crf": 26, "movflags": "frag_keyframe+empty_moov+faststart", "c:a": "aac"}
+	KwArgs := ffmpeg.KwArgs{"format": "mp4", "c:v": "libx264", "preset": "fast", "crf": 26, "movflags": "frag_keyframe+empty_moov+faststart", "c:a": "aac"}
 	mime := "video/mp4"
 	fileName := media.MediaFile().FileID + ".mp4"
 	arg := media.MediaType()
