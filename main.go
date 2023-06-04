@@ -59,6 +59,8 @@ func main() {
 		{tele.Command{Text: "bonk", Description: "бонкнуть кого-нибудь"}, commands.Bonk, chats},
 		{tele.Command{Text: "cur", Description: "посмотреть курс валют"}, commands.Cur, chats},
 		{tele.Command{Text: "del", Description: "удалить гет"}, commands.Del, chats},
+		{tele.Command{Text: "invert", Description: "инвертировать видео"}, commands.Invert, chats},
+		{tele.Command{Text: "reverse", Description: "инвертировать видео"}, commands.Invert, chats},
 		{tele.Command{Text: "duel", Description: "вызвать на дуэль кого-нибудь"}, duel.Request, chats},
 		{tele.Command{Text: "duelstats", Description: "посмотреть свою статистику дуэли"}, duel.Duelstats, chats},
 		{tele.Command{Text: "ping", Description: "понг"}, commands.Ping, chats},

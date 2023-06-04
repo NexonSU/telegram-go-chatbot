@@ -55,13 +55,20 @@ func Download(context tele.Context) error {
 		}
 	}
 
-	var done = make(chan bool)
+	var done = make(chan bool, 1)
 	go func() {
 		for {
-			context.Notify(tele.UploadingVideo)
+			select {
+			case <-done:
+				return
+			default:
+				context.Notify(tele.UploadingVideo)
+			}
 			time.Sleep(time.Second * 5)
-			<-done
 		}
+	}()
+	defer func() {
+		done <- true
 	}()
 
 	defaultKwArgs := ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": ""}
@@ -94,14 +101,14 @@ func Download(context tele.Context) error {
 				continue
 			}
 			filesize := format.Filesize + audioFormat.Filesize
-			if filesize < 50000000 && filesize > formatSize {
+			if filesize < 45000000 && filesize > formatSize {
 				formatSize = filesize
 				formatID = format.FormatID + "+" + audioFormat.FormatID
 			}
 		}
 
 		if formatID == "best" {
-			if result.Info.Filesize > 50000000 || result.Info.FilesizeApprox > 50000000 {
+			if result.Info.Filesize > 45000000 || result.Info.FilesizeApprox > 45000000 {
 				if !strings.Contains(link, "/clip/") {
 					return context.Reply("Видео больше 50МБ")
 				}
@@ -127,7 +134,12 @@ func Download(context tele.Context) error {
 			Height:    int(result.Info.Height),
 			Width:     int(result.Info.Width),
 			Streaming: true,
-			FileName:  result.Info.ID + ".mp4",
+			Thumbnail: &tele.Photo{
+				File:   tele.FromURL(result.Info.Thumbnail),
+				Height: int(result.Info.Height),
+				Width:  int(result.Info.Width),
+			},
+			FileName: result.Info.ID + ".mp4",
 		}, &tele.SendOptions{AllowWithoutReply: true})
 	}
 	if service == "twitter" {

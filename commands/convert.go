@@ -71,13 +71,20 @@ func Convert(context tele.Context) error {
 		KwArgs = ffmpeg.KwArgs{"map": "v:0", "format": "mp4", "c:v": "libx264", "an": "", "preset": "fast", "crf": 26, "movflags": "frag_keyframe+empty_moov+faststart"}
 	}
 
-	var done = make(chan bool)
+	var done = make(chan bool, 1)
 	go func() {
 		for {
-			context.Notify(tele.ChatAction(action))
-			time.Sleep(time.Second * 4)
-			<-done
+			select {
+			case <-done:
+				return
+			default:
+				context.Notify(tele.ChatAction(action))
+			}
+			time.Sleep(time.Second * 5)
 		}
+	}()
+	defer func() {
+		done <- true
 	}()
 
 	buf := bytes.NewBuffer(nil)
