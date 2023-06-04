@@ -4,15 +4,23 @@ import (
 	"crypto/rand"
 	"errors"
 	"fmt"
+	"io"
 	"math/big"
+	"net/http"
+	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 	"unicode/utf16"
 
+	cntx "context"
+
 	"github.com/neonxp/StemmerRu"
+	ffmpeg "github.com/u2takey/ffmpeg-go"
 	tele "gopkg.in/telebot.v3"
+	ffprobe "gopkg.in/vansante/go-ffprobe.v2"
 	"gorm.io/gorm/clause"
 )
 
@@ -335,4 +343,220 @@ func GetHtmlText(message tele.Message) string {
 	}
 
 	return textString
+}
+
+func FFmpegConvert(context tele.Context, filePath string, targetType string) error {
+	var KwArgs ffmpeg.KwArgs
+	var extension string
+	var vbitrate int
+	var abitrate int
+	var height int
+	var width int
+	var duration float64
+
+	videoKwArgs := ffmpeg.KwArgs{"c:v": "libx265", "movflags": "frag_keyframe+empty_moov+faststart"}
+	defaultKwArgs := ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": ""}
+	name := strings.TrimSuffix(filepath.Base(filePath), filepath.Ext(filePath))
+
+	ctx, cancelFn := cntx.WithTimeout(cntx.Background(), 5*time.Second)
+	defer cancelFn()
+
+	file, err := os.Stat(filePath)
+	if err != nil {
+		return err
+	}
+
+	data, err := ffprobe.ProbeURL(ctx, filePath)
+	if err != nil {
+		return err
+	}
+	inputVideoFormat := data.FirstVideoStream()
+	inputAudioFormat := data.FirstAudioStream()
+
+	if inputVideoFormat != nil {
+		width = inputVideoFormat.Width
+		height = inputVideoFormat.Height
+		vbitrate, err = strconv.Atoi(inputVideoFormat.BitRate)
+		if err != nil {
+			vbitrate = 0
+		}
+		duration, err = strconv.ParseFloat(inputVideoFormat.Duration, 32)
+		if err != nil {
+			duration = 0
+		}
+	} else {
+		switch targetType {
+		case "animation", "gif", "webm", "animation_reverse", "sticker_reverse":
+			return fmt.Errorf("видео-дорожка не найдена")
+		case "video", "mp4":
+			targetType = "audio"
+		case "video_reverse", "reverse", "invert":
+			targetType = "audio_reverse"
+		}
+	}
+
+	if inputAudioFormat != nil {
+		abitrate, err = strconv.Atoi(inputAudioFormat.BitRate)
+		if err != nil {
+			abitrate = 0
+		}
+		if duration == 0 {
+			duration, err = strconv.ParseFloat(inputAudioFormat.Duration, 32)
+			if err != nil {
+				duration = 0
+			}
+		}
+	} else {
+		switch targetType {
+		case "audio", "mp3", "voice", "ogg", "audio_reverse", "voice_reverse":
+			return fmt.Errorf("аудио-дорожка не найдена")
+		case "video", "mp4", "webm":
+			targetType = "animation"
+		case "video_reverse", "reverse", "invert":
+			targetType = "animation_reverse"
+		}
+	}
+
+	if inputAudioFormat == nil && inputVideoFormat == nil {
+		return fmt.Errorf("медиа-дорожек не найдено")
+	}
+
+	if file.Size() > 45000000 {
+		vbitrate = int(450000000 * 8 / int(duration))
+		videoKwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"b:v": vbitrate}})
+	} else {
+		videoKwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"crf": 25}})
+	}
+
+	if abitrate > 192000 {
+		abitrate = 192000
+	}
+
+	switch targetType {
+	case "audio", "mp3":
+		KwArgs = ffmpeg.KwArgs{"map": "a:0", "c:a": "libmp3lame", "b:a": abitrate}
+		extension = "mp3"
+		targetType = "audio"
+	case "voice", "ogg":
+		KwArgs = ffmpeg.KwArgs{"map": "a:0", "c:a": "libopus", "b:a": abitrate}
+		extension = "ogg"
+		targetType = "voice"
+	case "photo", "jpg":
+		KwArgs = ffmpeg.KwArgs{"vf": "select=eq(n\\,0)", "format": "image2"}
+		extension = "jpg"
+		targetType = "photo"
+	case "sticker", "webp":
+		KwArgs = ffmpeg.KwArgs{"vf": "select=eq(n\\,0)", "format": "image2"}
+		extension = "webp"
+		targetType = "sticker"
+	case "animation", "gif":
+		KwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"map": "v:0", "an": ""}})
+		extension = "mp4"
+		targetType = "animation"
+	case "video", "mp4":
+		KwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"c:a": "aac", "b:a": abitrate}})
+		extension = "mp4"
+		targetType = "video"
+	case "video_reverse", "reverse", "invert":
+		KwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"c:a": "aac", "b:a": abitrate, "vf": "reverse", "af": "areverse"}})
+		extension = "mp4"
+		targetType = "video"
+	case "animation_reverse":
+		KwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"map": "v:0", "an": "", "vf": "reverse"}})
+		extension = "mp4"
+		targetType = "animation"
+	case "sticker_reverse", "webm":
+		KwArgs = ffmpeg.KwArgs{"c:v": "libvpx-vp9", "map": "v:0", "an": "", "vf": "reverse"}
+		extension = "webm"
+		targetType = "sticker"
+	case "audio_reverse":
+		KwArgs = ffmpeg.KwArgs{"map": "a:0", "c:a": "libmp3lame", "b:a": abitrate, "af": "areverse"}
+		extension = "mp3"
+		targetType = "audio"
+	case "voice_reverse":
+		KwArgs = ffmpeg.KwArgs{"map": "a:0", "c:a": "libopus", "b:a": abitrate, "af": "areverse"}
+		extension = "ogg"
+		targetType = "voice"
+	default:
+		return fmt.Errorf("targetType %v not supported", targetType)
+	}
+
+	resultFilePath := fmt.Sprintf("%v/%v_converted.%v", os.TempDir(), name, extension)
+
+	err = ffmpeg.Input(filePath).Output(resultFilePath, ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{defaultKwArgs, KwArgs})).OverWriteOutput().ErrorToStdOut().Run()
+	if err != nil {
+		return err
+	}
+
+	err = os.Remove(filePath)
+	if err != nil {
+		return err
+	}
+
+	defer func(resultFilePath string) {
+		os.Remove(resultFilePath)
+	}(resultFilePath)
+
+	switch targetType {
+	case "video":
+		return context.Reply(&tele.Video{
+			File:      tele.FromDisk(resultFilePath),
+			FileName:  filepath.Base(resultFilePath),
+			Streaming: true,
+			Width:     width,
+			Height:    height,
+			Duration:  int(duration),
+			MIME:      "video/mp4",
+		}, &tele.SendOptions{AllowWithoutReply: true})
+	case "animation":
+		return context.Reply(&tele.Animation{
+			File:     tele.FromDisk(resultFilePath),
+			FileName: filepath.Base(resultFilePath),
+			Width:    width,
+			Height:   height,
+			Duration: int(duration),
+			MIME:     "video/mp4",
+		}, &tele.SendOptions{AllowWithoutReply: true})
+	case "audio":
+		return context.Reply(&tele.Audio{
+			File:     tele.FromDisk(resultFilePath),
+			FileName: filepath.Base(resultFilePath),
+			MIME:     "audio/mp3",
+		}, &tele.SendOptions{AllowWithoutReply: true})
+	case "voice":
+		return context.Reply(&tele.Voice{
+			File: tele.FromDisk(resultFilePath),
+			MIME: "audio/ogg",
+		}, &tele.SendOptions{AllowWithoutReply: true})
+	default:
+		return context.Reply(&tele.Document{
+			File:     tele.FromDisk(resultFilePath),
+			FileName: filepath.Base(resultFilePath),
+		}, &tele.SendOptions{AllowWithoutReply: true})
+	}
+}
+
+func DownloadFile(filepath string, url string) (err error) {
+	out, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("bad status: %s", resp.Status)
+	}
+
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

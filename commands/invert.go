@@ -1,32 +1,58 @@
 package commands
 
 import (
-	"bytes"
+	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	ffmpeg "github.com/u2takey/ffmpeg-go"
 	tele "gopkg.in/telebot.v3"
 )
 
 // Invert given file
 func Invert(context tele.Context) error {
 	if context.Message().ReplyTo == nil {
-		return context.Reply("Пример использования: <code>/convert</code> в ответ на какое-либо сообщение с видео.")
+		return context.Reply("Пример использования: <code>/invert</code> в ответ на какое-либо сообщение с видео.")
 	}
 	if context.Message().ReplyTo.Media() == nil {
 		return context.Reply("Какого-либо видео нет в указанном сообщении.")
 	}
+
 	media := context.Message().ReplyTo.Media()
-	outputKwArgs := ffmpeg.KwArgs{"map": "0"}
-	switch media.MediaType() {
-	case "video":
-		outputKwArgs = ffmpeg.KwArgs{"format": "mp4", "c:v": "libx264", "preset": "fast", "crf": 26, "movflags": "frag_keyframe+empty_moov+faststart", "c:a": "aac", "vf": "reverse", "af": "areverse"}
-	case "animation":
-		outputKwArgs = ffmpeg.KwArgs{"format": "mp4", "map": "v:0", "c:v": "libx264", "preset": "fast", "crf": 26, "movflags": "frag_keyframe+empty_moov+faststart", "vf": "reverse"}
+
+	targetArg := media.MediaType()
+	if len(context.Args()) == 1 {
+		targetArg = strings.ToLower(context.Args()[0])
+	}
+
+	var extension string
+	switch targetArg {
+	case "video", "mp4":
+		extension = "mp4"
+		targetArg = "video"
+	case "animation", "gif":
+		extension = "mp4"
+		targetArg = "animation"
+	case "sticker", "webm":
+		extension = "webm"
+		targetArg = "sticker"
+	case "voice", "ogg":
+		extension = "ogg"
+		targetArg = "voice"
+	case "audio", "mp3":
+		extension = "mp3"
+		targetArg = "audio"
 	default:
 		return context.Reply("Неподдерживаемая операция")
+	}
+
+	targetArg = targetArg + "_reverse"
+
+	if targetArg == "sticker_reverse" {
+		if !context.Message().ReplyTo.Sticker.Animated && !context.Message().ReplyTo.Sticker.Video {
+			return context.Reply("Неподдерживаемая операция")
+		}
 	}
 
 	var done = make(chan bool, 1)
@@ -36,7 +62,7 @@ func Invert(context tele.Context) error {
 			case <-done:
 				return
 			default:
-				context.Notify(tele.ChatAction("upload_video"))
+				context.Notify(tele.ChatAction(tele.UploadingDocument))
 			}
 			time.Sleep(time.Second * 5)
 		}
@@ -45,21 +71,12 @@ func Invert(context tele.Context) error {
 		done <- true
 	}()
 
-	buf := bytes.NewBuffer(nil)
-	err := utils.Bot.Download(media.MediaFile(), "/tmp/"+media.MediaFile().FileID+".mp4")
-	if err != nil {
-		return err
-	}
-	err = ffmpeg.Input("/tmp/"+media.MediaFile().FileID+".mp4").Output("pipe:", outputKwArgs).WithOutput(buf, os.Stdout).Run()
+	filePath := fmt.Sprintf("%v/%v.%v", os.TempDir(), media.MediaFile().FileID, extension)
+
+	err := utils.Bot.Download(media.MediaFile(), filePath)
 	if err != nil {
 		return err
 	}
 
-	os.Remove("/tmp/" + media.MediaFile().FileID + ".mp4")
-
-	return context.Reply(&tele.Document{
-		File:     tele.FromReader(buf),
-		MIME:     "video/mp4",
-		FileName: media.MediaFile().FileID + ".mp4",
-	}, &tele.SendOptions{AllowWithoutReply: true})
+	return utils.FFmpegConvert(context, filePath, targetArg)
 }

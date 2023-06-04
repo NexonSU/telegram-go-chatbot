@@ -1,74 +1,60 @@
 package commands
 
 import (
-	"bytes"
+	"fmt"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	ffmpeg "github.com/u2takey/ffmpeg-go"
 	tele "gopkg.in/telebot.v3"
 )
 
 // Convert given file
 func Convert(context tele.Context) error {
 	if context.Message().ReplyTo == nil {
+		for _, entity := range context.Message().Entities {
+			if entity.Type == tele.EntityURL {
+				return Download(context)
+			}
+		}
 		return context.Reply("Пример использования: <code>/convert</code> в ответ на какое-либо сообщение с медиа-файлом.\nДопольнительные параметры: gif,mp3,ogg,jpg.")
 	}
 	if context.Message().ReplyTo.Media() == nil {
+		for _, entity := range context.Message().ReplyTo.Entities {
+			if entity.Type == tele.EntityURL {
+				return Download(context)
+			}
+		}
 		return context.Reply("Какого-либо медиа файла нет в указанном сообщении.")
 	}
 
 	media := context.Message().ReplyTo.Media()
-	defaultKwArgs := ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": ""}
-	KwArgs := ffmpeg.KwArgs{"format": "mp4", "c:v": "libx264", "preset": "fast", "crf": 26, "movflags": "frag_keyframe+empty_moov+faststart", "c:a": "aac"}
-	mime := "video/mp4"
-	fileName := media.MediaFile().FileID + ".mp4"
-	arg := media.MediaType()
-	action := "upload_video"
-	if len(context.Args()) == 1 {
-		arg = strings.ToLower(context.Args()[0])
-		switch arg {
-		case "mp3", "audio", "ogg", "voice":
-			if !utils.StringInSlice(media.MediaType(), []string{"video", "voice", "audio", "document"}) {
-				return context.Reply("Неподдерживаемая операция")
-			}
-		case "jpg", "photo":
-			if !utils.StringInSlice(media.MediaType(), []string{"photo", "animation", "video", "document"}) {
-				return context.Reply("Неподдерживаемая операция")
-			}
-		case "gif", "animation":
-			if !utils.StringInSlice(media.MediaType(), []string{"video", "animation", "document"}) {
-				return context.Reply("Неподдерживаемая операция")
-			}
-		case "video", "video_note", "document":
-			break
-		default:
-			return context.Reply("Неподдерживаемая операция")
+	var extension string
+	var targetArg string
+
+	switch media.MediaType() {
+	case "audio":
+		extension = "mp3"
+	case "voice":
+		extension = "ogg"
+	case "photo":
+		extension = "jpg"
+	case "sticker":
+		extension = "webp"
+	case "animation", "video", "video_note", "document":
+		extension = "mp4"
+	}
+
+	if media.MediaType() == "sticker" {
+		if context.Message().ReplyTo.Sticker.Animated || context.Message().ReplyTo.Sticker.Video {
+			extension = "webm"
 		}
 	}
-	if arg == "sticker" && (context.Message().ReplyTo.Sticker.Animated || context.Message().ReplyTo.Sticker.Video) {
-		arg = "gif"
-	}
-	switch arg {
-	case "mp3", "audio":
-		KwArgs = ffmpeg.KwArgs{"map": "a:0", "format": "mp3", "c:a": "libmp3lame"}
-		mime = "audio/mp3"
-		fileName = media.MediaFile().FileID + ".mp3"
-		action = "upload_audio"
-	case "ogg", "voice":
-		KwArgs = ffmpeg.KwArgs{"map": "a:0", "format": "ogg", "c:a": "libopus"}
-		mime = "audio/ogg"
-		fileName = media.MediaFile().FileID + ".ogg"
-		action = "record_voice"
-	case "jpg", "photo", "sticker":
-		KwArgs = ffmpeg.KwArgs{"vf": "select=eq(n\\,0)", "format": "image2"}
-		mime = "image/jpeg"
-		fileName = media.MediaFile().FileID + ".jpg"
-		action = "upload_photo"
-	case "gif", "animation":
-		KwArgs = ffmpeg.KwArgs{"map": "v:0", "format": "mp4", "c:v": "libx264", "an": "", "preset": "fast", "crf": 26, "movflags": "frag_keyframe+empty_moov+faststart"}
+
+	targetArg = media.MediaType()
+	if len(context.Args()) == 1 {
+		targetArg = strings.ToLower(context.Args()[0])
 	}
 
 	var done = make(chan bool, 1)
@@ -78,7 +64,7 @@ func Convert(context tele.Context) error {
 			case <-done:
 				return
 			default:
-				context.Notify(tele.ChatAction(action))
+				context.Notify(tele.ChatAction(tele.UploadingDocument))
 			}
 			time.Sleep(time.Second * 5)
 		}
@@ -87,21 +73,12 @@ func Convert(context tele.Context) error {
 		done <- true
 	}()
 
-	buf := bytes.NewBuffer(nil)
-	err := utils.Bot.Download(media.MediaFile(), "/tmp/"+media.MediaFile().FileID+".mp4")
-	if err != nil {
-		return err
-	}
-	err = ffmpeg.Input("/tmp/"+media.MediaFile().FileID+".mp4").Output("pipe:", ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{defaultKwArgs, KwArgs})).WithOutput(buf, os.Stdout).Run()
+	filePath := fmt.Sprintf("%v/%v.%v", os.TempDir(), media.MediaFile().FileID, extension)
+
+	err := utils.Bot.Download(media.MediaFile(), filePath)
 	if err != nil {
 		return err
 	}
 
-	os.Remove("/tmp/" + media.MediaFile().FileID + ".mp4")
-
-	return context.Reply(&tele.Document{
-		File:     tele.FromReader(buf),
-		MIME:     mime,
-		FileName: fileName,
-	}, &tele.SendOptions{AllowWithoutReply: true})
+	return utils.FFmpegConvert(context, filePath, targetArg)
 }
