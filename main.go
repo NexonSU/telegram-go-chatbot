@@ -4,6 +4,7 @@ import (
 	"log"
 	"sort"
 
+	"github.com/NexonSU/telegram-go-chatbot/bets"
 	"github.com/NexonSU/telegram-go-chatbot/commands"
 	"github.com/NexonSU/telegram-go-chatbot/duel"
 	"github.com/NexonSU/telegram-go-chatbot/pidor"
@@ -69,6 +70,9 @@ func main() {
 		{tele.Command{Text: "suicide", Description: "устроиться в роскомнадзор"}, commands.Blessing, chats},
 		{tele.Command{Text: "topm", Description: "сохранить пост в личку"}, commands.SaveToPM, chats},
 		{tele.Command{Text: "advice", Description: "получить совет"}, commands.Advice, chats},
+		{tele.Command{Text: "bet", Description: "поставить ставку"}, bets.Bet, chats},
+		{tele.Command{Text: "allbets", Description: "список актуальных ставок"}, bets.AllBets, chats},
+		{tele.Command{Text: "delbet", Description: "удалить ставку"}, bets.DelBet, chats},
 		{tele.Command{Text: "convert", Description: "конвертировать файл, доппараметры: mp3,ogg,gif,audio,voice,animation"}, commands.Convert, chats},
 		{tele.Command{Text: "download", Description: "скачать файл"}, commands.Download, chats},
 	}

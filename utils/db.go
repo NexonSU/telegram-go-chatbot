@@ -47,6 +47,12 @@ type Nope struct {
 	Text string `gorm:"primaryKey"`
 }
 
+type Bets struct {
+	UserID    int64  `gorm:"primaryKey"`
+	Text      string `gorm:"primaryKey"`
+	Timestamp int64  `gorm:"primaryKey"`
+}
+
 type StatsWords struct {
 	ID        int64 `gorm:"primaryKey;autoIncrement"`
 	Word      string
@@ -76,7 +82,7 @@ func DataBaseInit(file string) gorm.DB {
 	}
 
 	//Create tables, if they not exists in DB
-	err = database.AutoMigrate(tele.User{}, Get{}, Warn{}, PidorStats{}, PidorList{}, Duelist{}, Bless{}, Nope{}, Stats{}, StatsWords{})
+	err = database.AutoMigrate(tele.User{}, Get{}, Warn{}, PidorStats{}, PidorList{}, Duelist{}, Bless{}, Nope{}, Stats{}, StatsWords{}, Bets{})
 	if err != nil {
 		log.Println(err)
 	}
