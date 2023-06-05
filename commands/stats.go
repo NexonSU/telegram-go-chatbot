@@ -6,5 +6,12 @@ import (
 
 // Reply with stats link
 func Stats(context tele.Context) error {
-	return context.Reply("https://grafana.nexon.su/goto/gK6C_fw4R?orgId=1")
+	return context.Reply("Статистика чата", &tele.ReplyMarkup{
+		InlineKeyboard: [][]tele.InlineButton{{
+			{
+				Text:   "Открыть",
+				WebApp: &tele.WebApp{URL: "https://grafana.nexon.su/d/aef7a25c-3824-4046-8ed3-53ccb5850c9d/zavtrachat?orgId=1&kiosk"},
+			},
+		}},
+	})
 }
