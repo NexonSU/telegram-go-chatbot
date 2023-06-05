@@ -22,7 +22,7 @@ func AllBets(context tele.Context) error {
 		}
 	}
 	from = time.Now().Local().Unix() - 86400
-	result, _ := utils.DB.Model(&utils.Bets{}).Where("timestamp > ?", from).Order("timestamp DESC").Rows()
+	result, _ := utils.DB.Model(&utils.Bets{}).Where("timestamp > ?", from).Order("timestamp ASC").Rows()
 	for result.Next() {
 		err := utils.DB.ScanRows(result, &bet)
 		if err != nil {
