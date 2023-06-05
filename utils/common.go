@@ -465,7 +465,7 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 
 	resultFilePath := fmt.Sprintf("%v/%v_converted.%v", os.TempDir(), name, extension)
 
-	err = ffmpeg.Input(filePath).Output(resultFilePath, ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{defaultKwArgs, KwArgs})).OverWriteOutput().ErrorToStdOut().WithCpuCoreLimit(4).Run()
+	err = ffmpeg.Input(filePath).Output(resultFilePath, ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{defaultKwArgs, KwArgs})).OverWriteOutput().ErrorToStdOut().WithCpuCoreLimit(2).Run()
 	if err != nil {
 		return err
 	}
