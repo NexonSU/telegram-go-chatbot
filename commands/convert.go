@@ -1,7 +1,9 @@
 package commands
 
 import (
+	"encoding/json"
 	"fmt"
+	"html"
 	"os"
 	"strings"
 	"time"
@@ -75,10 +77,15 @@ func Convert(context tele.Context) error {
 
 	filePath := fmt.Sprintf("%v/%v.%v", os.TempDir(), media.MediaFile().FileID, extension)
 
-	err := utils.Bot.Download(media.MediaFile(), filePath)
+	file, err := utils.Bot.FileByID(media.MediaFile().FileID)
 	if err != nil {
 		return err
 	}
 
+	MarshalledMessage, _ := json.MarshalIndent(file, "", "    ")
+	JsonMessage := html.EscapeString(string(MarshalledMessage))
+	return context.Reply(fmt.Sprintf("\n\nMessage:\n<pre>%v</pre>", JsonMessage))
+
+	return nil
 	return utils.FFmpegConvert(context, filePath, targetArg)
 }
