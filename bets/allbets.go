@@ -22,7 +22,7 @@ func AllBets(context tele.Context) error {
 		}
 	}
 	from = time.Now().Local().Unix() - 86400
-	result, _ := utils.DB.Model(&utils.Bets{}).Where("timestamp > ?", from).Rows()
+	result, _ := utils.DB.Model(&utils.Bets{}).Where("timestamp > ?", from).Order("timestamp DESC").Rows()
 	for result.Next() {
 		err := utils.DB.ScanRows(result, &bet)
 		if err != nil {
@@ -35,11 +35,7 @@ func AllBets(context tele.Context) error {
 		}
 		betlist += fmt.Sprintf("%v, %v:<pre>%v</pre>\n", time.Unix(bet.Timestamp, 0).Format("02.01.2006"), utils.UserFullName(&user), bet.Text)
 		if len(betlist) > 3900 {
-			err = context.Reply(betlist)
-			if err != nil {
-				return err
-			}
-			betlist = ""
+			return context.Reply(betlist)
 		}
 	}
 	return context.Reply(betlist)
