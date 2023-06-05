@@ -19,8 +19,8 @@ func Bet(context tele.Context) error {
 	if err != nil {
 		return err
 	}
-	if date.Unix() < date.Local().Unix() {
-		return fmt.Errorf("нельзя поставить ставку в прошлом")
+	if date.Unix() < time.Now().Local().Unix() {
+		return fmt.Errorf("минимальная дата: %v", time.Now().Local().Format("02.01.2006"))
 	}
 	bet.UserID = context.Sender().ID
 	bet.Timestamp = date.Unix()
