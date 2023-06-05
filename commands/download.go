@@ -68,11 +68,11 @@ func Download(context tele.Context) error {
 		return err
 	}
 
-	if result.Info.Duration > 600 {
-		return context.Reply("Максимальная длина видео 10 минут.")
+	if result.Info.Duration > 3600 {
+		return context.Reply("Максимальная длина видео 60 минут.")
 	}
 
-	ytdlpResult, err := result.Download(cntx.Background(), "bv*[filesize<50M]+ba/b[filesize<50M]")
+	ytdlpResult, err := result.Download(cntx.Background(), "bv*[height<=1080]+ba/b[height<=1080] / wv*+ba/w")
 	if err != nil {
 		return err
 	}

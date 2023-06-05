@@ -348,23 +348,16 @@ func GetHtmlText(message tele.Message) string {
 func FFmpegConvert(context tele.Context, filePath string, targetType string) error {
 	var KwArgs ffmpeg.KwArgs
 	var extension string
-	var vbitrate int
-	var abitrate int
 	var height int
 	var width int
 	var duration float64
 
-	videoKwArgs := ffmpeg.KwArgs{"c:v": "libx265", "movflags": "frag_keyframe+empty_moov+faststart"}
+	videoKwArgs := ffmpeg.KwArgs{"c:v": "libx265", "crf": 25, "movflags": "frag_keyframe+empty_moov+faststart"}
 	defaultKwArgs := ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": ""}
 	name := strings.TrimSuffix(filepath.Base(filePath), filepath.Ext(filePath))
 
 	ctx, cancelFn := cntx.WithTimeout(cntx.Background(), 5*time.Second)
 	defer cancelFn()
-
-	file, err := os.Stat(filePath)
-	if err != nil {
-		return err
-	}
 
 	data, err := ffprobe.ProbeURL(ctx, filePath)
 	if err != nil {
@@ -376,10 +369,6 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 	if inputVideoFormat != nil {
 		width = inputVideoFormat.Width
 		height = inputVideoFormat.Height
-		vbitrate, err = strconv.Atoi(inputVideoFormat.BitRate)
-		if err != nil {
-			vbitrate = 0
-		}
 		duration, err = strconv.ParseFloat(inputVideoFormat.Duration, 32)
 		if err != nil {
 			duration = 0
@@ -396,10 +385,6 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 	}
 
 	if inputAudioFormat != nil {
-		abitrate, err = strconv.Atoi(inputAudioFormat.BitRate)
-		if err != nil {
-			abitrate = 0
-		}
 		if duration == 0 {
 			duration, err = strconv.ParseFloat(inputAudioFormat.Duration, 32)
 			if err != nil {
@@ -423,26 +408,15 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 		return fmt.Errorf("медиа-дорожек не найдено")
 	}
 
-	if file.Size() > 45000000 {
-		vbitrate = int(450000000 * 8 / int(duration))
-		videoKwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"b:v": vbitrate}})
-	} else {
-		videoKwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"crf": 25}})
-	}
-
-	if abitrate > 192000 {
-		abitrate = 192000
-	}
-
 	print(targetType)
 
 	switch targetType {
 	case "audio", "mp3":
-		KwArgs = ffmpeg.KwArgs{"vn": "", "c:a": "libmp3lame", "b:a": abitrate}
+		KwArgs = ffmpeg.KwArgs{"vn": "", "c:a": "libmp3lame"}
 		extension = "mp3"
 		targetType = "audio"
 	case "voice", "ogg":
-		KwArgs = ffmpeg.KwArgs{"vn": "", "c:a": "libopus", "b:a": abitrate}
+		KwArgs = ffmpeg.KwArgs{"vn": "", "c:a": "libopus"}
 		extension = "ogg"
 		targetType = "voice"
 	case "photo", "jpg":
@@ -458,11 +432,11 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 		extension = "mp4"
 		targetType = "animation"
 	case "video", "mp4":
-		KwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"c:a": "aac", "b:a": abitrate}})
+		KwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"c:a": "aac"}})
 		extension = "mp4"
 		targetType = "video"
 	case "video_reverse", "reverse", "invert":
-		KwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"c:a": "aac", "b:a": abitrate, "vf": "reverse", "af": "areverse"}})
+		KwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"c:a": "aac", "vf": "reverse", "af": "areverse"}})
 		extension = "mp4"
 		targetType = "video"
 	case "animation_reverse":
@@ -474,11 +448,11 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 		extension = "webm"
 		targetType = "sticker"
 	case "audio_reverse":
-		KwArgs = ffmpeg.KwArgs{"vn": "", "c:a": "libmp3lame", "b:a": abitrate, "af": "areverse"}
+		KwArgs = ffmpeg.KwArgs{"vn": "", "c:a": "libmp3lame", "af": "areverse"}
 		extension = "mp3"
 		targetType = "audio"
 	case "voice_reverse":
-		KwArgs = ffmpeg.KwArgs{"vn": "", "c:a": "libopus", "b:a": abitrate, "af": "areverse"}
+		KwArgs = ffmpeg.KwArgs{"vn": "", "c:a": "libopus", "af": "areverse"}
 		extension = "ogg"
 		targetType = "voice"
 	case "animation_loop", "loop":
