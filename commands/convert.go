@@ -1,10 +1,6 @@
 package commands
 
 import (
-	"encoding/json"
-	"fmt"
-	"html"
-	"os"
 	"strings"
 	"time"
 
@@ -32,27 +28,7 @@ func Convert(context tele.Context) error {
 	}
 
 	media := context.Message().ReplyTo.Media()
-	var extension string
 	var targetArg string
-
-	switch media.MediaType() {
-	case "audio":
-		extension = "mp3"
-	case "voice":
-		extension = "ogg"
-	case "photo":
-		extension = "jpg"
-	case "sticker":
-		extension = "webp"
-	case "animation", "video", "video_note", "document":
-		extension = "mp4"
-	}
-
-	if media.MediaType() == "sticker" {
-		if context.Message().ReplyTo.Sticker.Animated || context.Message().ReplyTo.Sticker.Video {
-			extension = "webm"
-		}
-	}
 
 	targetArg = media.MediaType()
 	if len(context.Args()) == 1 {
@@ -75,17 +51,10 @@ func Convert(context tele.Context) error {
 		done <- true
 	}()
 
-	filePath := fmt.Sprintf("%v/%v.%v", os.TempDir(), media.MediaFile().FileID, extension)
-
 	file, err := utils.Bot.FileByID(media.MediaFile().FileID)
 	if err != nil {
 		return err
 	}
 
-	MarshalledMessage, _ := json.MarshalIndent(file, "", "    ")
-	JsonMessage := html.EscapeString(string(MarshalledMessage))
-	return context.Reply(fmt.Sprintf("\n\nMessage:\n<pre>%v</pre>", JsonMessage))
-
-	return nil
-	return utils.FFmpegConvert(context, filePath, targetArg)
+	return utils.FFmpegConvert(context, file.FilePath, targetArg)
 }
