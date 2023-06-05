@@ -33,7 +33,7 @@ func AllBets(context tele.Context) error {
 		if err != nil {
 			return err
 		}
-		betlist += fmt.Sprintf("%v, %v:<pre>%v</pre>\n", time.Unix(bet.Timestamp, 0).Format("02.01.2006"), utils.UserFullName(&user), bet.Text)
+		betlist += fmt.Sprintf("%v, %v:\n<pre>%v</pre>\n", time.Unix(bet.Timestamp, 0).Format("02.01.2006"), utils.UserFullName(&user), bet.Text)
 		if len(betlist) > 3900 {
 			return context.Reply(betlist)
 		}
