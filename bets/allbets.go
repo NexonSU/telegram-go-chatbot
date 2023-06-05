@@ -16,13 +16,15 @@ func AllBets(context tele.Context) error {
 	var user tele.User
 	var i = 0
 	var from int64
+	var to int64
 	if len(context.Args()) > 0 {
 		if context.Args()[0] == "all" {
 			from = 0
 		}
 	}
-	from = time.Now().Local().Unix() - 86400
-	result, _ := utils.DB.Model(&utils.Bets{}).Where("timestamp > ?", from).Order("timestamp ASC").Rows()
+	from = time.Now().Local().Truncate(24 * time.Hour).Unix()
+	to = time.Now().Local().Add(43800 * time.Hour).Unix()
+	result, _ := utils.DB.Model(&utils.Bets{}).Where("timestamp > ? AND timestamp < ?", from, to).Order("timestamp ASC").Rows()
 	for result.Next() {
 		err := utils.DB.ScanRows(result, &bet)
 		if err != nil {
