@@ -352,7 +352,7 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 	var width int
 	var duration float64
 
-	videoKwArgs := ffmpeg.KwArgs{"c:v": "libx265", "crf": 25, "filter:v": "scale='min(1280,iw)':min'(720,ih)':force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2", "movflags": "frag_keyframe+empty_moov+faststart"}
+	videoKwArgs := ffmpeg.KwArgs{"c:v": "libx264", "preset": "fast", "crf": 25, "filter:v": "scale='min(1280,iw)':min'(720,ih)':force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2", "movflags": "frag_keyframe+empty_moov+faststart"}
 	defaultKwArgs := ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": ""}
 	name := strings.TrimSuffix(filepath.Base(filePath), filepath.Ext(filePath))
 
