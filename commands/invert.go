@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"fmt"
-	"os"
 	"strings"
 	"time"
 
@@ -26,22 +24,16 @@ func Invert(context tele.Context) error {
 		targetArg = strings.ToLower(context.Args()[0])
 	}
 
-	var extension string
 	switch targetArg {
 	case "video", "mp4":
-		extension = "mp4"
 		targetArg = "video"
 	case "animation", "gif":
-		extension = "mp4"
 		targetArg = "animation"
 	case "sticker", "webm":
-		extension = "webm"
 		targetArg = "sticker"
 	case "voice", "ogg":
-		extension = "ogg"
 		targetArg = "voice"
 	case "audio", "mp3":
-		extension = "mp3"
 		targetArg = "audio"
 	default:
 		return context.Reply("Неподдерживаемая операция")
@@ -71,12 +63,10 @@ func Invert(context tele.Context) error {
 		done <- true
 	}()
 
-	filePath := fmt.Sprintf("%v/%v.%v", os.TempDir(), media.MediaFile().FileID, extension)
-
-	err := utils.Bot.Download(media.MediaFile(), filePath)
+	file, err := utils.Bot.FileByID(media.MediaFile().FileID)
 	if err != nil {
 		return err
 	}
 
-	return utils.FFmpegConvert(context, filePath, targetArg)
+	return utils.FFmpegConvert(context, file.FilePath, targetArg)
 }
