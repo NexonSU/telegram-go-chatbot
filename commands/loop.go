@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"fmt"
-	"os"
 	"strings"
 	"time"
 
@@ -26,10 +24,8 @@ func Loop(context tele.Context) error {
 		targetArg = strings.ToLower(context.Args()[0])
 	}
 
-	var extension string
 	switch targetArg {
 	case "animation":
-		extension = "mp4"
 		targetArg = "animation"
 	default:
 		return context.Reply("Неподдерживаемая операция")
@@ -53,12 +49,10 @@ func Loop(context tele.Context) error {
 		done <- true
 	}()
 
-	filePath := fmt.Sprintf("%v/%v.%v", os.TempDir(), media.MediaFile().FileID, extension)
-
-	err := utils.Bot.Download(media.MediaFile(), filePath)
+	file, err := utils.Bot.FileByID(media.MediaFile().FileID)
 	if err != nil {
 		return err
 	}
 
-	return utils.FFmpegConvert(context, filePath, targetArg)
+	return utils.FFmpegConvert(context, file.FilePath, targetArg)
 }
