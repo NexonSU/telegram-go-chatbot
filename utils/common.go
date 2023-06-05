@@ -386,7 +386,7 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 		}
 	} else {
 		switch targetType {
-		case "animation", "gif", "webm", "animation_reverse", "sticker_reverse":
+		case "animation", "gif", "webm", "animation_reverse", "sticker_reverse", "animation_loop", "loop":
 			return fmt.Errorf("видео-дорожка не найдена")
 		case "video", "mp4":
 			targetType = "audio"
@@ -408,12 +408,14 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 		}
 	} else {
 		switch targetType {
-		case "audio", "mp3", "voice", "ogg", "audio_reverse", "voice_reverse":
+		case "audio", "mp3", "voice", "ogg", "audio_reverse", "voice_reverse", "audio_loop", "voice_loop":
 			return fmt.Errorf("аудио-дорожка не найдена")
 		case "video", "mp4", "webm":
 			targetType = "animation"
 		case "video_reverse", "reverse", "invert":
 			targetType = "animation_reverse"
+		case "video_loop", "loop":
+			targetType = "animation_loop"
 		}
 	}
 
@@ -432,13 +434,15 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 		abitrate = 192000
 	}
 
+	print(targetType)
+
 	switch targetType {
 	case "audio", "mp3":
-		KwArgs = ffmpeg.KwArgs{"map": "a:0", "c:a": "libmp3lame", "b:a": abitrate}
+		KwArgs = ffmpeg.KwArgs{"vn": "", "c:a": "libmp3lame", "b:a": abitrate}
 		extension = "mp3"
 		targetType = "audio"
 	case "voice", "ogg":
-		KwArgs = ffmpeg.KwArgs{"map": "a:0", "c:a": "libopus", "b:a": abitrate}
+		KwArgs = ffmpeg.KwArgs{"vn": "", "c:a": "libopus", "b:a": abitrate}
 		extension = "ogg"
 		targetType = "voice"
 	case "photo", "jpg":
@@ -450,7 +454,7 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 		extension = "webp"
 		targetType = "sticker"
 	case "animation", "gif":
-		KwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"map": "v:0", "an": ""}})
+		KwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"an": ""}})
 		extension = "mp4"
 		targetType = "animation"
 	case "video", "mp4":
@@ -462,21 +466,25 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 		extension = "mp4"
 		targetType = "video"
 	case "animation_reverse":
-		KwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"map": "v:0", "an": "", "vf": "reverse"}})
+		KwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"an": "", "vf": "reverse"}})
 		extension = "mp4"
 		targetType = "animation"
 	case "sticker_reverse", "webm":
-		KwArgs = ffmpeg.KwArgs{"c:v": "libvpx-vp9", "map": "v:0", "an": "", "vf": "reverse"}
+		KwArgs = ffmpeg.KwArgs{"c:v": "libvpx-vp9", "an": "", "vf": "reverse"}
 		extension = "webm"
 		targetType = "sticker"
 	case "audio_reverse":
-		KwArgs = ffmpeg.KwArgs{"map": "a:0", "c:a": "libmp3lame", "b:a": abitrate, "af": "areverse"}
+		KwArgs = ffmpeg.KwArgs{"vn": "", "c:a": "libmp3lame", "b:a": abitrate, "af": "areverse"}
 		extension = "mp3"
 		targetType = "audio"
 	case "voice_reverse":
-		KwArgs = ffmpeg.KwArgs{"map": "a:0", "c:a": "libopus", "b:a": abitrate, "af": "areverse"}
+		KwArgs = ffmpeg.KwArgs{"vn": "", "c:a": "libopus", "b:a": abitrate, "af": "areverse"}
 		extension = "ogg"
 		targetType = "voice"
+	case "animation_loop", "loop":
+		KwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"an": "", "filter_complex": "[0]reverse[r];[0][r]concat,loop=1:2"}})
+		extension = "mp4"
+		targetType = "animation"
 	default:
 		return fmt.Errorf("targetType %v not supported", targetType)
 	}

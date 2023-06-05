@@ -72,13 +72,13 @@ func Download(context tele.Context) error {
 		return context.Reply("Максимальная длина видео 10 минут.")
 	}
 
-	ytdlpResult, err := result.Download(cntx.Background(), "bv*[filesize<50M]+ba/b[filesize<50M] / bv*[height<=720]+ba/b[height<=720] / wv*+ba/w")
+	ytdlpResult, err := result.Download(cntx.Background(), "bv*[filesize<50M]+ba/b[filesize<50M]")
 	if err != nil {
 		return err
 	}
 	defer ytdlpResult.Close()
 
-	filePath = fmt.Sprintf("%v/%v.%v", os.TempDir(), result.Info.Title, result.Info.Ext)
+	filePath = fmt.Sprintf("%v/%v.%v", os.TempDir(), result.Info.ID, result.Info.Ext)
 
 	f, err := os.Create(filePath)
 	if err != nil {
