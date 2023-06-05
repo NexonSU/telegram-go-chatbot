@@ -352,7 +352,7 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 	var width int
 	var duration float64
 
-	videoKwArgs := ffmpeg.KwArgs{"c:v": "libx264", "preset": "fast", "crf": 25, "movflags": "frag_keyframe+empty_moov+faststart"}
+	videoKwArgs := ffmpeg.KwArgs{"c:v": "libx264", "preset": "fast", "crf": 25, "filter:v": "scale='min(1280,iw)':min'(720,ih)':force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2", "movflags": "frag_keyframe+empty_moov+faststart"}
 	defaultKwArgs := ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": ""}
 	name := strings.TrimSuffix(filepath.Base(filePath), filepath.Ext(filePath))
 
@@ -402,6 +402,10 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 		case "video_loop", "loop":
 			targetType = "animation_loop"
 		}
+	}
+
+	if (strings.Contains(targetType, "reverse") || strings.Contains(targetType, "loop")) && duration > 60 {
+		return fmt.Errorf("слишком длинное видео для эффекта")
 	}
 
 	if inputAudioFormat == nil && inputVideoFormat == nil {
@@ -465,7 +469,7 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 
 	resultFilePath := fmt.Sprintf("%v/%v_converted.%v", os.TempDir(), name, extension)
 
-	err = ffmpeg.Input(filePath).Output(resultFilePath, ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{defaultKwArgs, KwArgs})).OverWriteOutput().ErrorToStdOut().WithCpuCoreLimit(2).Run()
+	err = ffmpeg.Input(filePath).Output(resultFilePath, ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{defaultKwArgs, KwArgs})).OverWriteOutput().ErrorToStdOut().Run()
 	if err != nil {
 		return err
 	}
