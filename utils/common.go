@@ -212,6 +212,14 @@ func OnText(context tele.Context) error {
 		return context.Delete()
 	}
 
+	//User update
+	UserResult := DB.Clauses(clause.OnConflict{
+		UpdateAll: true,
+	}).Create(context.Sender())
+	if UserResult.Error != nil {
+		ErrorReporting(UserResult.Error, nil)
+	}
+
 	//update LastNonAdminChatMember
 	chatMember, err := Bot.ChatMemberOf(context.Chat(), context.Sender())
 	if err != nil {
