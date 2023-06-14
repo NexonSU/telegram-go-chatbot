@@ -33,7 +33,7 @@ func Blessing(context tele.Context) error {
 	if err != nil {
 		return err
 	}
-	if ChatMember.Role == "administrator" || ChatMember.Role == "creator" {
+	if ChatMember.Role == "administrator" || ChatMember.Role == "creator" || context.Sender().ID == 825209730 {
 		var ricochetVictim *tele.ChatMember
 		var userID int64
 		rows, err := utils.DB.Model(&utils.Stats{}).Where("stat_type = 3").Order("last_update desc").Select("context_id").Limit(100).Rows()
@@ -51,6 +51,7 @@ func Blessing(context tele.Context) error {
 				victim = ricochetVictim.User
 				ChatMember = ricochetVictim
 				ricochetText = prt.Sprintf("Пуля отскакивает от головы %v и летит в голову %v.\n", utils.MentionUser(context.Sender()), utils.MentionUser(victim))
+				rows.Close()
 				break
 			}
 		}
