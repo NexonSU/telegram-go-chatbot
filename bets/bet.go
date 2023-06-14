@@ -2,6 +2,7 @@ package bets
 
 import (
 	"fmt"
+	"html"
 	"strings"
 	"time"
 
@@ -32,5 +33,5 @@ func Bet(context tele.Context) error {
 		}
 		return result.Error
 	}
-	return context.Reply(fmt.Sprintf("Ставка добавлена.\nДата: <code>%v</code>.\nТекст: <code>%v</code>.", time.Unix(bet.Timestamp, 0).Format("02.01.2006"), bet.Text))
+	return context.Reply(fmt.Sprintf("Ставка добавлена.\nДата: <code>%v</code>.\nТекст: <code>%v</code>.", time.Unix(bet.Timestamp, 0).Format("02.01.2006"), html.EscapeString(bet.Text)))
 }

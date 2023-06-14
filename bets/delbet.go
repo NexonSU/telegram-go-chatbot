@@ -2,6 +2,7 @@ package bets
 
 import (
 	"fmt"
+	"html"
 	"strings"
 	"time"
 
@@ -27,7 +28,7 @@ func DelBet(context tele.Context) error {
 	}
 	result := utils.DB.Delete(&bet)
 	if result.RowsAffected != 0 {
-		return context.Reply(fmt.Sprintf("Ставка удалена:\n%v, %v:<pre>%v</pre>\n", time.Unix(bet.Timestamp, 0).Format("02.01.2006"), utils.UserFullName(context.Sender()), bet.Text))
+		return context.Reply(fmt.Sprintf("Ставка удалена:\n%v, %v:<pre>%v</pre>\n", time.Unix(bet.Timestamp, 0).Format("02.01.2006"), utils.UserFullName(context.Sender()), html.EscapeString(bet.Text)))
 	} else {
 		return context.Reply("Твоя ставка не найдена по указанным параметрам.")
 	}
