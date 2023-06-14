@@ -93,14 +93,33 @@ func Accept(context tele.Context) error {
 			return err
 		}
 		time.Sleep(time.Second * 2)
-		VictimChatMember = utils.LastNonAdminChatMember
-		victim = utils.LastNonAdminChatMember.User
-		prefix = prt.Sprintf("%vПуля отскакивает от головы %v и летит в голову %v.\n", prefix, utils.MentionUser(player), utils.MentionUser(victim))
-		_, err = utils.Bot.Edit(message, prefix)
+		var ricochetVictim *tele.ChatMember
+		var userID int64
+		rows, err := utils.DB.Model(&utils.Stats{}).Where("stat_type = 3").Order("last_update desc").Select("context_id").Limit(100).Rows()
 		if err != nil {
 			return err
 		}
-		player = context.Bot().Me
+		defer rows.Close()
+		for rows.Next() {
+			rows.Scan(&userID)
+			ricochetVictim = &tele.ChatMember{}
+			ricochetVictim, err = utils.Bot.ChatMemberOf(context.Chat(), &tele.User{ID: userID})
+			if err != nil {
+				continue
+			}
+			if ricochetVictim.Role == "member" {
+				VictimChatMember = ricochetVictim
+				victim = ricochetVictim.User
+				prefix = prt.Sprintf("%vПуля отскакивает от головы %v и летит в голову %v.\n", prefix, utils.MentionUser(player), utils.MentionUser(victim))
+				_, err = utils.Bot.Edit(message, prefix)
+				if err != nil {
+					return err
+				}
+				player = context.Bot().Me
+				rows.Close()
+				break
+			}
+		}
 	}
 	if utils.IsAdmin(victim.ID) {
 		_, err = utils.Bot.Edit(message, prt.Sprintf("%v😈 Наводит револьвер на %v и стреляет.", prefix, utils.MentionUser(player)))

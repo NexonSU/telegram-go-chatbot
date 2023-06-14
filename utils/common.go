@@ -24,7 +24,6 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-var LastNonAdminChatMember = &tele.ChatMember{}
 var onlyWords = regexp.MustCompile(`[,.!?]+`)
 
 func UserFullName(user *tele.User) string {
@@ -218,15 +217,6 @@ func OnText(context tele.Context) error {
 	}).Create(context.Sender())
 	if UserResult.Error != nil {
 		ErrorReporting(UserResult.Error, nil)
-	}
-
-	//update LastNonAdminChatMember
-	chatMember, err := Bot.ChatMemberOf(context.Chat(), context.Sender())
-	if err != nil {
-		ErrorReporting(err, nil)
-	}
-	if chatMember.Role == tele.Member {
-		LastNonAdminChatMember = chatMember
 	}
 
 	//update StatsDays(1), StatsHours(2), StatsUsers(3), StatsWords(4), StatsWeekday(5)
