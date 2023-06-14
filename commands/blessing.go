@@ -36,7 +36,7 @@ func Blessing(context tele.Context) error {
 	if ChatMember.Role == "administrator" || ChatMember.Role == "creator" {
 		var ricochetVictim *tele.ChatMember
 		var userID int64
-		rows, err := utils.DB.Model(&utils.Stats{}).Where("stat_type = 3").Order("last_update desc").Select("context_id").Rows()
+		rows, err := utils.DB.Model(&utils.Stats{}).Where("stat_type = 3").Order("last_update desc").Select("context_id").Limit(100).Rows()
 		if err != nil {
 			return err
 		}
