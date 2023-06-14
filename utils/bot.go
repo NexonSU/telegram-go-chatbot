@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html"
 	"log"
+	"regexp"
 	"runtime"
 	"strings"
 	"time"
@@ -110,9 +111,10 @@ func ErrorReporting(err error, context tele.Context) {
 		return
 	}
 	if context != nil && context.Message() != nil {
-		MarshalledMessage, _ := json.MarshalIndent(context.Message(), "", "    ")
-		JsonMessage := html.EscapeString(string(MarshalledMessage))
-		text += fmt.Sprintf("\n\nMessage:\n<pre>%v</pre>", JsonMessage)
+		marshalledMessage, _ := json.MarshalIndent(context.Message(), "", "    ")
+		marshalledMessageWithoutNil := regexp.MustCompile(`.*": (null|""|0|false)(,|)\n`).ReplaceAllString(string(marshalledMessage), "")
+		jsonMessage := html.EscapeString(marshalledMessageWithoutNil)
+		text += fmt.Sprintf("\n\nMessage:\n<pre>%v</pre>", jsonMessage)
 	}
 	Bot.Send(tele.ChatID(Config.SysAdmin), text)
 }
