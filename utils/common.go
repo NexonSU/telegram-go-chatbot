@@ -420,8 +420,6 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 		return fmt.Errorf("медиа-дорожек не найдено")
 	}
 
-	print(targetType)
-
 	switch targetType {
 	case "audio", "mp3":
 		KwArgs = ffmpeg.KwArgs{"vn": "", "c:a": "libmp3lame"}
