@@ -35,14 +35,15 @@ func Blessing(context tele.Context) error {
 	}
 	if ChatMember.Role == "administrator" || ChatMember.Role == "creator" {
 		var ricochetVictim *tele.ChatMember
+		var userID int64
 		rows, err := utils.DB.Model(&utils.Stats{}).Where("stat_type = 3").Order("last_update desc").Select("context_id").Rows()
 		if err != nil {
 			return err
 		}
 		defer rows.Close()
 		for rows.Next() {
-			rows.Scan(ricochetVictim.User.ID)
-			ricochetVictim, err = utils.Bot.ChatMemberOf(context.Chat(), &tele.User{ID: ricochetVictim.User.ID})
+			rows.Scan(&userID)
+			ricochetVictim, err = utils.Bot.ChatMemberOf(context.Chat(), &tele.User{ID: userID})
 			if err != nil {
 				continue
 			}
