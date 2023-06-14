@@ -64,6 +64,7 @@ type Stats struct {
 	StatType     int64 `gorm:"primaryKey"`
 	Count        int64
 	DayTimestamp int64 `gorm:"primaryKey"`
+	LastUpdate   int64 `gorm:"default:1685221200"`
 }
 
 type Bless struct {
