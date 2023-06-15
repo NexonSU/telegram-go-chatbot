@@ -349,65 +349,68 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 	var height int
 	var width int
 	var duration float64
+	var err error
 
 	videoKwArgs := ffmpeg.KwArgs{"c:v": "libx264", "preset": "fast", "crf": 26, "pix_fmt": "yuv420p", "movflags": "+faststart"}
 	defaultKwArgs := ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": ""}
 	name := strings.TrimSuffix(filepath.Base(filePath), filepath.Ext(filePath))
 
-	ctx, cancelFn := cntx.WithTimeout(cntx.Background(), 5*time.Second)
-	defer cancelFn()
+	if targetType != "force" {
+		ctx, cancelFn := cntx.WithTimeout(cntx.Background(), 5*time.Second)
+		defer cancelFn()
 
-	data, err := ffprobe.ProbeURL(ctx, filePath)
-	if err != nil {
-		return err
-	}
-	inputVideoFormat := data.FirstVideoStream()
-	inputAudioFormat := data.FirstAudioStream()
-
-	if inputVideoFormat != nil {
-		width = inputVideoFormat.Width
-		height = inputVideoFormat.Height
-		duration, err = strconv.ParseFloat(inputVideoFormat.Duration, 32)
+		data, err := ffprobe.ProbeURL(ctx, filePath)
 		if err != nil {
-			duration = 0
+			return err
 		}
-	} else {
-		switch targetType {
-		case "animation", "gif", "webm", "animation_reverse", "sticker_reverse", "animation_loop", "loop":
-			return fmt.Errorf("видео-дорожка не найдена")
-		case "video", "mp4":
-			targetType = "audio"
-		case "video_reverse", "reverse", "invert":
-			targetType = "audio_reverse"
-		}
-	}
+		inputVideoFormat := data.FirstVideoStream()
+		inputAudioFormat := data.FirstAudioStream()
 
-	if inputAudioFormat != nil {
-		if duration == 0 {
-			duration, err = strconv.ParseFloat(inputAudioFormat.Duration, 32)
+		if inputVideoFormat != nil {
+			width = inputVideoFormat.Width
+			height = inputVideoFormat.Height
+			duration, err = strconv.ParseFloat(inputVideoFormat.Duration, 32)
 			if err != nil {
 				duration = 0
 			}
+		} else {
+			switch targetType {
+			case "animation", "gif", "webm", "animation_reverse", "sticker_reverse", "animation_loop", "loop":
+				return fmt.Errorf("видео-дорожка не найдена")
+			case "video", "mp4":
+				targetType = "audio"
+			case "video_reverse", "reverse", "invert":
+				targetType = "audio_reverse"
+			}
 		}
-	} else {
-		switch targetType {
-		case "audio", "mp3", "voice", "ogg", "audio_reverse", "voice_reverse", "audio_loop", "voice_loop":
-			return fmt.Errorf("аудио-дорожка не найдена")
-		case "video", "mp4", "webm":
-			targetType = "animation"
-		case "video_reverse", "reverse", "invert":
-			targetType = "animation_reverse"
-		case "video_loop", "loop":
-			targetType = "animation_loop"
+
+		if inputAudioFormat != nil {
+			if duration == 0 {
+				duration, err = strconv.ParseFloat(inputAudioFormat.Duration, 32)
+				if err != nil {
+					duration = 0
+				}
+			}
+		} else {
+			switch targetType {
+			case "audio", "mp3", "voice", "ogg", "audio_reverse", "voice_reverse", "audio_loop", "voice_loop":
+				return fmt.Errorf("аудио-дорожка не найдена")
+			case "video", "mp4", "webm":
+				targetType = "animation"
+			case "video_reverse", "reverse", "invert":
+				targetType = "animation_reverse"
+			case "video_loop", "loop":
+				targetType = "animation_loop"
+			}
 		}
-	}
 
-	if (strings.Contains(targetType, "reverse") || strings.Contains(targetType, "loop")) && duration > 60 {
-		return fmt.Errorf("слишком длинное видео для эффекта")
-	}
+		if (strings.Contains(targetType, "reverse") || strings.Contains(targetType, "loop")) && duration > 60 {
+			return fmt.Errorf("слишком длинное видео для эффекта")
+		}
 
-	if inputAudioFormat == nil && inputVideoFormat == nil {
-		return fmt.Errorf("медиа-дорожек не найдено")
+		if inputAudioFormat == nil && inputVideoFormat == nil {
+			return fmt.Errorf("медиа-дорожек не найдено")
+		}
 	}
 
 	switch targetType {
