@@ -411,6 +411,8 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 		if inputAudioFormat == nil && inputVideoFormat == nil {
 			return fmt.Errorf("медиа-дорожек не найдено")
 		}
+	} else {
+		targetType = "video"
 	}
 
 	switch targetType {
