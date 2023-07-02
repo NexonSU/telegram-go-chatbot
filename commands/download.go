@@ -90,7 +90,7 @@ func Download(context tele.Context) error {
 		done2 <- true
 	}()
 
-	filePath = fmt.Sprintf("%v/%v.mp4", os.TempDir(), result.Info.Title)
+	filePath = fmt.Sprintf("%v/%v.mp4", os.TempDir(), result.Info.ID)
 
 	f, err := os.Create(filePath)
 	if err != nil {
@@ -102,5 +102,5 @@ func Download(context tele.Context) error {
 		return err
 	}
 
-	return context.Reply(&tele.Document{File: tele.FromDisk(filePath)})
+	return context.Reply(&tele.Document{File: tele.FromDisk(filePath), FileName: result.Info.Title + ".mp4"})
 }
