@@ -2,6 +2,9 @@ package commands
 
 import (
 	cntx "context"
+	"fmt"
+	"io"
+	"os"
 	"time"
 
 	"github.com/wader/goutubedl"
@@ -10,6 +13,8 @@ import (
 
 // Convert given file
 func Download(context tele.Context) error {
+	var filePath string
+
 	if context.Message().ReplyTo == nil && len(context.Args()) < 1 {
 		return context.Reply("Пример использования: <code>/download {ссылка на ютуб/твиттер}</code>\nИли отправь в ответ на какое-либо сообщение с ссылкой <code>/download</code>")
 	}
@@ -85,5 +90,17 @@ func Download(context tele.Context) error {
 		done2 <- true
 	}()
 
-	return context.Reply(&tele.Document{File: tele.FromReader(ytdlpResult), FileName: result.Info.Title + ".mp4"})
+	filePath = fmt.Sprintf("%v/%v.mp4", os.TempDir(), result.Info.Title)
+
+	f, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	_, err = io.Copy(f, ytdlpResult)
+	if err != nil {
+		return err
+	}
+
+	return context.Reply(&tele.Document{File: tele.FromDisk(filePath)})
 }
