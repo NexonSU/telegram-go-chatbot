@@ -61,6 +61,10 @@ func Download(context tele.Context) error {
 		}
 	}
 
+	if link == "" {
+		return context.Reply("Ссылка ненайдена.")
+	}
+
 	goutubedl.Path = "yt-dlp"
 
 	result, err := goutubedl.New(cntx.Background(), link, goutubedl.Options{})
