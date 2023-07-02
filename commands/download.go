@@ -56,7 +56,7 @@ func Download(context tele.Context) error {
 
 	for _, entity := range message.Entities {
 		if entity.Type == tele.EntityURL {
-			text := message.EntityText(entity)
+			text := entity.URL
 			link = text
 		}
 	}
