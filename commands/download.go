@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/NexonSU/telegram-go-chatbot/utils"
 	"github.com/wader/goutubedl"
 	tele "gopkg.in/telebot.v3"
 )
@@ -21,6 +22,15 @@ func Download(context tele.Context) error {
 
 	link := ""
 	message := &tele.Message{}
+	arg := "video"
+
+	if context.Message().ReplyTo == nil && len(context.Args()) == 2 {
+		arg = context.Args()[1]
+	}
+
+	if context.Message().ReplyTo != nil && len(context.Args()) == 1 {
+		arg = context.Args()[0]
+	}
 
 	if context.Message().ReplyTo == nil {
 		message = context.Message()
@@ -51,10 +61,6 @@ func Download(context tele.Context) error {
 		}
 	}
 
-	if link == "" {
-		return context.Reply("Ссылка ненайдена.")
-	}
-
 	goutubedl.Path = "yt-dlp"
 
 	result, err := goutubedl.New(cntx.Background(), link, goutubedl.Options{})
@@ -66,11 +72,23 @@ func Download(context tele.Context) error {
 		return context.Reply("Максимальная длина видео 60 минут.")
 	}
 
-	ytdlpResult, err := result.Download(cntx.Background(), "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4] / bv*+ba/b")
+	ytdlpResult, err := result.Download(cntx.Background(), "")
 	if err != nil {
 		return err
 	}
 	defer ytdlpResult.Close()
+
+	filePath = fmt.Sprintf("%v/%v.%v", os.TempDir(), result.Info.ID, result.Info.Ext)
+
+	f, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	_, err = io.Copy(f, ytdlpResult)
+	if err != nil {
+		return err
+	}
 
 	done <- true
 
@@ -90,17 +108,5 @@ func Download(context tele.Context) error {
 		done2 <- true
 	}()
 
-	filePath = fmt.Sprintf("%v/%v.mp4", os.TempDir(), result.Info.ID)
-
-	f, err := os.Create(filePath)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	_, err = io.Copy(f, ytdlpResult)
-	if err != nil {
-		return err
-	}
-
-	return context.Reply(&tele.Document{File: tele.FromDisk(filePath), FileName: result.Info.Title + ".mp4"})
+	return utils.FFmpegConvert(context, filePath, arg)
 }
