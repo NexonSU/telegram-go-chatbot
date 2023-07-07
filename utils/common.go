@@ -351,7 +351,7 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 	var duration float64
 	var err error
 
-	videoKwArgs := ffmpeg.KwArgs{"c:v": "libx264", "preset": "fast", "crf": 26, "pix_fmt": "yuv420p", "movflags": "+faststart"}
+	videoKwArgs := ffmpeg.KwArgs{}
 	defaultKwArgs := ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": ""}
 	name := strings.TrimSuffix(filepath.Base(filePath), filepath.Ext(filePath))
 
@@ -450,7 +450,7 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 		targetType = "animation"
 	case "sticker_reverse", "webm":
 		KwArgs = ffmpeg.KwArgs{"c:v": "libvpx-vp9", "an": "", "vf": "reverse"}
-		extension = "webm"
+		extension = "mp4"
 		targetType = "sticker"
 	case "audio_reverse":
 		KwArgs = ffmpeg.KwArgs{"vn": "", "c:a": "libmp3lame", "af": "areverse"}
