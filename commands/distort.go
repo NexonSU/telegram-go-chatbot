@@ -84,7 +84,7 @@ func Distort(context tele.Context) error {
 	outputFile := fmt.Sprintf("%v/output.%v", workdir, extension)
 
 	if err := os.Mkdir(workdir, os.ModePerm); err != nil {
-		return err
+		return fmt.Errorf("обработка файла уже выполняется")
 	}
 	defer func(workdir string) {
 		os.RemoveAll(workdir)
