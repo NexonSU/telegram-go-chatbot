@@ -113,7 +113,7 @@ func Distort(context tele.Context) error {
 	height := frameConfig.Height
 	scale := 0
 
-	pool := tunny.NewFunc(runtime.NumCPU(), func(payload interface{}) interface{} {
+	pool := tunny.NewFunc(runtime.NumCPU()-1, func(payload interface{}) interface{} {
 		payloadCommand := strings.Fields(payload.(string))
 		return exec.Command(payloadCommand[0], payloadCommand[1:]...).Run()
 	})
