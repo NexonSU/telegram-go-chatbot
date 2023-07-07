@@ -13,10 +13,13 @@ import (
 
 	_ "golang.org/x/image/bmp"
 
+	cntx "context"
+
 	"github.com/Jeffail/tunny"
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 	tele "gopkg.in/telebot.v3"
+	"gopkg.in/vansante/go-ffprobe.v2"
 )
 
 var DistortBusy bool
@@ -83,6 +86,16 @@ func Distort(context tele.Context) error {
 	inputFile := file.FilePath
 	outputFile := fmt.Sprintf("%v/output.%v", workdir, extension)
 
+	ctx, cancelFn := cntx.WithTimeout(cntx.Background(), 5*time.Second)
+	defer cancelFn()
+
+	data, err := ffprobe.ProbeURL(ctx, inputFile)
+	if err != nil {
+		return err
+	}
+
+	outputKwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{outputKwArgs, {"r": data.FirstVideoStream().AvgFrameRate}})
+
 	if err := os.Mkdir(workdir, os.ModePerm); err != nil {
 		return fmt.Errorf("обработка файла уже выполняется")
 	}
@@ -120,7 +133,7 @@ func Distort(context tele.Context) error {
 	defer pool.Close()
 
 	for i, file := range files {
-		scale = 99 - (i * 100 / len(files))
+		scale = 100 - (i * 75 / len(files))
 		command := fmt.Sprintf("convert %v -liquid-rescale %v%% -resize %vx%v %v", file, scale, width, height, file)
 		go func(command string) {
 			if pool.Process(command) != nil {
