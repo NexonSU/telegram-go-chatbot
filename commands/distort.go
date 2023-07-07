@@ -4,20 +4,24 @@ import (
 	"bufio"
 	"fmt"
 	"image"
-	_ "image/gif"
-	_ "image/jpeg"
-	_ "image/png"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"time"
 
+	_ "golang.org/x/image/bmp"
+
+	"github.com/Jeffail/tunny"
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 	tele "gopkg.in/telebot.v3"
 )
 
-// Invert given file
+var DistortBusy bool
+
+// Distort given file
 func Distort(context tele.Context) error {
 	if context.Message().ReplyTo == nil {
 		return context.Reply("Пример использования: <code>/distort</code> в ответ на какое-либо сообщение с видео.")
@@ -33,17 +37,21 @@ func Distort(context tele.Context) error {
 	switch media.MediaType() {
 	case "video":
 		extension = "mp4"
-		if context.Message().ReplyTo.Video.Duration > 30 {
-			return context.Reply("Слишком длинное видео. Лимит 30 секунд.")
+		if context.Message().ReplyTo.Video.Duration > 60 {
+			return context.Reply("Слишком длинное видео. Лимит 60 секунд.")
 		}
 	case "animation":
 		extension = "mp4"
 		outputKwArgs = ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": "", "an": ""}
-		if context.Message().ReplyTo.Animation.Duration > 30 {
-			return context.Reply("Слишком длинная гифка. Лимит 30 секунд.")
+		if context.Message().ReplyTo.Animation.Duration > 60 {
+			return context.Reply("Слишком длинная гифка. Лимит 60 секунд.")
 		}
 	default:
 		return context.Reply("Неподдерживаемая операция")
+	}
+
+	if DistortBusy {
+		return context.Reply("Команда занята")
 	}
 
 	var done = make(chan bool, 1)
@@ -59,15 +67,19 @@ func Distort(context tele.Context) error {
 		}
 	}()
 	defer func() {
+		DistortBusy = false
 		done <- true
 	}()
+	DistortBusy = true
+
+	jobStarted := time.Now().Unix()
 
 	file, err := utils.Bot.FileByID(media.MediaFile().FileID)
 	if err != nil {
 		return err
 	}
 
-	workdir := fmt.Sprintf("/tmp/%v", media.MediaFile().FileID)
+	workdir := fmt.Sprintf("%v/telegram-go-chatbot-distort/%v", os.TempDir(), media.MediaFile().FileID)
 	inputFile := file.FilePath
 	outputFile := fmt.Sprintf("%v/output.%v", workdir, extension)
 
@@ -78,17 +90,17 @@ func Distort(context tele.Context) error {
 		os.RemoveAll(workdir)
 	}(workdir)
 
-	err = ffmpeg.Input(inputFile).Output(workdir + "/%04d.png").OverWriteOutput().ErrorToStdOut().Run()
+	err = ffmpeg.Input(inputFile).Output(workdir + "/%09d.bmp").OverWriteOutput().ErrorToStdOut().Run()
 	if err != nil {
 		return err
 	}
 
-	files, err := filepath.Glob(workdir + "/*.png")
+	files, err := filepath.Glob(workdir + "/*.bmp")
 	if err != nil {
 		return err
 	}
 
-	f, err := os.Open(workdir + "/0001.png")
+	f, err := os.Open(files[0])
 	if err != nil {
 		return err
 	}
@@ -99,23 +111,43 @@ func Distort(context tele.Context) error {
 	f.Close()
 	width := frameConfig.Width
 	height := frameConfig.Height
-	scaleWidth := 0
-	scaleHeight := 0
+	scale := 0
 
-	for i, v := range files {
-		scaleWidth = width - (i * 340 / len(files))
-		scaleHeight = height - (i * 340 / len(files))
-		err = exec.Command("convert", v, "-liquid-rescale", fmt.Sprintf("%vx%v", scaleWidth, scaleHeight), "-resize", fmt.Sprintf("%vx%v", width, height), v).Run()
-		if err != nil {
-			return err
-		}
+	pool := tunny.NewFunc(runtime.NumCPU(), func(payload interface{}) interface{} {
+		payloadCommand := strings.Fields(payload.(string))
+		return exec.Command(payloadCommand[0], payloadCommand[1:]...).Run()
+	})
+	defer pool.Close()
+
+	for i, file := range files {
+		scale = 512 - (i * 340 / len(files))
+		command := fmt.Sprintf("convert %v -liquid-rescale %vx%v -resize %vx%v %v", file, scale, scale, width, height, file)
+		go func(command string) {
+			if pool.Process(command) != nil {
+				err = pool.Process(command).(error)
+			}
+		}(command)
 	}
 
-	err = ffmpeg.Input(inputFile, ffmpeg.KwArgs{"i": workdir + "/%04d.png"}).Output(outputFile, outputKwArgs).OverWriteOutput().ErrorToStdOut().Run()
+	for {
+		time.Sleep(1 * time.Second)
+		if time.Now().Unix()-jobStarted > 300 {
+			return fmt.Errorf("слишком долгое выполнение операции")
+		}
+		if pool.QueueLength() == 0 {
+			break
+		}
+	}
 	if err != nil {
 		return err
 	}
 
+	err = ffmpeg.Input(workdir+"/%09d.bmp").Output(outputFile, outputKwArgs).OverWriteOutput().ErrorToStdOut().Run()
+	if err != nil {
+		return err
+	}
+
+	DistortBusy = false
 	switch media.MediaType() {
 	case "video":
 		return context.Reply(&tele.Video{
@@ -140,4 +172,13 @@ func Distort(context tele.Context) error {
 			FileName: media.MediaFile().FileID + "." + extension,
 		}, &tele.SendOptions{AllowWithoutReply: true})
 	}
+}
+
+func init() {
+	dir := fmt.Sprintf("%v/telegram-go-chatbot-distort", os.TempDir())
+	if err := os.Mkdir(dir, os.ModePerm); err != nil {
+		os.RemoveAll(dir)
+		os.Mkdir(dir, os.ModePerm)
+	}
+	DistortBusy = false
 }
