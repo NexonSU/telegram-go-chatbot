@@ -35,7 +35,7 @@ func Distort(context tele.Context) error {
 	}
 
 	media := context.Message().ReplyTo.Media()
-	outputKwArgs := ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": ""}
+	outputKwArgs := ffmpeg.KwArgs{"loglevel": "info", "hide_banner": ""}
 	inputKwArgs := ffmpeg.KwArgs{}
 
 	switch media.MediaType() {
@@ -110,11 +110,12 @@ func Distort(context tele.Context) error {
 	}(workdir)
 
 	if media.MediaType() == "video" {
-		ffmpeg.Input(inputFile).Output(workdir + "/audio.mp3").OverWriteOutput().ErrorToStdOut().Run()
-		outputKwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{outputKwArgs, {"i": workdir + "/audio.mp3", "filter_complex": "vibrato=f=5", "c:a": "aac"}})
+		ffmpeg.Input(inputFile).Output(workdir+"/audio.mp3", ffmpeg.KwArgs{"filter_complex": "vibrato=f=10:d=0.7"}).OverWriteOutput().ErrorToStdOut().Run()
+		outputKwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{outputKwArgs, {"c:a": "aac"}})
+		inputKwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{inputKwArgs, {"i": workdir + "/audio.mp3"}})
 	}
 
-	inputKwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{inputKwArgs, {"framerate": data.FirstVideoStream().AvgFrameRate}})
+	outputKwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{outputKwArgs, {"vcodec": "libx264", "crf": "28"}})
 
 	err = ffmpeg.Input(inputFile).Output(workdir + "/%09d.bmp").OverWriteOutput().ErrorToStdOut().Run()
 	if err != nil {
@@ -168,7 +169,8 @@ func Distort(context tele.Context) error {
 		return err
 	}
 
-	err = ffmpeg.Input(workdir+"/%09d.bmp", inputKwArgs).Output(outputFile, outputKwArgs).OverWriteOutput().ErrorToStdOut().Run()
+	ffmpegCommand := strings.Fields(fmt.Sprintf("ffmpeg -y -framerate %v -i %v/%%09d.bmp -i %v/audio.mp3 -c:v: libx264 -preset fast -crf 26 -pix_fmt yuv420p -movflags +faststart -c:a aac -hide_banner -loglevel info %v", data.FirstVideoStream().AvgFrameRate, workdir, workdir, outputFile))
+	err = exec.Command(ffmpegCommand[0], ffmpegCommand[1:]...).Run()
 	if err != nil {
 		return err
 	}
