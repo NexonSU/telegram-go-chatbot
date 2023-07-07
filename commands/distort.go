@@ -35,19 +35,17 @@ func Distort(context tele.Context) error {
 	}
 
 	media := context.Message().ReplyTo.Media()
-	outputKwArgs := ffmpeg.KwArgs{"loglevel": "info", "hide_banner": ""}
-	inputKwArgs := ffmpeg.KwArgs{}
+	additionalInputArgs := ""
 
 	switch media.MediaType() {
 	case "video":
 		break
 	case "animation":
-		outputKwArgs = ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": "", "an": ""}
+		break
 	case "sticker":
 		if !context.Message().ReplyTo.Sticker.Animated && !context.Message().ReplyTo.Sticker.Video {
 			return context.Reply("Неподдерживаемая операция")
 		}
-		outputKwArgs = ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": "", "an": ""}
 	default:
 		return context.Reply("Неподдерживаемая операция")
 	}
@@ -111,11 +109,8 @@ func Distort(context tele.Context) error {
 
 	if media.MediaType() == "video" {
 		ffmpeg.Input(inputFile).Output(workdir+"/audio.mp3", ffmpeg.KwArgs{"filter_complex": "vibrato=f=10:d=0.7"}).OverWriteOutput().ErrorToStdOut().Run()
-		outputKwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{outputKwArgs, {"c:a": "aac"}})
-		inputKwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{inputKwArgs, {"i": workdir + "/audio.mp3"}})
+		additionalInputArgs = "-i " + workdir + "/audio.mp3 -c:a aac"
 	}
-
-	outputKwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{outputKwArgs, {"vcodec": "libx264", "crf": "28"}})
 
 	err = ffmpeg.Input(inputFile).Output(workdir + "/%09d.bmp").OverWriteOutput().ErrorToStdOut().Run()
 	if err != nil {
@@ -169,7 +164,7 @@ func Distort(context tele.Context) error {
 		return err
 	}
 
-	ffmpegCommand := strings.Fields(fmt.Sprintf("ffmpeg -y -framerate %v -i %v/%%09d.bmp -i %v/audio.mp3 -c:v: libx264 -preset fast -crf 26 -pix_fmt yuv420p -movflags +faststart -c:a aac -hide_banner -loglevel info %v", data.FirstVideoStream().AvgFrameRate, workdir, workdir, outputFile))
+	ffmpegCommand := strings.Fields(fmt.Sprintf("ffmpeg -y -framerate %v -i %v/%%09d.bmp %v -c:v: libx264 -preset fast -crf 26 -pix_fmt yuv420p -movflags +faststart -hide_banner -loglevel info %v", data.FirstVideoStream().AvgFrameRate, workdir, additionalInputArgs, outputFile))
 	err = exec.Command(ffmpegCommand[0], ffmpegCommand[1:]...).Run()
 	if err != nil {
 		return err
