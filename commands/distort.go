@@ -111,7 +111,7 @@ func Distort(context tele.Context) error {
 
 	if media.MediaType() == "video" {
 		ffmpeg.Input(inputFile).Output(workdir + "/audio.mp3").OverWriteOutput().ErrorToStdOut().Run()
-		outputKwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{outputKwArgs, {"i": workdir + "/audio.mp3", "filter_complex": "vibrato=f=8,aphaser=type=t:speed=2:decay=0.6"}})
+		outputKwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{outputKwArgs, {"i": workdir + "/audio.mp3", "filter_complex": "vibrato=f=5"}})
 	}
 
 	inputKwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{inputKwArgs, {"framerate": data.FirstVideoStream().AvgFrameRate}})
