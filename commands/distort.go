@@ -54,8 +54,13 @@ func Distort(context tele.Context) error {
 		done <- true
 	}()
 
+	file, err := utils.Bot.FileByID(media.MediaFile().FileID)
+	if err != nil {
+		return err
+	}
+
 	workdir := fmt.Sprintf("/tmp/%v", media.MediaFile().FileID)
-	inputFile := fmt.Sprintf("%v/input.%v", workdir, extension)
+	inputFile := file.FilePath
 	outputFile := fmt.Sprintf("%v/output.%v", workdir, extension)
 
 	if err := os.Mkdir(workdir, os.ModePerm); err != nil {
@@ -64,11 +69,6 @@ func Distort(context tele.Context) error {
 	defer func(workdir string) {
 		os.RemoveAll(workdir)
 	}(workdir)
-
-	err := utils.Bot.Download(media.MediaFile(), inputFile)
-	if err != nil {
-		return err
-	}
 
 	err = ffmpeg.Input(inputFile).Output(workdir + "/%04d.png").OverWriteOutput().ErrorToStdOut().Run()
 	if err != nil {
