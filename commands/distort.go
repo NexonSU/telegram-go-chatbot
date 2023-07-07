@@ -28,12 +28,14 @@ func Distort(context tele.Context) error {
 
 	media := context.Message().ReplyTo.Media()
 	extension := ""
+	outputKwArgs := ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": ""}
 
 	switch media.MediaType() {
 	case "video":
 		extension = "mp4"
 	case "animation":
 		extension = "mp4"
+		outputKwArgs = ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": "", "an": ""}
 	default:
 		return context.Reply("Неподдерживаемая операция")
 	}
@@ -103,15 +105,33 @@ func Distort(context tele.Context) error {
 		}
 	}
 
-	err = ffmpeg.Input(inputFile, ffmpeg.KwArgs{"i": workdir + "/%04d.png"}).Output(outputFile, ffmpeg.KwArgs{"i": workdir + "/%04d.png"}).OverWriteOutput().ErrorToStdOut().Run()
+	err = ffmpeg.Input(inputFile, ffmpeg.KwArgs{"i": workdir + "/%04d.png"}).Output(outputFile, outputKwArgs).OverWriteOutput().ErrorToStdOut().Run()
 	if err != nil {
 		return err
 	}
 
-	return context.Reply(&tele.Video{
-		File:      tele.FromDisk(outputFile),
-		FileName:  media.MediaFile().FileID + "." + extension,
-		Streaming: true,
-		MIME:      "video/mp4",
-	}, &tele.SendOptions{AllowWithoutReply: true})
+	switch media.MediaType() {
+	case "video":
+		return context.Reply(&tele.Video{
+			File:      tele.FromDisk(outputFile),
+			FileName:  media.MediaFile().FileID + "." + extension,
+			Streaming: true,
+			Width:     width,
+			Height:    height,
+			MIME:      "video/mp4",
+		}, &tele.SendOptions{AllowWithoutReply: true})
+	case "animation":
+		return context.Reply(&tele.Animation{
+			File:     tele.FromDisk(outputFile),
+			FileName: media.MediaFile().FileID + "." + extension,
+			Width:    width,
+			Height:   height,
+			MIME:     "video/mp4",
+		}, &tele.SendOptions{AllowWithoutReply: true})
+	default:
+		return context.Reply(&tele.Document{
+			File:     tele.FromDisk(outputFile),
+			FileName: media.MediaFile().FileID + "." + extension,
+		}, &tele.SendOptions{AllowWithoutReply: true})
+	}
 }
