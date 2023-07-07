@@ -31,6 +31,13 @@ func Convert(context tele.Context) error {
 	var targetArg string
 
 	targetArg = media.MediaType()
+
+	if targetArg == "sticker" {
+		if context.Message().ReplyTo.Sticker.Animated || context.Message().ReplyTo.Sticker.Video {
+			targetArg = "gif"
+		}
+	}
+
 	if len(context.Args()) == 1 {
 		targetArg = strings.ToLower(context.Args()[0])
 	}
