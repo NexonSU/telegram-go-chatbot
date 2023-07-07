@@ -34,15 +34,18 @@ func Distort(context tele.Context) error {
 	}
 
 	media := context.Message().ReplyTo.Media()
-	extension := ""
 	outputKwArgs := ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": ""}
 	inputKwArgs := ffmpeg.KwArgs{}
 
 	switch media.MediaType() {
 	case "video":
-		extension = "mp4"
+		break
 	case "animation":
-		extension = "mp4"
+		outputKwArgs = ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": "", "an": ""}
+	case "sticker":
+		if !context.Message().ReplyTo.Sticker.Animated && !context.Message().ReplyTo.Sticker.Video {
+			return context.Reply("Неподдерживаемая операция")
+		}
 		outputKwArgs = ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": "", "an": ""}
 	default:
 		return context.Reply("Неподдерживаемая операция")
@@ -79,7 +82,7 @@ func Distort(context tele.Context) error {
 
 	workdir := fmt.Sprintf("%v/telegram-go-chatbot-distort/%v", os.TempDir(), media.MediaFile().FileID)
 	inputFile := file.FilePath
-	outputFile := fmt.Sprintf("%v/output.%v", workdir, extension)
+	outputFile := fmt.Sprintf("%v/output.mp4", workdir)
 
 	ctx, cancelFn := cntx.WithTimeout(cntx.Background(), 5*time.Second)
 	defer cancelFn()
@@ -169,16 +172,16 @@ func Distort(context tele.Context) error {
 	case "video":
 		return context.Reply(&tele.Video{
 			File:      tele.FromDisk(outputFile),
-			FileName:  media.MediaFile().FileID + "." + extension,
+			FileName:  media.MediaFile().FileID + ".mp4",
 			Streaming: true,
 			Width:     width,
 			Height:    height,
 			MIME:      "video/mp4",
 		}, &tele.SendOptions{AllowWithoutReply: true})
-	case "animation":
+	case "animation", "sticker":
 		return context.Reply(&tele.Animation{
 			File:     tele.FromDisk(outputFile),
-			FileName: media.MediaFile().FileID + "." + extension,
+			FileName: media.MediaFile().FileID + ".mp4",
 			Width:    width,
 			Height:   height,
 			MIME:     "video/mp4",
@@ -186,7 +189,7 @@ func Distort(context tele.Context) error {
 	default:
 		return context.Reply(&tele.Document{
 			File:     tele.FromDisk(outputFile),
-			FileName: media.MediaFile().FileID + "." + extension,
+			FileName: media.MediaFile().FileID + ".mp4",
 		}, &tele.SendOptions{AllowWithoutReply: true})
 	}
 }
