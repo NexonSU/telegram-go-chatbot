@@ -36,6 +36,7 @@ func Distort(context tele.Context) error {
 	media := context.Message().ReplyTo.Media()
 	extension := ""
 	outputKwArgs := ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": ""}
+	inputKwArgs := ffmpeg.KwArgs{}
 
 	switch media.MediaType() {
 	case "video":
@@ -94,14 +95,19 @@ func Distort(context tele.Context) error {
 		return err
 	}
 
-	outputKwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{outputKwArgs, {"r": data.FirstVideoStream().AvgFrameRate}})
-
 	if err := os.Mkdir(workdir, os.ModePerm); err != nil {
 		return fmt.Errorf("обработка файла уже выполняется")
 	}
 	defer func(workdir string) {
 		os.RemoveAll(workdir)
 	}(workdir)
+
+	if media.MediaType() == "video" {
+		ffmpeg.Input(inputFile).Output(workdir + "/audio.mp3").OverWriteOutput().ErrorToStdOut().Run()
+		outputKwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{outputKwArgs, {"i": workdir + "/audio.mp3", "filter_complex": "vibrato=f=8,aphaser=type=t:speed=2:decay=0.6"}})
+	}
+
+	inputKwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{inputKwArgs, {"framerate": data.FirstVideoStream().AvgFrameRate}})
 
 	err = ffmpeg.Input(inputFile).Output(workdir + "/%09d.bmp").OverWriteOutput().ErrorToStdOut().Run()
 	if err != nil {
@@ -155,7 +161,7 @@ func Distort(context tele.Context) error {
 		return err
 	}
 
-	err = ffmpeg.Input(workdir+"/%09d.bmp").Output(outputFile, outputKwArgs).OverWriteOutput().ErrorToStdOut().Run()
+	err = ffmpeg.Input(workdir+"/%09d.bmp", inputKwArgs).Output(outputFile, outputKwArgs).OverWriteOutput().ErrorToStdOut().Run()
 	if err != nil {
 		return err
 	}
