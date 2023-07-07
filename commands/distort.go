@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -92,8 +93,13 @@ func Distort(context tele.Context) error {
 		return err
 	}
 
-	if data.FirstVideoStream().DurationTs > 300000 {
-		return context.Reply("Видео слишком длинное. Лимит 30 секунд.")
+	frames, err := strconv.Atoi(data.FirstVideoStream().NbFrames)
+	if err != nil {
+		return err
+	}
+
+	if frames > 1000 {
+		return context.Reply("Видео слишком длинное. Максимум 1000 фреймов.")
 	}
 
 	if err := os.Mkdir(workdir, os.ModePerm); err != nil {
