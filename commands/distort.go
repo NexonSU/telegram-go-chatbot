@@ -33,9 +33,15 @@ func Distort(context tele.Context) error {
 	switch media.MediaType() {
 	case "video":
 		extension = "mp4"
+		if context.Message().ReplyTo.Video.Duration > 30 {
+			return context.Reply("Слишком длинное видео. Лимит 30 секунд.")
+		}
 	case "animation":
 		extension = "mp4"
 		outputKwArgs = ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": "", "an": ""}
+		if context.Message().ReplyTo.Animation.Duration > 30 {
+			return context.Reply("Слишком длинная гифка. Лимит 30 секунд.")
+		}
 	default:
 		return context.Reply("Неподдерживаемая операция")
 	}
