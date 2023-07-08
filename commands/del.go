@@ -12,7 +12,7 @@ import (
 func Del(context tele.Context) error {
 	var get utils.Get
 	//args check
-	if len(context.Args()) != 1 {
+	if len(context.Args()) == 0 {
 		return context.Reply("Пример использования: <code>/del {гет}</code>")
 	}
 	//ownership check
