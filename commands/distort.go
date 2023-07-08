@@ -191,7 +191,7 @@ func Distort(context tele.Context) error {
 	defer pool.Close()
 
 	for i, file := range files {
-		scale = 100 - (i * 75 / len(files))
+		scale = 90 - (i * 65 / len(files))
 		command := fmt.Sprintf("convert %v -liquid-rescale %v%% -resize %vx%v! %v", file, scale, width, height, file)
 		go func(command string) {
 			if pool.Process(command) != nil {
