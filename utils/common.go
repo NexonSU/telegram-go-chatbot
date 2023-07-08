@@ -355,64 +355,60 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 	defaultKwArgs := ffmpeg.KwArgs{"loglevel": "fatal", "hide_banner": ""}
 	name := strings.TrimSuffix(filepath.Base(filePath), filepath.Ext(filePath))
 
-	if targetType != "force" {
-		ctx, cancelFn := cntx.WithTimeout(cntx.Background(), 5*time.Second)
-		defer cancelFn()
+	ctx, cancelFn := cntx.WithTimeout(cntx.Background(), 5*time.Second)
+	defer cancelFn()
 
-		data, err := ffprobe.ProbeURL(ctx, filePath)
+	data, err := ffprobe.ProbeURL(ctx, filePath)
+	if err != nil {
+		return err
+	}
+	inputVideoFormat := data.FirstVideoStream()
+	inputAudioFormat := data.FirstAudioStream()
+
+	if inputVideoFormat != nil {
+		width = inputVideoFormat.Width
+		height = inputVideoFormat.Height
+		duration, err = strconv.ParseFloat(inputVideoFormat.Duration, 32)
 		if err != nil {
-			return err
+			duration = 0
 		}
-		inputVideoFormat := data.FirstVideoStream()
-		inputAudioFormat := data.FirstAudioStream()
+	} else {
+		switch targetType {
+		case "animation", "gif", "webm", "animation_reverse", "sticker_reverse", "animation_loop", "loop":
+			return fmt.Errorf("видео-дорожка не найдена")
+		case "video", "mp4":
+			targetType = "audio"
+		case "video_reverse", "reverse", "invert":
+			targetType = "audio_reverse"
+		}
+	}
 
-		if inputVideoFormat != nil {
-			width = inputVideoFormat.Width
-			height = inputVideoFormat.Height
-			duration, err = strconv.ParseFloat(inputVideoFormat.Duration, 32)
+	if inputAudioFormat != nil {
+		if duration == 0 {
+			duration, err = strconv.ParseFloat(inputAudioFormat.Duration, 32)
 			if err != nil {
 				duration = 0
 			}
-		} else {
-			switch targetType {
-			case "animation", "gif", "webm", "animation_reverse", "sticker_reverse", "animation_loop", "loop":
-				return fmt.Errorf("видео-дорожка не найдена")
-			case "video", "mp4":
-				targetType = "audio"
-			case "video_reverse", "reverse", "invert":
-				targetType = "audio_reverse"
-			}
-		}
-
-		if inputAudioFormat != nil {
-			if duration == 0 {
-				duration, err = strconv.ParseFloat(inputAudioFormat.Duration, 32)
-				if err != nil {
-					duration = 0
-				}
-			}
-		} else {
-			switch targetType {
-			case "audio", "mp3", "voice", "ogg", "audio_reverse", "voice_reverse", "audio_loop", "voice_loop":
-				return fmt.Errorf("аудио-дорожка не найдена")
-			case "video", "mp4", "webm":
-				targetType = "animation"
-			case "video_reverse", "reverse", "invert":
-				targetType = "animation_reverse"
-			case "video_loop", "loop":
-				targetType = "animation_loop"
-			}
-		}
-
-		if (strings.Contains(targetType, "reverse") || strings.Contains(targetType, "loop")) && duration > 60 {
-			return fmt.Errorf("слишком длинное видео для эффекта")
-		}
-
-		if inputAudioFormat == nil && inputVideoFormat == nil {
-			return fmt.Errorf("медиа-дорожек не найдено")
 		}
 	} else {
-		targetType = "video"
+		switch targetType {
+		case "audio", "mp3", "voice", "ogg", "audio_reverse", "voice_reverse", "audio_loop", "voice_loop":
+			return fmt.Errorf("аудио-дорожка не найдена")
+		case "video", "mp4", "webm":
+			targetType = "animation"
+		case "video_reverse", "reverse", "invert":
+			targetType = "animation_reverse"
+		case "video_loop", "loop":
+			targetType = "animation_loop"
+		}
+	}
+
+	if (strings.Contains(targetType, "reverse") || strings.Contains(targetType, "loop")) && duration > 60 {
+		return fmt.Errorf("слишком длинное видео для эффекта")
+	}
+
+	if inputAudioFormat == nil && inputVideoFormat == nil {
+		return fmt.Errorf("медиа-дорожек не найдено")
 	}
 
 	switch targetType {
@@ -461,7 +457,11 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 		extension = "ogg"
 		targetType = "voice"
 	case "animation_loop", "loop":
-		KwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"an": "", "filter_complex": "[0]reverse[r];[0][r]concat,loop=1:2"}})
+		framesInt, err := strconv.Atoi(inputVideoFormat.NbFrames)
+		if err != nil {
+			return err
+		}
+		KwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"an": "", "filter_complex": fmt.Sprintf("[0]trim=start_frame=1:end_frame=%d,setpts=PTS-STARTPTS,reverse[r];[0][r]concat,loop=1:2", framesInt-1)}})
 		extension = "mp4"
 		targetType = "animation"
 	default:
