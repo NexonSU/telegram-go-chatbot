@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	_ "golang.org/x/image/bmp"
+	_ "image/png"
 
 	cntx "context"
 
@@ -120,16 +120,16 @@ func Distort(context tele.Context) error {
 		additionalInputArgs = "-i " + workdir + "/audio.mp3 -c:a aac"
 	}
 
-	err = ffmpeg.Input(inputFile).Output(workdir + "/%09d.bmp").OverWriteOutput().ErrorToStdOut().Run()
+	err = ffmpeg.Input(inputFile).Output(workdir + "/%09d.png").OverWriteOutput().ErrorToStdOut().Run()
 	if err != nil {
 		return err
 	}
 
 	if media.MediaType() == "photo" || (media.MediaType() == "sticker" && !context.Message().ReplyTo.Sticker.Animated && !context.Message().ReplyTo.Sticker.Video) {
 		framerate = "15/1"
-		src := workdir + "/000000001.bmp"
+		src := workdir + "/000000001.png"
 		for i := 2; i < 31; i++ {
-			dst := fmt.Sprintf("%v/%09d.bmp", workdir, i)
+			dst := fmt.Sprintf("%v/%09d.png", workdir, i)
 
 			sourceFileStat, err := os.Stat(src)
 			if err != nil {
@@ -158,7 +158,7 @@ func Distort(context tele.Context) error {
 		}
 	}
 
-	files, err := filepath.Glob(workdir + "/*.bmp")
+	files, err := filepath.Glob(workdir + "/*.png")
 	if err != nil {
 		return err
 	}
@@ -213,7 +213,7 @@ func Distort(context tele.Context) error {
 		return err
 	}
 
-	ffmpegCommand := fmt.Sprintf("ffmpeg -y -framerate %v -i %v/%%09d.bmp %v -c:v: libx264 -preset fast -crf 26 -pix_fmt yuv420p -movflags +faststart -hide_banner -loglevel fatal %v", framerate, workdir, additionalInputArgs, outputFile)
+	ffmpegCommand := fmt.Sprintf("ffmpeg -y -framerate %v -i %v/%%09d.png %v -c:v: libx264 -preset fast -crf 26 -pix_fmt yuv420p -movflags +faststart -hide_banner -loglevel fatal %v", framerate, workdir, additionalInputArgs, outputFile)
 	ffmpegCommandExec := strings.Fields(ffmpegCommand)
 	err = exec.Command(ffmpegCommandExec[0], ffmpegCommandExec[1:]...).Run()
 	if err != nil {
