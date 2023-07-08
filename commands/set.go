@@ -9,15 +9,21 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-//Save Get to DB on /set
+// Save Get to DB on /set
 func Set(context tele.Context) error {
 	var get utils.Get
+	var inputGet string
 	//args check
 	if (context.Message().ReplyTo == nil && len(context.Args()) < 2) || (context.Message().ReplyTo != nil && len(context.Args()) == 0) {
 		return context.Reply("Пример использования: <code>/set {гет} {значение}</code>\nИли отправь в ответ на какое-либо сообщение <code>/set {гет}</code>")
 	}
+	if context.Message().ReplyTo == nil {
+		inputGet = context.Args()[1]
+	} else {
+		inputGet = context.Data()
+	}
 	//ownership check
-	result := utils.DB.Where(&utils.Get{Name: strings.ToLower(context.Args()[0])}).First(&get)
+	result := utils.DB.Where(&utils.Get{Name: strings.ToLower(inputGet)}).First(&get)
 	if result.RowsAffected != 0 {
 		creator, err := utils.GetUserFromDB(fmt.Sprint(get.Creator))
 		if err != nil {
@@ -29,13 +35,13 @@ func Set(context tele.Context) error {
 	}
 	//filling Get from message
 	if context.Message().ReplyTo == nil {
-		get.Name = strings.ToLower(context.Args()[0])
-		get.Title = context.Args()[0]
+		get.Name = strings.ToLower(inputGet)
+		get.Title = inputGet
 		get.Type = "Text"
 		get.Data = utils.GetHtmlText(*context.Message())
 	} else {
-		get.Name = strings.ToLower(context.Data())
-		get.Title = context.Data()
+		get.Name = strings.ToLower(inputGet)
+		get.Title = inputGet
 		get.Caption = utils.GetHtmlText(*context.Message().ReplyTo)
 		switch {
 		case context.Message().ReplyTo.Animation != nil:
