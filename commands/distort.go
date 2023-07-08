@@ -114,12 +114,14 @@ func Distort(context tele.Context) error {
 	}(workdir)
 
 	if media.MediaType() == "video" {
-		ffmpeg.Input(inputFile).Output(workdir+"/audio.mp3", ffmpeg.KwArgs{"filter_complex": "vibrato=f=10:d=0.7"}).OverWriteOutput().ErrorToStdOut().Run()
+		ffmpeg.Input(inputFile).Output(workdir + "/input_audio.mp3").OverWriteOutput().ErrorToStdOut().Run()
+		ffmpeg.Input(workdir+"/input_audio.mp3").Output(workdir+"/audio.mp3", ffmpeg.KwArgs{"filter_complex": "vibrato=f=10:d=0.7"}).OverWriteOutput().ErrorToStdOut().Run()
 		additionalInputArgs = "-i " + workdir + "/audio.mp3 -c:a aac"
 	}
 
 	if media.MediaType() == "audio" || media.MediaType() == "voice" {
-		err = ffmpeg.Input(inputFile).Output(workdir+"/audio.mp3", ffmpeg.KwArgs{"filter_complex": "vibrato=f=10:d=0.7"}).OverWriteOutput().ErrorToStdOut().Run()
+		ffmpeg.Input(inputFile).Output(workdir + "/input_audio.mp3").OverWriteOutput().ErrorToStdOut().Run()
+		err = ffmpeg.Input(workdir+"/input_audio.mp3").Output(workdir+"/audio.mp3", ffmpeg.KwArgs{"filter_complex": "vibrato=f=10:d=0.7"}).OverWriteOutput().ErrorToStdOut().Run()
 		if err != nil {
 			return err
 		}
@@ -213,7 +215,7 @@ func Distort(context tele.Context) error {
 	for {
 		time.Sleep(1 * time.Second)
 		if time.Now().Unix()-jobStarted > 300 {
-			return fmt.Errorf("слишком долгое выполнение операции")
+			return context.Reply("Слишком долгое выполнение операции")
 		}
 		if pool.QueueLength() == 0 {
 			break
