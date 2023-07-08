@@ -39,13 +39,7 @@ func Distort(context tele.Context) error {
 	additionalInputArgs := ""
 
 	switch media.MediaType() {
-	case "video":
-		break
-	case "animation":
-		break
-	case "photo":
-		break
-	case "sticker":
+	case "video", "animation", "photo", "audio", "voice", "sticker":
 		break
 	default:
 		return context.Reply("Неподдерживаемая операция")
@@ -92,20 +86,24 @@ func Distort(context tele.Context) error {
 		return err
 	}
 
-	frames := data.FirstVideoStream().NbFrames
-	framerate := data.FirstVideoStream().AvgFrameRate
+	framerate := "30/1"
 
-	if frames == "" {
-		frames = "1"
-	}
+	if media.MediaType() != "audio" && media.MediaType() != "voice" {
+		frames := data.FirstVideoStream().NbFrames
+		framerate = data.FirstVideoStream().AvgFrameRate
 
-	framesInt, err := strconv.Atoi(frames)
-	if err != nil {
-		return err
-	}
+		if frames == "" {
+			frames = "1"
+		}
 
-	if framesInt > 1000 {
-		return context.Reply("Видео слишком длинное. Максимум 1000 фреймов.")
+		framesInt, err := strconv.Atoi(frames)
+		if err != nil {
+			return err
+		}
+
+		if framesInt > 1000 {
+			return context.Reply("Видео слишком длинное. Максимум 1000 фреймов.")
+		}
 	}
 
 	if err := os.Mkdir(workdir, os.ModePerm); err != nil {
@@ -118,6 +116,18 @@ func Distort(context tele.Context) error {
 	if media.MediaType() == "video" {
 		ffmpeg.Input(inputFile).Output(workdir+"/audio.mp3", ffmpeg.KwArgs{"filter_complex": "vibrato=f=10:d=0.7"}).OverWriteOutput().ErrorToStdOut().Run()
 		additionalInputArgs = "-i " + workdir + "/audio.mp3 -c:a aac"
+	}
+
+	if media.MediaType() == "audio" || media.MediaType() == "voice" {
+		err = ffmpeg.Input(inputFile).Output(workdir+"/audio.mp3", ffmpeg.KwArgs{"filter_complex": "vibrato=f=10:d=0.7"}).OverWriteOutput().ErrorToStdOut().Run()
+		if err != nil {
+			return err
+		}
+		return context.Reply(&tele.Audio{
+			File:     tele.FromDisk(workdir + "/audio.mp3"),
+			FileName: media.MediaFile().FileID + ".mp3",
+			MIME:     "video/mp3",
+		}, &tele.SendOptions{AllowWithoutReply: true})
 	}
 
 	err = ffmpeg.Input(inputFile).Output(workdir + "/%09d.png").OverWriteOutput().ErrorToStdOut().Run()
