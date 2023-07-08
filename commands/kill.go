@@ -30,9 +30,6 @@ func Kill(context tele.Context) error {
 	if err != nil {
 		return err
 	}
-	if context.Message().ReplyTo != nil {
-		utils.Bot.Delete(context.Message().ReplyTo)
-	}
 	victimText := ""
 	if ChatMember.Role == "administrator" || ChatMember.Role == "creator" || context.Sender().ID == 825209730 {
 		var victim *tele.ChatMember
@@ -55,6 +52,10 @@ func Kill(context tele.Context) error {
 				rows.Close()
 				break
 			}
+		}
+	} else {
+		if context.Message().ReplyTo != nil {
+			utils.Bot.Delete(context.Message().ReplyTo)
 		}
 	}
 	var duelist utils.Duelist
