@@ -46,9 +46,7 @@ func Distort(context tele.Context) error {
 	case "photo":
 		break
 	case "sticker":
-		if !context.Message().ReplyTo.Sticker.Animated && !context.Message().ReplyTo.Sticker.Video {
-			return context.Reply("Неподдерживаемая операция")
-		}
+		break
 	default:
 		return context.Reply("Неподдерживаемая операция")
 	}
@@ -127,7 +125,7 @@ func Distort(context tele.Context) error {
 		return err
 	}
 
-	if media.MediaType() == "photo" {
+	if media.MediaType() == "photo" || (media.MediaType() == "sticker" && !context.Message().ReplyTo.Sticker.Animated && !context.Message().ReplyTo.Sticker.Video) {
 		framerate = "15/1"
 		src := workdir + "/000000001.bmp"
 		for i := 2; i < 31; i++ {
