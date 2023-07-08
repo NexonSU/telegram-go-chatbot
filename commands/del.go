@@ -32,5 +32,5 @@ func Del(context tele.Context) error {
 	if result.Error != nil {
 		return result.Error
 	}
-	return context.Reply(fmt.Sprintf("Гет <code>%v</code> удалён.", context.Args()[0]))
+	return context.Reply(fmt.Sprintf("Гет <code>%v</code> удалён.", context.Data()))
 }
