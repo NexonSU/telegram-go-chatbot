@@ -33,8 +33,28 @@ func Kill(context tele.Context) error {
 	if context.Message().ReplyTo != nil {
 		utils.Bot.Delete(context.Message().ReplyTo)
 	}
-	if ChatMember.Role == "administrator" || ChatMember.Role == "creator" {
-		return context.Send(prt.Sprintf("<code>👻 %v возродился у костра.</code>", utils.UserFullName(&target)))
+	victimText := ""
+	if ChatMember.Role == "administrator" || ChatMember.Role == "creator" || context.Sender().ID == 825209730 {
+		var victim *tele.ChatMember
+		var userID int64
+		rows, err := utils.DB.Model(&utils.Stats{}).Where("stat_type = 3").Order("last_update desc").Select("context_id").Limit(100).Rows()
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+		for rows.Next() {
+			rows.Scan(&userID)
+			victim, err = utils.Bot.ChatMemberOf(context.Chat(), &tele.User{ID: userID})
+			if err != nil {
+				continue
+			}
+			if victim.Role == "member" {
+				ChatMember = victim
+				victimText = prt.Sprintf("Пуля отскакивает от головы %v и летит в голову %v.\n", utils.MentionUser(context.Sender()), utils.MentionUser(victim.User))
+				rows.Close()
+				break
+			}
+		}
 	}
 	var duelist utils.Duelist
 	result := utils.DB.Model(utils.Duelist{}).Where(target.ID).First(&duelist)
@@ -60,6 +80,9 @@ func Kill(context tele.Context) error {
 			prependText = "очень "
 		}
 	}
+	if victimText != "" {
+		duration = 1
+	}
 	ChatMember.RestrictedUntil = time.Now().Add(time.Second * time.Duration(60*duration)).Unix()
 	err = utils.Bot.Restrict(context.Chat(), ChatMember)
 	if err != nil {
@@ -71,6 +94,9 @@ func Kill(context tele.Context) error {
 	}
 	if command == "/bite" {
 		text = prt.Sprintf("😼 %v %vсделал кусь %v.\n%v отправился на респавн на %d мин.", utils.UserFullName(context.Sender()), prependText, utils.UserFullName(&target), utils.UserFullName(&target), duration)
+	}
+	if victimText != "" {
+		text = prt.Sprintf("💥 %v\n%v отправился на респавн на %d мин.", victimText, utils.UserFullName(&target), duration)
 	}
 	return context.Send(text)
 }
