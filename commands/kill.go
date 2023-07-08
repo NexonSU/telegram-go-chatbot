@@ -50,7 +50,8 @@ func Kill(context tele.Context) error {
 			}
 			if victim.Role == "member" {
 				ChatMember = victim
-				victimText = prt.Sprintf("Пуля отскакивает от головы %v и летит в голову %v.\n", utils.MentionUser(context.Sender()), utils.MentionUser(victim.User))
+				victimText = prt.Sprintf("Пуля отскакивает от головы %v и летит в голову %v.\n", utils.MentionUser(&target), utils.MentionUser(victim.User))
+				target = *ChatMember.User
 				rows.Close()
 				break
 			}
