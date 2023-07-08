@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"image"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -41,6 +42,8 @@ func Distort(context tele.Context) error {
 	case "video":
 		break
 	case "animation":
+		break
+	case "photo":
 		break
 	case "sticker":
 		if !context.Message().ReplyTo.Sticker.Animated && !context.Message().ReplyTo.Sticker.Video {
@@ -91,12 +94,19 @@ func Distort(context tele.Context) error {
 		return err
 	}
 
-	frames, err := strconv.Atoi(data.FirstVideoStream().NbFrames)
+	frames := data.FirstVideoStream().NbFrames
+	framerate := data.FirstVideoStream().AvgFrameRate
+
+	if frames == "" {
+		frames = "1"
+	}
+
+	framesInt, err := strconv.Atoi(frames)
 	if err != nil {
 		return err
 	}
 
-	if frames > 1000 {
+	if framesInt > 1000 {
 		return context.Reply("Видео слишком длинное. Максимум 1000 фреймов.")
 	}
 
@@ -117,6 +127,39 @@ func Distort(context tele.Context) error {
 		return err
 	}
 
+	if media.MediaType() == "photo" {
+		framerate = "15/1"
+		src := workdir + "/000000001.bmp"
+		for i := 2; i < 31; i++ {
+			dst := fmt.Sprintf("%v/%09d.bmp", workdir, i)
+
+			sourceFileStat, err := os.Stat(src)
+			if err != nil {
+				return err
+			}
+
+			if !sourceFileStat.Mode().IsRegular() {
+				return fmt.Errorf("%s is not a regular file", src)
+			}
+
+			source, err := os.Open(src)
+			if err != nil {
+				return err
+			}
+			defer source.Close()
+
+			destination, err := os.Create(dst)
+			if err != nil {
+				return err
+			}
+			defer destination.Close()
+			_, err = io.Copy(destination, source)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 	files, err := filepath.Glob(workdir + "/*.bmp")
 	if err != nil {
 		return err
@@ -134,6 +177,14 @@ func Distort(context tele.Context) error {
 	width := frameConfig.Width
 	height := frameConfig.Height
 	scale := 0
+
+	if width%2 != 0 {
+		width++
+	}
+
+	if height%2 != 0 {
+		height++
+	}
 
 	pool := tunny.NewFunc(runtime.NumCPU()-1, func(payload interface{}) interface{} {
 		payloadCommand := strings.Fields(payload.(string))
@@ -164,8 +215,9 @@ func Distort(context tele.Context) error {
 		return err
 	}
 
-	ffmpegCommand := strings.Fields(fmt.Sprintf("ffmpeg -y -framerate %v -i %v/%%09d.bmp %v -c:v: libx264 -preset fast -crf 26 -pix_fmt yuv420p -movflags +faststart -hide_banner -loglevel info %v", data.FirstVideoStream().AvgFrameRate, workdir, additionalInputArgs, outputFile))
-	err = exec.Command(ffmpegCommand[0], ffmpegCommand[1:]...).Run()
+	ffmpegCommand := fmt.Sprintf("ffmpeg -y -framerate %v -i %v/%%09d.bmp %v -c:v: libx264 -preset fast -crf 26 -pix_fmt yuv420p -movflags +faststart -hide_banner -loglevel info %v", framerate, workdir, additionalInputArgs, outputFile)
+	ffmpegCommandExec := strings.Fields(ffmpegCommand)
+	err = exec.Command(ffmpegCommandExec[0], ffmpegCommandExec[1:]...).Run()
 	if err != nil {
 		return err
 	}
