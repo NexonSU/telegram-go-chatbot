@@ -8,7 +8,7 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-//Delete Get in DB on /del
+// Delete Get in DB on /del
 func Del(context tele.Context) error {
 	var get utils.Get
 	//args check
@@ -16,7 +16,7 @@ func Del(context tele.Context) error {
 		return context.Reply("Пример использования: <code>/del {гет}</code>")
 	}
 	//ownership check
-	result := utils.DB.Where(&utils.Get{Name: strings.ToLower(context.Args()[0])}).First(&get)
+	result := utils.DB.Where(&utils.Get{Name: strings.ToLower(context.Text())}).First(&get)
 	if result.RowsAffected == 0 {
 		return context.Reply(fmt.Sprintf("Гет <code>%v</code> не найден.", context.Data()))
 	}
