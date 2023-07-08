@@ -194,7 +194,7 @@ func Distort(context tele.Context) error {
 
 	for i, file := range files {
 		scale = 100 - (i * 75 / len(files))
-		command := fmt.Sprintf("convert %v -liquid-rescale %v%% -resize %vx%v %v", file, scale, width, height, file)
+		command := fmt.Sprintf("convert %v -liquid-rescale %v%% -resize %vx%v! %v", file, scale, width, height, file)
 		go func(command string) {
 			if pool.Process(command) != nil {
 				err = pool.Process(command).(error)
@@ -215,7 +215,7 @@ func Distort(context tele.Context) error {
 		return err
 	}
 
-	ffmpegCommand := fmt.Sprintf("ffmpeg -y -framerate %v -i %v/%%09d.bmp %v -c:v: libx264 -preset fast -crf 26 -pix_fmt yuv420p -movflags +faststart -hide_banner -loglevel info %v", framerate, workdir, additionalInputArgs, outputFile)
+	ffmpegCommand := fmt.Sprintf("ffmpeg -y -framerate %v -i %v/%%09d.bmp %v -c:v: libx264 -preset fast -crf 26 -pix_fmt yuv420p -movflags +faststart -hide_banner -loglevel fatal %v", framerate, workdir, additionalInputArgs, outputFile)
 	ffmpegCommandExec := strings.Fields(ffmpegCommand)
 	err = exec.Command(ffmpegCommandExec[0], ffmpegCommandExec[1:]...).Run()
 	if err != nil {
