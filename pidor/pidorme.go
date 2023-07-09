@@ -10,7 +10,7 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-//Send DB stats on /pidorme
+// Send DB stats on /pidorme
 func Pidorme(context tele.Context) error {
 	// prt will replace fmt package to format text according plurals defined in utils package
 	// If no plural rule matched it will be ignored and processed as usual formatting
@@ -24,5 +24,5 @@ func Pidorme(context tele.Context) error {
 	utils.DB.Model(&utils.PidorStats{}).Where(pidor).Count(&countAlltime)
 	thisYear := prt.Sprintf("В этом году ты был пидором дня — %d раз", countYear)
 	total := prt.Sprintf("За всё время ты был пидором дня — %d раз!", countAlltime)
-	return context.Reply(prt.Sprintf("%s\n%s", thisYear, total))
+	return utils.SendAndRemove(prt.Sprintf("%s\n%s", thisYear, total), context)
 }

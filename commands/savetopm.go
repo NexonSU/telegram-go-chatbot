@@ -13,7 +13,7 @@ import (
 // Resend post on user request
 func SaveToPM(context tele.Context) error {
 	if context.Message() == nil || context.Message().ReplyTo == nil {
-		return context.Reply("Пример использования:\n/topm в ответ на какое-либо сообщение\nБот должен быть запущен и разблокирован в личке.")
+		return utils.SendAndRemove("Пример использования:\n/topm в ответ на какое-либо сообщение\nБот должен быть запущен и разблокирован в личке.", context)
 	}
 	link := fmt.Sprintf("https://t.me/c/%v/%v", strings.TrimLeft(strings.TrimLeft(strconv.Itoa(int(context.Chat().ID)), "-1"), "0"), context.Message().ReplyTo.ID)
 	var err error

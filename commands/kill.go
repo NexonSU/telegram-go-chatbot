@@ -20,7 +20,7 @@ func Kill(context tele.Context) error {
 
 	command := strings.Split(strings.Split(context.Text(), "@")[0], " ")[0]
 	if (context.Message().ReplyTo == nil && len(context.Args()) != 1) || (context.Message().ReplyTo != nil && len(context.Args()) != 0) {
-		return context.Reply(prt.Sprintf("Пример использования: <code>%v {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>%v</code>", command, command))
+		return utils.SendAndRemove(prt.Sprintf("Пример использования: <code>%v {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>%v</code>", command, command), context)
 	}
 	target, _, err := utils.FindUserInMessage(context)
 	if err != nil {

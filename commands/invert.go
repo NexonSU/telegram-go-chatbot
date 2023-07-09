@@ -11,10 +11,10 @@ import (
 // Invert given file
 func Invert(context tele.Context) error {
 	if context.Message().ReplyTo == nil {
-		return context.Reply("Пример использования: <code>/invert</code> в ответ на какое-либо сообщение с видео.")
+		return utils.SendAndRemove("Пример использования: <code>/invert</code> в ответ на какое-либо сообщение с видео.", context)
 	}
 	if context.Message().ReplyTo.Media() == nil {
-		return context.Reply("Какого-либо видео нет в указанном сообщении.")
+		return utils.SendAndRemove("Какого-либо видео нет в указанном сообщении.", context)
 	}
 
 	media := context.Message().ReplyTo.Media()
@@ -36,14 +36,14 @@ func Invert(context tele.Context) error {
 	case "audio", "mp3":
 		targetArg = "audio"
 	default:
-		return context.Reply("Неподдерживаемая операция")
+		return utils.SendAndRemove("Неподдерживаемая операция", context)
 	}
 
 	targetArg = targetArg + "_reverse"
 
 	if targetArg == "sticker_reverse" {
 		if !context.Message().ReplyTo.Sticker.Animated && !context.Message().ReplyTo.Sticker.Video {
-			return context.Reply("Неподдерживаемая операция")
+			return utils.SendAndRemove("Неподдерживаемая операция", context)
 		}
 	}
 

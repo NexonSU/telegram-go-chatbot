@@ -10,7 +10,7 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-//Send warning amount on /mywarns
+// Send warning amount on /mywarns
 func Mywarns(context tele.Context) error {
 	// prt will replace fmt package to format text according plurals defined in utils package
 	// If no plural rule matched it will be ignored and processed as usual formatting
@@ -28,5 +28,5 @@ func Mywarns(context tele.Context) error {
 		warn.LastWarn = time.Unix(0, 0)
 		warn.Amount = 0
 	}
-	return context.Reply(prt.Sprintf("У тебя %d предупреждений.", warn.Amount))
+	return utils.SendAndRemove(prt.Sprintf("У тебя %d предупреждений.", warn.Amount), context)
 }

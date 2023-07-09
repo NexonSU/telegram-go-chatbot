@@ -14,7 +14,7 @@ import (
 func DelBet(context tele.Context) error {
 	var bet utils.Bets
 	if len(context.Args()) < 2 {
-		return context.Reply("Пример использования: <code>/bet 30.06.2023 ставлю жопу, что TESVI будет говном</code>")
+		return utils.SendAndRemove("Пример использования: <code>/delbet 30.06.2023 ставлю жопу, что TESVI будет говном</code>", context)
 	}
 	date, err := time.Parse("02.01.2006", context.Args()[0])
 	if err != nil {
@@ -28,8 +28,8 @@ func DelBet(context tele.Context) error {
 	}
 	result := utils.DB.Delete(&bet)
 	if result.RowsAffected != 0 {
-		return context.Reply(fmt.Sprintf("Ставка удалена:\n%v, %v:<pre>%v</pre>\n", time.Unix(bet.Timestamp, 0).Format("02.01.2006"), utils.UserFullName(context.Sender()), html.EscapeString(bet.Text)))
+		return utils.SendAndRemove(fmt.Sprintf("Ставка удалена:\n%v, %v:<pre>%v</pre>\n", time.Unix(bet.Timestamp, 0).Format("02.01.2006"), utils.UserFullName(context.Sender()), html.EscapeString(bet.Text)), context)
 	} else {
-		return context.Reply("Твоя ставка не найдена по указанным параметрам.")
+		return utils.SendAndRemove("Твоя ставка не найдена по указанным параметрам.", context)
 	}
 }

@@ -9,11 +9,11 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-//Write username on hug picture and send to target
+// Write username on hug picture and send to target
 func Hug(context tele.Context) error {
 	var err error
 	if context.Message().ReplyTo == nil {
-		return context.Reply("Просто отправь <code>/hug</code> в ответ на чье-либо сообщение.")
+		return utils.SendAndRemove("Просто отправь <code>/hug</code> в ответ на чье-либо сообщение.", context)
 	}
 	context.Delete()
 	im, err := webp.Load("files/hug.webp")

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/NexonSU/telegram-go-chatbot/utils"
 	tele "gopkg.in/telebot.v3"
 )
 
@@ -31,5 +32,5 @@ func Advice(context tele.Context) error {
 		return err
 	}
 
-	return context.Reply(advice.Text)
+	return utils.SendAndRemove(advice.Text, context)
 }

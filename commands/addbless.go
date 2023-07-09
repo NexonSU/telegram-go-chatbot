@@ -11,7 +11,7 @@ import (
 func AddBless(context tele.Context) error {
 	var bless utils.Bless
 	if (context.Message().ReplyTo == nil && len(context.Args()) == 0) || (context.Message().ReplyTo != nil && len(context.Args()) != 0) {
-		return context.Reply("Пример использования: <code>/addbless {текст}</code>\nИли отправь в ответ на сообщение с текстом <code>/addbless</code>")
+		return utils.SendAndRemove("Пример использования: <code>/addbless {текст}</code>\nИли отправь в ответ на сообщение с текстом <code>/addbless</code>", context)
 	}
 	if context.Message().ReplyTo == nil {
 		bless.Text = context.Data()
@@ -19,15 +19,15 @@ func AddBless(context tele.Context) error {
 		if context.Message().ReplyTo.Text != "" {
 			bless.Text = context.Message().ReplyTo.Text
 		} else {
-			return context.Reply("Я не смог найти текст в указанном сообщении.")
+			return utils.SendAndRemove("Я не смог найти текст в указанном сообщении.", context)
 		}
 	}
 	if len([]rune(bless.Text)) > 200 {
-		return context.Reply("Bless не может быть длиннее 200 символов.")
+		return utils.SendAndRemove("Bless не может быть длиннее 200 символов.", context)
 	}
 	result := utils.DB.Create(&bless)
 	if result.Error != nil {
 		return result.Error
 	}
-	return context.Reply(fmt.Sprintf("Bless добавлен как <code>%v</code>.", bless.Text))
+	return utils.SendAndRemove(fmt.Sprintf("Bless добавлен как <code>%v</code>.", bless.Text), context)
 }

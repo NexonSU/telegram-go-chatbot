@@ -24,7 +24,7 @@ func Request(context tele.Context) error {
 		if time.Now().Unix()-Message.Time().Unix() > 3600 {
 			busy["bot_is_dead"] = false
 		} else {
-			return context.Reply("Я не могу провести игру, т.к. я немного умер. Зайдите позже.")
+			return utils.SendAndRemove("Я не могу провести игру, т.к. я немного умер. Зайдите позже.", context)
 		}
 	}
 	if busy["russianroulettePending"] && !busy["russianrouletteInProgress"] && time.Now().Unix()-Message.Time().Unix() > 60 {
@@ -39,22 +39,22 @@ func Request(context tele.Context) error {
 		busy["russianrouletteInProgress"] = false
 	}
 	if busy["russianroulette"] || busy["russianroulettePending"] || busy["russianrouletteInProgress"] {
-		return context.Reply("Команда занята. Попробуйте позже.")
+		return utils.SendAndRemove("Команда занята. Попробуйте позже.", context)
 	}
 	busy["russianroulette"] = true
 	defer func() { busy["russianroulette"] = false }()
 	if (context.Message().ReplyTo == nil && len(context.Args()) != 1) || (context.Message().ReplyTo != nil && len(context.Args()) != 0) {
-		return context.Reply("Пример использования: <code>/russianroulette {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/russianroulette</code>")
+		return utils.SendAndRemove("Пример использования: <code>/russianroulette {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/russianroulette</code>", context)
 	}
 	target, _, err := utils.FindUserInMessage(context)
 	if err != nil {
 		return err
 	}
 	if target.ID == context.Sender().ID {
-		return context.Reply("Как ты себе это представляешь? Нет, нельзя вызвать на дуэль самого себя.")
+		return utils.SendAndRemove("Как ты себе это представляешь? Нет, нельзя вызвать на дуэль самого себя.", context)
 	}
 	if target.IsBot {
-		return context.Reply("Бота нельзя вызвать на дуэль.")
+		return utils.SendAndRemove("Бота нельзя вызвать на дуэль.", context)
 	}
 	ChatMember, err := utils.Bot.ChatMemberOf(context.Chat(), &target)
 	if err != nil {

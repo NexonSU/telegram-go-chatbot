@@ -9,10 +9,10 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-//Write username on bonk picture and send to target
+// Write username on bonk picture and send to target
 func Bonk(context tele.Context) error {
 	if context.Message().ReplyTo == nil {
-		return context.Reply("Просто отправь <code>/bonk</code> в ответ на чье-либо сообщение.")
+		return utils.SendAndRemove("Просто отправь <code>/bonk</code> в ответ на чье-либо сообщение.", context)
 	}
 	context.Delete()
 	im, err := webp.Load("files/bonk.webp")

@@ -13,24 +13,24 @@ func Del(context tele.Context) error {
 	var get utils.Get
 	//args check
 	if len(context.Args()) == 0 {
-		return context.Reply("Пример использования: <code>/del {гет}</code>")
+		return utils.SendAndRemove("Пример использования: <code>/del {гет}</code>", context)
 	}
 	//ownership check
 	result := utils.DB.Where(&utils.Get{Name: strings.ToLower(context.Data())}).First(&get)
 	if result.RowsAffected == 0 {
-		return context.Reply(fmt.Sprintf("Гет <code>%v</code> не найден.", context.Data()))
+		return utils.SendAndRemove(fmt.Sprintf("Гет <code>%v</code> не найден.", context.Data()), context)
 	}
 	creator, err := utils.GetUserFromDB(fmt.Sprint(get.Creator))
 	if err != nil {
 		return err
 	}
 	if get.Creator != context.Sender().ID && !utils.IsAdminOrModer(context.Sender().ID) {
-		return context.Reply(fmt.Sprintf("Данный гет могут изменять либо администраторы, либо %v.", utils.UserFullName(&creator)))
+		return utils.SendAndRemove(fmt.Sprintf("Данный гет могут изменять либо администраторы, либо %v.", utils.UserFullName(&creator)), context)
 	}
 	//removing Get
 	result = utils.DB.Delete(&get)
 	if result.Error != nil {
 		return result.Error
 	}
-	return context.Reply(fmt.Sprintf("Гет <code>%v</code> удалён.", context.Data()))
+	return utils.SendAndRemove(fmt.Sprintf("Гет <code>%v</code> удалён.", context.Data()), context)
 }

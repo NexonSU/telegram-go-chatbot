@@ -8,7 +8,7 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-//Send user utils.Duelist stats on /duelstats
+// Send user utils.Duelist stats on /duelstats
 func Duelstats(context tele.Context) error {
 	// prt will replace fmt package to format text according plurals defined in utils package
 	// If no plural rule matched it will be ignored and processed as usual formatting
@@ -17,9 +17,9 @@ func Duelstats(context tele.Context) error {
 	var duelist utils.Duelist
 	result := utils.DB.Model(utils.Duelist{}).Where(context.Sender().ID).First(&duelist)
 	if result.RowsAffected == 0 {
-		return context.Reply("У тебя нет статистики.")
+		return utils.SendAndRemove("У тебя нет статистики.", context)
 	}
 	winsMessage := prt.Sprintf("%d побед", duelist.Kills)
 	deathsMessage := prt.Sprintf("%d смертей", duelist.Deaths)
-	return context.Reply(prt.Sprintf("У тебя %s и %s", winsMessage, deathsMessage))
+	return utils.SendAndRemove(prt.Sprintf("У тебя %s и %s", winsMessage, deathsMessage), context)
 }

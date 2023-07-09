@@ -5,10 +5,10 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-//Send text in chat on /say
+// Send text in chat on /say
 func Say(context tele.Context) error {
 	if len(context.Args()) == 0 {
-		return context.Reply("Укажите сообщение.")
+		return utils.SendAndRemove("Укажите сообщение.", context)
 	}
 	context.Delete()
 	return context.Send(utils.GetHtmlText(*context.Message()))

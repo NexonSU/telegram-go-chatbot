@@ -7,7 +7,7 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-//Kill user on /blessing, /suicide
+// Kill user on /blessing, /suicide
 func TestRandom(context tele.Context) error {
 	text := "1000xRandInt(0, 9):\n"
 	numbers := [10]int{}
@@ -17,5 +17,5 @@ func TestRandom(context tele.Context) error {
 	for number, count := range numbers {
 		text = fmt.Sprintf("%v%v - %v\n", text, number, count)
 	}
-	return context.Reply(text)
+	return utils.SendAndRemove(text, context)
 }
