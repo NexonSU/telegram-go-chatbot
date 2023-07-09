@@ -83,10 +83,10 @@ func GetIdName(ID string) string {
 // Reply currency "cur"
 func Cur(context tele.Context) error {
 	if utils.Config.CurrencyKey == "" {
-		return context.Reply("Конвертация валют не настроена")
+		return utils.SendAndRemove("Конвертация валют не настроена", context)
 	}
 	if len(context.Args()) != 3 {
-		return context.Reply("Пример использования:\n/cur 1 USD RUB")
+		return utils.SendAndRemove("Пример использования:\n/cur 1 USD RUB", context)
 	}
 	amount, err := strconv.ParseFloat(context.Args()[0], 64)
 	if err != nil {

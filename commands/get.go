@@ -14,7 +14,7 @@ import (
 func Get(context tele.Context) error {
 	var get utils.Get
 	if len(context.Args()) == 0 {
-		return context.Reply("Пример использования: <code>/get {гет}</code>")
+		return utils.SendAndRemove("Пример использования: <code>/get {гет}</code>", context)
 	}
 	result := utils.DB.Where(&utils.Get{Name: strings.ToLower(context.Data())}).First(&get)
 	if result.RowsAffected != 0 {
@@ -52,10 +52,10 @@ func Get(context tele.Context) error {
 		case get.Type == "Text":
 			return context.Reply(get.Data)
 		default:
-			return context.Reply(fmt.Sprintf("Ошибка при определении типа гета, я не знаю тип <code>%v</code>.", get.Type))
+			return utils.SendAndRemove(fmt.Sprintf("Ошибка при определении типа гета, я не знаю тип <code>%v</code>.", get.Type), context)
 		}
 	} else {
-		return context.Reply(fmt.Sprintf("Гет <code>%v</code> не найден.\nИспользуйте inline-режим бота, чтобы найти гет.", context.Data()))
+		return utils.SendAndRemove(fmt.Sprintf("Гет <code>%v</code> не найден.\nИспользуйте inline-режим бота, чтобы найти гет.", context.Data()), context)
 	}
 }
 
