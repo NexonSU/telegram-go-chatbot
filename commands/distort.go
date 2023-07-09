@@ -29,10 +29,10 @@ var DistortBusy bool
 // Distort given file
 func Distort(context tele.Context) error {
 	if context.Message().ReplyTo == nil {
-		return context.Reply("Пример использования: <code>/distort</code> в ответ на какое-либо сообщение с видео.")
+		return utils.SendAndRemove("Пример использования: <code>/distort</code> в ответ на какое-либо сообщение с видео.", context)
 	}
 	if context.Message().ReplyTo.Media() == nil {
-		return context.Reply("Какого-либо видео нет в указанном сообщении.")
+		return utils.SendAndRemove("Какого-либо видео нет в указанном сообщении.", context)
 	}
 
 	media := context.Message().ReplyTo.Media()
@@ -42,11 +42,11 @@ func Distort(context tele.Context) error {
 	case "video", "animation", "photo", "audio", "voice", "sticker":
 		break
 	default:
-		return context.Reply("Неподдерживаемая операция")
+		return utils.SendAndRemove("Неподдерживаемая операция", context)
 	}
 
 	if DistortBusy {
-		return context.Reply("Команда занята")
+		return utils.SendAndRemove("Команда занята", context)
 	}
 
 	var done = make(chan bool, 1)
@@ -102,12 +102,12 @@ func Distort(context tele.Context) error {
 		}
 
 		if framesInt > 1000 {
-			return context.Reply("Видео слишком длинное. Максимум 1000 фреймов.")
+			return utils.SendAndRemove("Видео слишком длинное. Максимум 1000 фреймов.", context)
 		}
 	}
 
 	if err := os.Mkdir(workdir, os.ModePerm); err != nil {
-		return context.Reply("Обработка файла уже выполняется")
+		return utils.SendAndRemove("Обработка файла уже выполняется", context)
 	}
 	defer func(workdir string) {
 		os.RemoveAll(workdir)
@@ -125,11 +125,13 @@ func Distort(context tele.Context) error {
 		if err != nil {
 			return err
 		}
-		return context.Reply(&tele.Audio{
+		_, err = utils.Bot.Send(context.Sender(), &tele.Audio{
 			File:     tele.FromDisk(workdir + "/audio.mp3"),
 			FileName: media.MediaFile().FileID + ".mp3",
 			MIME:     "video/mp3",
-		}, &tele.SendOptions{AllowWithoutReply: true})
+		})
+		utils.SendAndRemove("Результат отправлен в личку. Если не пришло, то нужно написать что-нибудь в личку @zavtrachat_bot.", context)
+		return err
 	}
 
 	err = ffmpeg.Input(inputFile).Output(workdir + "/%09d.png").OverWriteOutput().ErrorToStdOut().Run()
@@ -215,7 +217,7 @@ func Distort(context tele.Context) error {
 	for {
 		time.Sleep(1 * time.Second)
 		if time.Now().Unix()-jobStarted > 300 {
-			return context.Reply("Слишком долгое выполнение операции")
+			return utils.SendAndRemove("Слишком долгое выполнение операции", context)
 		}
 		if pool.QueueLength() == 0 {
 			break
@@ -235,28 +237,30 @@ func Distort(context tele.Context) error {
 	DistortBusy = false
 	switch media.MediaType() {
 	case "video":
-		return context.Reply(&tele.Video{
+		_, err = utils.Bot.Send(context.Sender(), &tele.Video{
 			File:      tele.FromDisk(outputFile),
 			FileName:  media.MediaFile().FileID + ".mp4",
 			Streaming: true,
 			Width:     width,
 			Height:    height,
 			MIME:      "video/mp4",
-		}, &tele.SendOptions{AllowWithoutReply: true})
+		})
 	case "animation", "sticker":
-		return context.Reply(&tele.Animation{
+		_, err = utils.Bot.Send(context.Sender(), &tele.Animation{
 			File:     tele.FromDisk(outputFile),
 			FileName: media.MediaFile().FileID + ".mp4",
 			Width:    width,
 			Height:   height,
 			MIME:     "video/mp4",
-		}, &tele.SendOptions{AllowWithoutReply: true})
+		})
 	default:
-		return context.Reply(&tele.Document{
+		_, err = utils.Bot.Send(context.Sender(), &tele.Document{
 			File:     tele.FromDisk(outputFile),
 			FileName: media.MediaFile().FileID + ".mp4",
-		}, &tele.SendOptions{AllowWithoutReply: true})
+		})
 	}
+	utils.SendAndRemove("Результат отправлен в личку. Если не пришло, то нужно написать что-нибудь в личку @zavtrachat_bot.", context)
+	return err
 }
 
 func init() {
