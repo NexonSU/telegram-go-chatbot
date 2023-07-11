@@ -266,30 +266,10 @@ func Distort(context tele.Context) error {
 	}
 
 	DistortBusy = false
-	switch media.MediaType() {
-	case "video":
-		resultMessage, err = utils.Bot.Send(recepient, &tele.Video{
-			File:      tele.FromDisk(outputFile),
-			FileName:  media.MediaFile().FileID + ".mp4",
-			Streaming: true,
-			Width:     width,
-			Height:    height,
-			MIME:      "video/mp4",
-		}, options)
-	case "animation", "sticker":
-		resultMessage, err = utils.Bot.Send(recepient, &tele.Animation{
-			File:     tele.FromDisk(outputFile),
-			FileName: media.MediaFile().FileID + ".mp4",
-			Width:    width,
-			Height:   height,
-			MIME:     "video/mp4",
-		}, options)
-	default:
-		resultMessage, err = utils.Bot.Send(recepient, &tele.Document{
-			File:     tele.FromDisk(outputFile),
-			FileName: media.MediaFile().FileID + ".mp4",
-		}, options)
-	}
+	resultMessage, err = utils.Bot.Send(recepient, &tele.Document{
+		File:     tele.FromDisk(outputFile),
+		FileName: media.MediaFile().FileID + ".mp4",
+	}, options)
 	DistortCache[media.MediaFile().FileID] = resultMessage.Media().MediaFile().FileID
 	if recepient == context.Sender() {
 		utils.ReplyAndRemove("Результат отправлен в личку. Если не пришло, то нужно написать что-нибудь в личку @zavtrachat_bot.", context)
