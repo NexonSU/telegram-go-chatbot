@@ -44,7 +44,11 @@ func Distort(context tele.Context) error {
 	var err error
 	var recepient tele.Recipient
 
-	if time.Now().Local().Hour() > 21 || time.Now().Local().Hour() < 7 {
+	ChatMember, err := utils.Bot.ChatMemberOf(context.Chat(), context.Sender())
+	if err != nil {
+		return err
+	}
+	if time.Now().Local().Hour() > 21 || time.Now().Local().Hour() < 7 || ChatMember.Role == "administrator" || ChatMember.Role == "creator" {
 		recepient = context.Chat()
 		options = &tele.SendOptions{ReplyTo: context.Message(), AllowWithoutReply: true}
 	} else {
