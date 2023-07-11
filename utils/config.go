@@ -26,6 +26,7 @@ type Configuration struct {
 	CurrencyKey       string   `json:"currency_key"`
 	OpenAIKey         string   `json:"openai_key"`
 	ReleasesUrl       string   `json:"releases_url"`
+	NHentaiCookie     string   `json:"nhentai_cookie"`
 }
 
 func ConfigInit(file string) Configuration {
