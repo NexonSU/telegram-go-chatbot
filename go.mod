@@ -12,8 +12,10 @@ require (
 	github.com/miguelmota/go-coinmarketcap v0.1.8
 	github.com/neonxp/StemmerRu v0.0.0-20190528102440-5c7748b15e2f
 	github.com/stretchr/testify v1.8.2
+	github.com/tidwall/gjson v1.14.4
 	github.com/u2takey/ffmpeg-go v0.4.1
 	github.com/wader/goutubedl v0.0.0-20230503164948-cef23e8d43d4
+	github.com/yudgnahk/go-cloudflare-scraper v0.0.1
 	golang.org/x/text v0.9.0
 	gopkg.in/telebot.v3 v3.1.2
 	gopkg.in/vansante/go-ffprobe.v2 v2.1.1
@@ -22,10 +24,7 @@ require (
 )
 
 require (
-	github.com/PuerkitoBio/goquery v1.8.0 // indirect
-	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/aws/aws-sdk-go v1.44.129 // indirect
-	github.com/cardigann/go-cloudflare-scraper v0.0.0-20200425223932-91bd9b1006f2 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-faster/errors v0.6.1 // indirect
@@ -38,21 +37,15 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.15.12 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/mattn/go-sqlite3 v1.14.15 // indirect
-	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
-	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/niuhuan/nhentai-go v0.0.0-20220617164634-57974195259d // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/robertkrimen/otto v0.2.1 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
-	github.com/tidwall/gjson v1.14.4 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/u2takey/go-utils v0.3.1 // indirect
-	github.com/yudgnahk/go-cloudflare-scraper v0.0.1 // indirect
 	go.opentelemetry.io/otel v1.11.1 // indirect
 	go.opentelemetry.io/otel/trace v1.11.1 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
