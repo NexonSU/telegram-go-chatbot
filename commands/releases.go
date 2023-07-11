@@ -17,7 +17,7 @@ import (
 func Releases(context tele.Context) error {
 	var err error
 	if utils.Config.ReleasesUrl == "" {
-		return utils.SendAndRemove("Список ближайших релизов не настроен", context)
+		return utils.ReplyAndRemove("Список ближайших релизов не настроен", context)
 	}
 	resp, err := http.Get(utils.Config.ReleasesUrl)
 	if err != nil {

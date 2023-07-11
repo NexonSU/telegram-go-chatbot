@@ -7,5 +7,5 @@ import (
 
 // Reply "Polo!" on "marco"
 func Marco(context tele.Context) error {
-	return utils.SendAndRemove("Polo!", context)
+	return utils.ReplyAndRemove("Polo!", context)
 }

@@ -27,5 +27,5 @@ func Getall(context tele.Context) error {
 		}
 	}
 	utils.Bot.Send(context.Sender(), getall)
-	return utils.SendAndRemove("Список отправлен в личку.\nЕсли список не пришел, то убедитесь, что бот запущен и не заблокирован в личке.", context)
+	return utils.ReplyAndRemove("Список отправлен в личку.\nЕсли список не пришел, то убедитесь, что бот запущен и не заблокирован в личке.", context)
 }

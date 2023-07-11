@@ -24,5 +24,5 @@ func Pidorme(context tele.Context) error {
 	utils.DB.Model(&utils.PidorStats{}).Where(pidor).Count(&countAlltime)
 	thisYear := prt.Sprintf("В этом году ты был пидором дня — %d раз", countYear)
 	total := prt.Sprintf("За всё время ты был пидором дня — %d раз!", countAlltime)
-	return utils.SendAndRemove(prt.Sprintf("%s\n%s", thisYear, total), context)
+	return utils.ReplyAndRemove(prt.Sprintf("%s\n%s", thisYear, total), context)
 }

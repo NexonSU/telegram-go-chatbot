@@ -10,7 +10,7 @@ import (
 // Unban user on /unban
 func Unban(context tele.Context) error {
 	if (context.Message().ReplyTo == nil && len(context.Args()) != 1) || (context.Message().ReplyTo != nil && len(context.Args()) != 0) {
-		return utils.SendAndRemove("Пример использования: <code>/unban {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/unban</code>", context)
+		return utils.ReplyAndRemove("Пример использования: <code>/unban {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/unban</code>", context)
 	}
 	target, _, err := utils.FindUserInMessage(context)
 	if err != nil {
@@ -23,5 +23,5 @@ func Unban(context tele.Context) error {
 	if err != nil {
 		return err
 	}
-	return utils.SendAndRemove(fmt.Sprintf("<a href=\"tg://user?id=%v\">%v</a> разбанен.", target.ID, utils.UserFullName(&target)), context)
+	return utils.ReplyAndRemove(fmt.Sprintf("<a href=\"tg://user?id=%v\">%v</a> разбанен.", target.ID, utils.UserFullName(&target)), context)
 }

@@ -11,7 +11,7 @@ import (
 // Kick user on /kick
 func Kick(context tele.Context) error {
 	if (context.Message().ReplyTo == nil && len(context.Args()) == 0) || (context.Message().ReplyTo != nil && len(context.Args()) != 0) {
-		return utils.SendAndRemove("Пример использования: <code>/kick {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/kick</code>", context)
+		return utils.ReplyAndRemove("Пример использования: <code>/kick {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/kick</code>", context)
 	}
 	target, _, err := utils.FindUserInMessage(context)
 	if err != nil {
@@ -30,5 +30,5 @@ func Kick(context tele.Context) error {
 	if err != nil {
 		return err
 	}
-	return utils.SendAndRemove(fmt.Sprintf("Пользователь <a href=\"tg://user?id=%v\">%v</a> исключен.", target.ID, utils.UserFullName(&target)), context)
+	return utils.ReplyAndRemove(fmt.Sprintf("Пользователь <a href=\"tg://user?id=%v\">%v</a> исключен.", target.ID, utils.UserFullName(&target)), context)
 }

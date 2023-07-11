@@ -17,9 +17,9 @@ func Duelstats(context tele.Context) error {
 	var duelist utils.Duelist
 	result := utils.DB.Model(utils.Duelist{}).Where(context.Sender().ID).First(&duelist)
 	if result.RowsAffected == 0 {
-		return utils.SendAndRemove("У тебя нет статистики.", context)
+		return utils.ReplyAndRemove("У тебя нет статистики.", context)
 	}
 	winsMessage := prt.Sprintf("%d побед", duelist.Kills)
 	deathsMessage := prt.Sprintf("%d смертей", duelist.Deaths)
-	return utils.SendAndRemove(prt.Sprintf("У тебя %s и %s", winsMessage, deathsMessage), context)
+	return utils.ReplyAndRemove(prt.Sprintf("У тебя %s и %s", winsMessage, deathsMessage), context)
 }

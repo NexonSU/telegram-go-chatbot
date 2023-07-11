@@ -16,7 +16,7 @@ func Convert(context tele.Context) error {
 				return Download(context)
 			}
 		}
-		return utils.SendAndRemove("Пример использования: <code>/convert</code> в ответ на какое-либо сообщение с медиа-файлом.\nДопольнительные параметры: gif,mp3,ogg,jpg.", context)
+		return utils.ReplyAndRemove("Пример использования: <code>/convert</code> в ответ на какое-либо сообщение с медиа-файлом.\nДопольнительные параметры: gif,mp3,ogg,jpg.", context)
 	}
 	if context.Message().ReplyTo.Media() == nil {
 		for _, entity := range context.Message().ReplyTo.Entities {
@@ -24,7 +24,7 @@ func Convert(context tele.Context) error {
 				return Download(context)
 			}
 		}
-		return utils.SendAndRemove("Какого-либо медиа файла нет в указанном сообщении.", context)
+		return utils.ReplyAndRemove("Какого-либо медиа файла нет в указанном сообщении.", context)
 	}
 
 	media := context.Message().ReplyTo.Media()

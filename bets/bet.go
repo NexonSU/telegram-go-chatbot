@@ -14,14 +14,14 @@ import (
 func Bet(context tele.Context) error {
 	var bet utils.Bets
 	if len(context.Args()) < 2 {
-		return utils.SendAndRemove("Пример использования: <code>/bet 30.06.2023 ставлю жопу, что TESVI будет говном</code>", context)
+		return utils.ReplyAndRemove("Пример использования: <code>/bet 30.06.2023 ставлю жопу, что TESVI будет говном</code>", context)
 	}
 	date, err := time.Parse("02.01.2006", context.Args()[0])
 	if err != nil {
-		return utils.SendAndRemove("Ошибка парсинга даты: "+err.Error(), context)
+		return utils.ReplyAndRemove("Ошибка парсинга даты: "+err.Error(), context)
 	}
 	if date.Unix() < time.Now().Local().Unix() {
-		return utils.SendAndRemove(fmt.Sprintf("минимальная дата: %v", time.Now().Local().Add(24*time.Hour).Format("02.01.2006")), context)
+		return utils.ReplyAndRemove(fmt.Sprintf("минимальная дата: %v", time.Now().Local().Add(24*time.Hour).Format("02.01.2006")), context)
 	}
 	bet.UserID = context.Sender().ID
 	bet.Timestamp = date.Unix()
@@ -29,9 +29,9 @@ func Bet(context tele.Context) error {
 	result := utils.DB.Create(&bet)
 	if result.Error != nil {
 		if strings.Contains(result.Error.Error(), "UNIQUE constraint failed") {
-			return utils.SendAndRemove("Такая ставка уже добавлена", context)
+			return utils.ReplyAndRemove("Такая ставка уже добавлена", context)
 		}
 		return result.Error
 	}
-	return utils.SendAndRemove(fmt.Sprintf("Ставка добавлена.\nДата: <code>%v</code>.\nТекст: <code>%v</code>.", time.Unix(bet.Timestamp, 0).Format("02.01.2006"), html.EscapeString(bet.Text)), context)
+	return utils.ReplyAndRemove(fmt.Sprintf("Ставка добавлена.\nДата: <code>%v</code>.\nТекст: <code>%v</code>.", time.Unix(bet.Timestamp, 0).Format("02.01.2006"), html.EscapeString(bet.Text)), context)
 }

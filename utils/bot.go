@@ -98,7 +98,7 @@ func ErrorReporting(err error, context tele.Context) {
 	_, fn, line, _ := runtime.Caller(1)
 	log.Printf("[%s:%d] %v", fn, line, err)
 	if context != nil && context.Message() != nil {
-		SendAndRemove(fmt.Sprintf("Ошибка: <code>%v</code>", err.Error()), context)
+		ReplyAndRemove(fmt.Sprintf("Ошибка: <code>%v</code>", err.Error()), context)
 	}
 	text := fmt.Sprintf("<pre>[%s:%d]\n%v</pre>", fn, line, strings.ReplaceAll(err.Error(), Config.Token, ""))
 	if strings.Contains(err.Error(), "specified new message content and reply markup are exactly the same") {

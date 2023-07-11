@@ -13,7 +13,7 @@ import (
 func Warn(context tele.Context) error {
 	var warn utils.Warn
 	if (context.Message().ReplyTo == nil && len(context.Args()) != 1) || (context.Message().ReplyTo != nil && len(context.Args()) != 0) {
-		return utils.SendAndRemove("Пример использования: <code>/warn {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/warn</code>", context)
+		return utils.ReplyAndRemove("Пример использования: <code>/warn {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/warn</code>", context)
 	}
 	target, _, err := utils.FindUserInMessage(context)
 	if err != nil {
@@ -54,7 +54,7 @@ func Warn(context tele.Context) error {
 		if err != nil {
 			return err
 		}
-		return utils.SendAndRemove(fmt.Sprintf("Пользователь <a href=\"tg://user?id=%v\">%v</a> забанен%v, т.к. набрал 3 предупреждения.", target.ID, utils.UserFullName(&target), utils.RestrictionTimeMessage(untildate)), context)
+		return utils.ReplyAndRemove(fmt.Sprintf("Пользователь <a href=\"tg://user?id=%v\">%v</a> забанен%v, т.к. набрал 3 предупреждения.", target.ID, utils.UserFullName(&target), utils.RestrictionTimeMessage(untildate)), context)
 	}
 	return err
 }

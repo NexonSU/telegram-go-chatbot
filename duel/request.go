@@ -24,7 +24,7 @@ func Request(context tele.Context) error {
 		if time.Now().Unix()-Message.Time().Unix() > 3600 {
 			busy["bot_is_dead"] = false
 		} else {
-			return utils.SendAndRemove("Я не могу провести игру, т.к. я немного умер. Зайдите позже.", context)
+			return utils.ReplyAndRemove("Я не могу провести игру, т.к. я немного умер. Зайдите позже.", context)
 		}
 	}
 	if busy["russianroulettePending"] && !busy["russianrouletteInProgress"] && time.Now().Unix()-Message.Time().Unix() > 60 {
@@ -39,22 +39,22 @@ func Request(context tele.Context) error {
 		busy["russianrouletteInProgress"] = false
 	}
 	if busy["russianroulette"] || busy["russianroulettePending"] || busy["russianrouletteInProgress"] {
-		return utils.SendAndRemove("Команда занята. Попробуйте позже.", context)
+		return utils.ReplyAndRemove("Команда занята. Попробуйте позже.", context)
 	}
 	busy["russianroulette"] = true
 	defer func() { busy["russianroulette"] = false }()
 	if (context.Message().ReplyTo == nil && len(context.Args()) != 1) || (context.Message().ReplyTo != nil && len(context.Args()) != 0) {
-		return utils.SendAndRemove("Пример использования: <code>/russianroulette {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/russianroulette</code>", context)
+		return utils.ReplyAndRemove("Пример использования: <code>/russianroulette {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/russianroulette</code>", context)
 	}
 	target, _, err := utils.FindUserInMessage(context)
 	if err != nil {
 		return err
 	}
 	if target.ID == context.Sender().ID {
-		return utils.SendAndRemove("Как ты себе это представляешь? Нет, нельзя вызвать на дуэль самого себя.", context)
+		return utils.ReplyAndRemove("Как ты себе это представляешь? Нет, нельзя вызвать на дуэль самого себя.", context)
 	}
 	if target.IsBot {
-		return utils.SendAndRemove("Бота нельзя вызвать на дуэль.", context)
+		return utils.ReplyAndRemove("Бота нельзя вызвать на дуэль.", context)
 	}
 	ChatMember, err := utils.Bot.ChatMemberOf(context.Chat(), &target)
 	if err != nil {

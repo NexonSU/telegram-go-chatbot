@@ -7,5 +7,5 @@ import (
 
 // Reply "Pong!" on /ping
 func Ping(context tele.Context) error {
-	return utils.SendAndRemove("Pong!", context)
+	return utils.ReplyAndRemove("Pong!", context)
 }

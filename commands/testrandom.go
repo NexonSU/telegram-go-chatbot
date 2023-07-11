@@ -17,5 +17,5 @@ func TestRandom(context tele.Context) error {
 	for number, count := range numbers {
 		text = fmt.Sprintf("%v%v - %v\n", text, number, count)
 	}
-	return utils.SendAndRemove(text, context)
+	return utils.ReplyAndRemove(text, context)
 }

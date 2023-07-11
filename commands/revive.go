@@ -11,7 +11,7 @@ import (
 // Unmute user on /unmute
 func Revive(context tele.Context) error {
 	if (context.Message().ReplyTo == nil && len(context.Args()) != 1) || (context.Message().ReplyTo != nil && len(context.Args()) != 0) {
-		return utils.SendAndRemove("Пример использования: <code>/unmute {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/unmute</code>", context)
+		return utils.ReplyAndRemove("Пример использования: <code>/unmute {ID или никнейм}</code>\nИли отправь в ответ на какое-либо сообщение <code>/unmute</code>", context)
 	}
 	target, _, err := utils.FindUserInMessage(context)
 	if err != nil {
@@ -31,5 +31,5 @@ func Revive(context tele.Context) error {
 	if err != nil {
 		return err
 	}
-	return utils.SendAndRemove(fmt.Sprintf("%v возродился в чате.", utils.MentionUser(&target)), context)
+	return utils.ReplyAndRemove(fmt.Sprintf("%v возродился в чате.", utils.MentionUser(&target)), context)
 }

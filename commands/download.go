@@ -17,7 +17,7 @@ func Download(context tele.Context) error {
 	var filePath string
 
 	if context.Message().ReplyTo == nil && len(context.Args()) < 1 {
-		return utils.SendAndRemove("Пример использования: <code>/download {ссылка на ютуб/твиттер}</code>\nИли отправь в ответ на какое-либо сообщение с ссылкой <code>/download</code>", context)
+		return utils.ReplyAndRemove("Пример использования: <code>/download {ссылка на ютуб/твиттер}</code>\nИли отправь в ответ на какое-либо сообщение с ссылкой <code>/download</code>", context)
 	}
 
 	link := ""
@@ -71,7 +71,7 @@ func Download(context tele.Context) error {
 	}
 
 	if result.Info.Duration > 3600 {
-		return utils.SendAndRemove("Максимальная длина видео 60 минут.", context)
+		return utils.ReplyAndRemove("Максимальная длина видео 60 минут.", context)
 	}
 
 	ytdlpResult, err := result.Download(cntx.Background(), "bestvideo*+bestaudio/best")

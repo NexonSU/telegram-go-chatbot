@@ -28,5 +28,5 @@ func Mywarns(context tele.Context) error {
 		warn.LastWarn = time.Unix(0, 0)
 		warn.Amount = 0
 	}
-	return utils.SendAndRemove(prt.Sprintf("У тебя %d предупреждений.", warn.Amount), context)
+	return utils.ReplyAndRemove(prt.Sprintf("У тебя %d предупреждений.", warn.Amount), context)
 }

@@ -34,5 +34,5 @@ func Anekdot(context tele.Context) error {
 	text = br.ReplaceAllString(text, `$1 $2`)
 	text = strings.ReplaceAll(text, "<br>", "\n")
 
-	return utils.SendAndRemove(text, context)
+	return utils.ReplyAndRemove(text, context)
 }

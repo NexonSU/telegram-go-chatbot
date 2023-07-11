@@ -11,10 +11,10 @@ import (
 // Invert given file
 func Loop(context tele.Context) error {
 	if context.Message().ReplyTo == nil {
-		return utils.SendAndRemove("Пример использования: <code>/loop</code> в ответ на какое-либо сообщение с видео.", context)
+		return utils.ReplyAndRemove("Пример использования: <code>/loop</code> в ответ на какое-либо сообщение с видео.", context)
 	}
 	if context.Message().ReplyTo.Media() == nil {
-		return utils.SendAndRemove("Какого-либо видео нет в указанном сообщении.", context)
+		return utils.ReplyAndRemove("Какого-либо видео нет в указанном сообщении.", context)
 	}
 
 	media := context.Message().ReplyTo.Media()
@@ -28,7 +28,7 @@ func Loop(context tele.Context) error {
 	case "animation":
 		targetArg = "animation"
 	default:
-		return utils.SendAndRemove("Неподдерживаемая операция", context)
+		return utils.ReplyAndRemove("Неподдерживаемая операция", context)
 	}
 
 	targetArg = targetArg + "_loop"

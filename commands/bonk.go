@@ -14,7 +14,7 @@ import (
 // Write username on bonk picture and send to target
 func Bonk(context tele.Context) error {
 	if context.Message().ReplyTo == nil {
-		return utils.SendAndRemove("Просто отправь <code>/bonk</code> в ответ на чье-либо сообщение.", context)
+		return utils.ReplyAndRemove("Просто отправь <code>/bonk</code> в ответ на чье-либо сообщение.", context)
 	}
 	context.Delete()
 	imfile, err := os.Open("files/bonk.png")

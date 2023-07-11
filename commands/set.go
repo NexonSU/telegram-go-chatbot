@@ -15,7 +15,7 @@ func Set(context tele.Context) error {
 	var inputGet string
 	//args check
 	if (context.Message().ReplyTo == nil && len(context.Args()) < 2) || (context.Message().ReplyTo != nil && len(context.Args()) == 0) {
-		return utils.SendAndRemove("Пример использования: <code>/set {гет} {значение}</code>\nИли отправь в ответ на какое-либо сообщение <code>/set {гет}</code>", context)
+		return utils.ReplyAndRemove("Пример использования: <code>/set {гет} {значение}</code>\nИли отправь в ответ на какое-либо сообщение <code>/set {гет}</code>", context)
 	}
 	if context.Message().ReplyTo == nil {
 		inputGet = context.Args()[1]
@@ -30,7 +30,7 @@ func Set(context tele.Context) error {
 			return err
 		}
 		if get.Creator != context.Sender().ID && !utils.IsAdminOrModer(context.Sender().ID) {
-			return utils.SendAndRemove(fmt.Sprintf("Данный гет могут изменять либо администраторы, либо %v.", utils.UserFullName(&creator)), context)
+			return utils.ReplyAndRemove(fmt.Sprintf("Данный гет могут изменять либо администраторы, либо %v.", utils.UserFullName(&creator)), context)
 		}
 	}
 	//filling Get from message
@@ -66,7 +66,7 @@ func Set(context tele.Context) error {
 			get.Type = "Text"
 			get.Data = utils.GetHtmlText(*context.Message().ReplyTo)
 		default:
-			return utils.SendAndRemove("Не удалось распознать файл в сообщении, возможно, он не поддерживается.", context)
+			return utils.ReplyAndRemove("Не удалось распознать файл в сообщении, возможно, он не поддерживается.", context)
 		}
 	}
 	get.Creator = context.Sender().ID
@@ -77,5 +77,5 @@ func Set(context tele.Context) error {
 	if result.Error != nil {
 		return result.Error
 	}
-	return utils.SendAndRemove(fmt.Sprintf("Гет <code>%v</code> сохранён как <code>%v</code>.", get.Name, get.Type), context)
+	return utils.ReplyAndRemove(fmt.Sprintf("Гет <code>%v</code> сохранён как <code>%v</code>.", get.Name, get.Type), context)
 }

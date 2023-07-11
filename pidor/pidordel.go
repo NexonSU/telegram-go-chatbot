@@ -17,8 +17,8 @@ func Pidordel(context tele.Context) error {
 	pidor = utils.PidorList(user)
 	result := utils.DB.Delete(&pidor)
 	if result.RowsAffected != 0 {
-		return utils.SendAndRemove(fmt.Sprintf("Пользователь %v удалён из игры <b>Пидор Дня</b>!", utils.MentionUser(&user)), context)
+		return utils.ReplyAndRemove(fmt.Sprintf("Пользователь %v удалён из игры <b>Пидор Дня</b>!", utils.MentionUser(&user)), context)
 	} else {
-		return utils.SendAndRemove(fmt.Sprintf("Не удалось удалить пользователя:\n<code>%v</code>", result.Error.Error()), context)
+		return utils.ReplyAndRemove(fmt.Sprintf("Не удалось удалить пользователя:\n<code>%v</code>", result.Error.Error()), context)
 	}
 }

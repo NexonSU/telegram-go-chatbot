@@ -29,10 +29,10 @@ var DistortBusy bool
 // Distort given file
 func Distort(context tele.Context) error {
 	if context.Message().ReplyTo == nil {
-		return utils.SendAndRemove("Пример использования: <code>/distort</code> в ответ на какое-либо сообщение с видео.", context)
+		return utils.ReplyAndRemove("Пример использования: <code>/distort</code> в ответ на какое-либо сообщение с видео.", context)
 	}
 	if context.Message().ReplyTo.Media() == nil {
-		return utils.SendAndRemove("Какого-либо видео нет в указанном сообщении.", context)
+		return utils.ReplyAndRemove("Какого-либо видео нет в указанном сообщении.", context)
 	}
 
 	media := context.Message().ReplyTo.Media()
@@ -42,11 +42,11 @@ func Distort(context tele.Context) error {
 	case "video", "animation", "photo", "audio", "voice", "sticker":
 		break
 	default:
-		return utils.SendAndRemove("Неподдерживаемая операция", context)
+		return utils.ReplyAndRemove("Неподдерживаемая операция", context)
 	}
 
 	if DistortBusy {
-		return utils.SendAndRemove("Команда занята", context)
+		return utils.ReplyAndRemove("Команда занята", context)
 	}
 
 	var done = make(chan bool, 1)
@@ -102,12 +102,12 @@ func Distort(context tele.Context) error {
 		}
 
 		if framesInt > 1000 {
-			return utils.SendAndRemove("Видео слишком длинное. Максимум 1000 фреймов.", context)
+			return utils.ReplyAndRemove("Видео слишком длинное. Максимум 1000 фреймов.", context)
 		}
 	}
 
 	if err := os.Mkdir(workdir, os.ModePerm); err != nil {
-		return utils.SendAndRemove("Обработка файла уже выполняется", context)
+		return utils.ReplyAndRemove("Обработка файла уже выполняется", context)
 	}
 	defer func(workdir string) {
 		os.RemoveAll(workdir)
@@ -130,7 +130,7 @@ func Distort(context tele.Context) error {
 			FileName: media.MediaFile().FileID + ".mp3",
 			MIME:     "video/mp3",
 		})
-		utils.SendAndRemove("Результат отправлен в личку. Если не пришло, то нужно написать что-нибудь в личку @zavtrachat_bot.", context)
+		utils.ReplyAndRemove("Результат отправлен в личку. Если не пришло, то нужно написать что-нибудь в личку @zavtrachat_bot.", context)
 		return err
 	}
 
@@ -217,7 +217,7 @@ func Distort(context tele.Context) error {
 	for {
 		time.Sleep(1 * time.Second)
 		if time.Now().Unix()-jobStarted > 300 {
-			return utils.SendAndRemove("Слишком долгое выполнение операции", context)
+			return utils.ReplyAndRemove("Слишком долгое выполнение операции", context)
 		}
 		if pool.QueueLength() == 0 {
 			break
@@ -259,7 +259,7 @@ func Distort(context tele.Context) error {
 			FileName: media.MediaFile().FileID + ".mp4",
 		})
 	}
-	utils.SendAndRemove("Результат отправлен в личку. Если не пришло, то нужно написать что-нибудь в личку @zavtrachat_bot.", context)
+	utils.ReplyAndRemove("Результат отправлен в личку. Если не пришло, то нужно написать что-нибудь в личку @zavtrachat_bot.", context)
 	return err
 }
 

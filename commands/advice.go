@@ -32,5 +32,5 @@ func Advice(context tele.Context) error {
 		return err
 	}
 
-	return utils.SendAndRemove(advice.Text, context)
+	return utils.ReplyAndRemove(advice.Text, context)
 }

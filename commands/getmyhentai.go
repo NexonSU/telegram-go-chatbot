@@ -16,13 +16,13 @@ import (
 // Send hentai manga by date or userid
 func GetMyHentai(context tele.Context) error {
 	if utils.Config.NHentaiCookie == "" {
-		return utils.SendAndRemove("Отсутствуют куки в конфиге", context)
+		return utils.ReplyAndRemove("Отсутствуют куки в конфиге", context)
 	}
 	hentaiId := ""
 	if len(context.Args()) == 1 {
 		date, err := time.Parse("02.01.2006", context.Args()[0])
 		if err != nil {
-			return utils.SendAndRemove("Ошибка парсинга даты: "+err.Error(), context)
+			return utils.ReplyAndRemove("Ошибка парсинга даты: "+err.Error(), context)
 		}
 		hentaiId = date.Format("20106")
 	} else {
@@ -47,11 +47,11 @@ func GetMyHentai(context tele.Context) error {
 	}
 
 	if resp.StatusCode == 404 {
-		return utils.SendAndRemove("Сорян, для тебя нет хентай-манги. Возможно, её удалили.", context)
+		return utils.ReplyAndRemove("Сорян, для тебя нет хентай-манги. Возможно, её удалили.", context)
 	}
 
 	if resp.StatusCode != 200 {
-		return utils.SendAndRemove("Ошибка запроса: "+resp.Status, context)
+		return utils.ReplyAndRemove("Ошибка запроса: "+resp.Status, context)
 	}
 
 	data, err := ioutil.ReadAll(resp.Body)
