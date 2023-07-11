@@ -3,8 +3,8 @@ module github.com/NexonSU/telegram-go-chatbot
 go 1.18
 
 require (
+	github.com/Jeffail/tunny v0.1.4
 	github.com/arran4/golang-ical v0.0.0-20220517104411-fd89fefb0182
-	github.com/chai2010/webp v1.1.1
 	github.com/dustin/go-humanize v1.0.1
 	github.com/fogleman/gg v1.3.0
 	github.com/gotd/contrib v0.13.0
@@ -22,7 +22,6 @@ require (
 )
 
 require (
-	github.com/Jeffail/tunny v0.1.4 // indirect
 	github.com/aws/aws-sdk-go v1.44.129 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

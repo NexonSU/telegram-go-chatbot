@@ -2,9 +2,11 @@ package commands
 
 import (
 	"bytes"
+	"image"
+	_ "image/png"
+	"os"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"github.com/chai2010/webp"
 	"github.com/fogleman/gg"
 	tele "gopkg.in/telebot.v3"
 )
@@ -16,10 +18,17 @@ func Hug(context tele.Context) error {
 		return utils.SendAndRemove("Просто отправь <code>/hug</code> в ответ на чье-либо сообщение.", context)
 	}
 	context.Delete()
-	im, err := webp.Load("files/hug.webp")
+	imfile, err := os.Open("files/hug.png")
 	if err != nil {
 		return err
 	}
+	defer imfile.Close()
+
+	im, _, err := image.Decode(imfile)
+	if err != nil {
+		return err
+	}
+
 	dc := gg.NewContextForImage(im)
 	dc.DrawImage(im, 0, 0)
 	dc.Rotate(gg.Radians(15))
@@ -44,7 +53,7 @@ func Hug(context tele.Context) error {
 	dc.SetRGB(0, 0, 0)
 	dc.DrawStringAnchored(s, 400, -30, 0.5, 0.5)
 	buf := new(bytes.Buffer)
-	err = webp.Encode(buf, dc.Image(), nil)
+	err = dc.EncodePNG(buf)
 	if err != nil {
 		return err
 	}
