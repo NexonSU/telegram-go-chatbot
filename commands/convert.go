@@ -33,7 +33,7 @@ func Convert(context tele.Context) error {
 	targetArg = media.MediaType()
 
 	if targetArg == "sticker" {
-		if context.Message().ReplyTo.Sticker.Animated || context.Message().ReplyTo.Sticker.Video {
+		if context.Message().ReplyTo.Sticker.Video {
 			targetArg = "gif"
 		}
 	}

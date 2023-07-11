@@ -42,7 +42,7 @@ func Invert(context tele.Context) error {
 	targetArg = targetArg + "_reverse"
 
 	if targetArg == "sticker_reverse" {
-		if !context.Message().ReplyTo.Sticker.Animated && !context.Message().ReplyTo.Sticker.Video {
+		if !context.Message().ReplyTo.Sticker.Video {
 			return utils.ReplyAndRemove("Неподдерживаемая операция", context)
 		}
 	}
