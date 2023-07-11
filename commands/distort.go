@@ -39,15 +39,26 @@ func Distort(context tele.Context) error {
 
 	media := context.Message().ReplyTo.Media()
 	additionalInputArgs := ""
+	options := &tele.SendOptions{AllowWithoutReply: true}
 	var resultMessage *tele.Message
 	var err error
+	var recepient tele.Recipient
+
+	if time.Now().Local().Hour() > 21 || time.Now().Local().Hour() < 7 {
+		recepient = context.Chat()
+		options = &tele.SendOptions{ReplyTo: context.Message(), AllowWithoutReply: true}
+	} else {
+		recepient = context.Sender()
+	}
 
 	if fileId, ok := DistortCache[media.MediaFile().FileID]; ok {
-		_, err = utils.Bot.Send(context.Sender(), &tele.Document{
+		_, err = utils.Bot.Send(recepient, &tele.Document{
 			File:     tele.File{FileID: fileId},
 			FileName: fileId + ".mp4",
-		})
-		utils.ReplyAndRemove("Результат отправлен в личку. Если не пришло, то нужно написать что-нибудь в личку @zavtrachat_bot.", context)
+		}, options)
+		if recepient == context.Sender() {
+			utils.ReplyAndRemove("Результат отправлен в личку. Если не пришло, то нужно написать что-нибудь в личку @zavtrachat_bot.", context)
+		}
 		return err
 	}
 
@@ -126,7 +137,7 @@ func Distort(context tele.Context) error {
 		os.RemoveAll(workdir)
 	}(workdir)
 
-	if media.MediaType() == "video" {
+	if media.MediaType() == "video" && data.FirstAudioStream() != nil {
 		ffmpeg.Input(inputFile).Output(workdir + "/input_audio.mp3").OverWriteOutput().ErrorToStdOut().Run()
 		ffmpeg.Input(workdir+"/input_audio.mp3").Output(workdir+"/audio.mp3", ffmpeg.KwArgs{"filter_complex": "vibrato=f=10:d=0.7"}).OverWriteOutput().ErrorToStdOut().Run()
 		additionalInputArgs = "-i " + workdir + "/audio.mp3 -c:a aac"
@@ -138,13 +149,15 @@ func Distort(context tele.Context) error {
 		if err != nil {
 			return err
 		}
-		resultMessage, err = utils.Bot.Send(context.Sender(), &tele.Audio{
+		resultMessage, err = utils.Bot.Send(recepient, &tele.Audio{
 			File:     tele.FromDisk(workdir + "/audio.mp3"),
 			FileName: media.MediaFile().FileID + ".mp3",
 			MIME:     "video/mp3",
-		})
+		}, options)
 		DistortCache[media.MediaFile().FileID] = resultMessage.Media().MediaFile().FileID
-		utils.ReplyAndRemove("Результат отправлен в личку. Если не пришло, то нужно написать что-нибудь в личку @zavtrachat_bot.", context)
+		if recepient == context.Sender() {
+			utils.ReplyAndRemove("Результат отправлен в личку. Если не пришло, то нужно написать что-нибудь в личку @zavtrachat_bot.", context)
+		}
 		return err
 	}
 
@@ -251,30 +264,32 @@ func Distort(context tele.Context) error {
 	DistortBusy = false
 	switch media.MediaType() {
 	case "video":
-		resultMessage, err = utils.Bot.Send(context.Sender(), &tele.Video{
+		resultMessage, err = utils.Bot.Send(recepient, &tele.Video{
 			File:      tele.FromDisk(outputFile),
 			FileName:  media.MediaFile().FileID + ".mp4",
 			Streaming: true,
 			Width:     width,
 			Height:    height,
 			MIME:      "video/mp4",
-		})
+		}, options)
 	case "animation", "sticker":
-		resultMessage, err = utils.Bot.Send(context.Sender(), &tele.Animation{
+		resultMessage, err = utils.Bot.Send(recepient, &tele.Animation{
 			File:     tele.FromDisk(outputFile),
 			FileName: media.MediaFile().FileID + ".mp4",
 			Width:    width,
 			Height:   height,
 			MIME:     "video/mp4",
-		})
+		}, options)
 	default:
-		resultMessage, err = utils.Bot.Send(context.Sender(), &tele.Document{
+		resultMessage, err = utils.Bot.Send(recepient, &tele.Document{
 			File:     tele.FromDisk(outputFile),
 			FileName: media.MediaFile().FileID + ".mp4",
-		})
+		}, options)
 	}
 	DistortCache[media.MediaFile().FileID] = resultMessage.Media().MediaFile().FileID
-	utils.ReplyAndRemove("Результат отправлен в личку. Если не пришло, то нужно написать что-нибудь в личку @zavtrachat_bot.", context)
+	if recepient == context.Sender() {
+		utils.ReplyAndRemove("Результат отправлен в личку. Если не пришло, то нужно написать что-нибудь в личку @zavtrachat_bot.", context)
+	}
 	return err
 }
 
