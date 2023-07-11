@@ -31,7 +31,7 @@ func Kill(context tele.Context) error {
 		return err
 	}
 	victimText := ""
-	if ChatMember.Role == "administrator" || ChatMember.Role == "creator" || context.Sender().ID == 825209730 {
+	if ChatMember.Role == "administrator" || ChatMember.Role == "creator" {
 		var victim *tele.ChatMember
 		var userID int64
 		rows, err := utils.DB.Model(&utils.Stats{}).Where("stat_type = 3").Order("last_update desc").Select("context_id").Limit(100).Rows()
