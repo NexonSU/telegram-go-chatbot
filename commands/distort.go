@@ -221,6 +221,16 @@ func Distort(context tele.Context) error {
 	height := frameConfig.Height
 	scale := 0
 
+	if width > 640 {
+		height = height * 640 / width
+		width = 640
+	}
+
+	if height > 640 {
+		width = 640 / height * width
+		height = 640
+	}
+
 	if width%2 != 0 {
 		width++
 	}
@@ -237,7 +247,7 @@ func Distort(context tele.Context) error {
 
 	for i, file := range files {
 		scale = 90 - (i * 65 / len(files))
-		command := fmt.Sprintf("convert %v -liquid-rescale %v%% -resize %vx%v! %v", file, scale, width, height, file)
+		command := fmt.Sprintf("convert %v -resize %vx%v! -liquid-rescale %v%% %v", file, width, height, scale, file)
 		go func(command string) {
 			if pool.Process(command) != nil {
 				err = pool.Process(command).(error)
