@@ -110,10 +110,10 @@ func ErrorReporting(err error, context tele.Context) {
 	if strings.Contains(err.Error(), "context does not contain message") {
 		return
 	}
-	if context != nil && context.Message() != nil {
-		marshalledMessage, _ := json.MarshalIndent(context.Message(), "", "    ")
-		marshalledMessageWithoutNil := regexp.MustCompile(`.*": (null|""|0|false)(,|)\n`).ReplaceAllString(string(marshalledMessage), "")
-		jsonMessage := html.EscapeString(marshalledMessageWithoutNil)
+	if context != nil {
+		marshalledContext, _ := json.MarshalIndent(context, "", "    ")
+		marshalledContextWithoutNil := regexp.MustCompile(`.*": (null|""|0|false)(,|)\n`).ReplaceAllString(string(marshalledContext), "")
+		jsonMessage := html.EscapeString(marshalledContextWithoutNil)
 		text += fmt.Sprintf("\n\nMessage:\n<pre>%v</pre>", jsonMessage)
 	}
 	Bot.Send(tele.ChatID(Config.SysAdmin), text)
