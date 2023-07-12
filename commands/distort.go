@@ -227,7 +227,7 @@ func Distort(context tele.Context) error {
 	}
 
 	if height > 640 {
-		width = 640 / height * width
+		width = width * 640 / height
 		height = 640
 	}
 
