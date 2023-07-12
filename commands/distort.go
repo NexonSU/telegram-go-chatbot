@@ -1,9 +1,7 @@
 package commands
 
 import (
-	"bufio"
 	"fmt"
-	"image"
 	"io"
 	"os"
 	"os/exec"
@@ -165,7 +163,28 @@ func Distort(context tele.Context) error {
 		return err
 	}
 
-	err = ffmpeg.Input(inputFile).Output(workdir + "/%09d.png").OverWriteOutput().ErrorToStdOut().Run()
+	width := data.FirstVideoStream().Width
+	height := data.FirstVideoStream().Height
+
+	if width > 640 {
+		height = height * 640 / width
+		width = 640
+	}
+
+	if height > 480 {
+		width = width * 480 / height
+		height = 480
+	}
+
+	if width%2 != 0 {
+		width++
+	}
+
+	if height%2 != 0 {
+		height++
+	}
+
+	err = ffmpeg.Input(inputFile).Output(workdir+"/%09d.png", ffmpeg.KwArgs{"vf": fmt.Sprintf("scale=%d:%d", width, height)}).OverWriteOutput().ErrorToStdOut().Run()
 	if err != nil {
 		return err
 	}
@@ -208,37 +227,6 @@ func Distort(context tele.Context) error {
 		return err
 	}
 
-	f, err := os.Open(files[0])
-	if err != nil {
-		return err
-	}
-	frameConfig, _, err := image.DecodeConfig(bufio.NewReader(f))
-	if err != nil {
-		return err
-	}
-	f.Close()
-	width := frameConfig.Width
-	height := frameConfig.Height
-	scale := 0
-
-	if width > 640 {
-		height = height * 640 / width
-		width = 640
-	}
-
-	if height > 640 {
-		width = width * 640 / height
-		height = 640
-	}
-
-	if width%2 != 0 {
-		width++
-	}
-
-	if height%2 != 0 {
-		height++
-	}
-
 	pool := tunny.NewFunc(runtime.NumCPU()-1, func(payload interface{}) interface{} {
 		payloadCommand := strings.Fields(payload.(string))
 		return exec.Command(payloadCommand[0], payloadCommand[1:]...).Run()
@@ -246,8 +234,7 @@ func Distort(context tele.Context) error {
 	defer pool.Close()
 
 	for i, file := range files {
-		scale = 90 - (i * 65 / len(files))
-		command := fmt.Sprintf("convert %v -resize %vx%v! -liquid-rescale %v%% %v", file, width, height, scale, file)
+		command := fmt.Sprintf("convert %v -liquid-rescale %v%% -resize %vx%v! %v", file, 90-(i*65/len(files)), width, height, file)
 		go func(command string) {
 			if pool.Process(command) != nil {
 				err = pool.Process(command).(error)
