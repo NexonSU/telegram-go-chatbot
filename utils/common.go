@@ -550,12 +550,18 @@ func DownloadFile(filepath string, url string) (err error) {
 
 func ReplyAndRemove(message string, context tele.Context) error {
 	message += "\n\nСообщение будет удалено через 10 секунд."
-	sentMessage, sendErr := Bot.Send(context.Chat(), message, &tele.SendOptions{ReplyTo: context.Message()})
+	sentMessage, err := Bot.Send(context.Chat(), message, &tele.SendOptions{ReplyTo: context.Message(), AllowWithoutReply: true})
+	if err != nil {
+		return err
+	}
+	if context.Message() == nil || context.Message().ID == 0 {
+		return nil
+	}
 	go func(messages []int) {
 		time.Sleep(10 * time.Second)
 		for _, message := range messages {
 			Bot.Delete(&tele.Message{ID: message, Chat: &tele.Chat{ID: context.Chat().ID}})
 		}
 	}([]int{context.Message().ID, sentMessage.ID})
-	return sendErr
+	return nil
 }
