@@ -97,7 +97,7 @@ func gotdClientInit() error {
 func ErrorReporting(err error, context tele.Context) {
 	_, fn, line, _ := runtime.Caller(1)
 	log.Printf("[%s:%d] %v", fn, line, err)
-	if context != nil && context.Message() != nil {
+	if context != nil && context.Message() != nil && context.Chat().ID == Config.Chat {
 		ReplyAndRemove(fmt.Sprintf("Ошибка: <code>%v</code>", err.Error()), context)
 	}
 	text := fmt.Sprintf("<pre>[%s:%d]\n%v</pre>", fn, line, strings.ReplaceAll(err.Error(), Config.Token, ""))
