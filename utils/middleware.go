@@ -34,7 +34,11 @@ func Whitelist(chats ...int64) tele.MiddlewareFunc {
 			Chats: chats,
 			In:    next,
 			Out: func(c tele.Context) error {
-				return ReplyAndRemove(GetNope(), c)
+				if c.Chat().ID == Config.Chat {
+					return ReplyAndRemove(GetNope(), c)
+				} else {
+					return nil
+				}
 			},
 		})(next)
 	}
