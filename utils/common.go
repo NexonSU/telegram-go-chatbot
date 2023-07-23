@@ -403,7 +403,7 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 		}
 	}
 
-	if (strings.Contains(targetType, "reverse") || strings.Contains(targetType, "loop")) && duration > 60 {
+	if (strings.Contains(targetType, "reverse") || strings.Contains(targetType, "loop")) && duration > 120 {
 		return fmt.Errorf("слишком длинное видео для эффекта")
 	}
 
