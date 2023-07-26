@@ -159,17 +159,28 @@ func GetUserFromDB(findstring string) (tele.User, error) {
 
 // Forward channel post to chat
 func ForwardPost(context tele.Context) error {
-	if context.Message().Chat.ID != Config.Channel {
+	if context.Message() == nil || context.Message().Chat.ID != Config.Channel {
 		return nil
 	}
-	_, err := Bot.Forward(&tele.Chat{ID: Config.Chat}, context.Message())
-	if Config.StreamChannel != 0 && strings.Contains(context.Text(), "zavtracast/live") {
-		_, err = Bot.Forward(&tele.Chat{ID: Config.StreamChannel}, context.Message())
+	var err error
+	if context.Message().Text != "" || context.Message().Caption != "" {
+		_, err = Bot.Forward(&tele.Chat{ID: Config.Chat}, context.Message())
 	}
-	if err != nil {
-		return err
+	if Config.StreamChannel != 0 {
+		if strings.Contains(context.Text(), "zavtracast/live") {
+			_, err = Bot.Forward(&tele.Chat{ID: Config.StreamChannel}, context.Message())
+			return err
+		}
+		for _, entity := range append(context.Message().CaptionEntities, context.Message().Entities...) {
+			if entity.Type == tele.EntityURL || entity.Type == tele.EntityTextLink {
+				if strings.Contains(entity.URL, "zavtracast/live") {
+					_, err = Bot.Forward(&tele.Chat{ID: Config.StreamChannel}, context.Message())
+					return err
+				}
+			}
+		}
 	}
-	return nil
+	return err
 }
 
 // Remove message
