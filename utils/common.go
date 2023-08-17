@@ -569,7 +569,7 @@ func ReplyAndRemove(message string, context tele.Context) error {
 		return nil
 	}
 	go func(messages []int) {
-		time.Sleep(10 * time.Second)
+		time.Sleep(30 * time.Second)
 		for _, message := range messages {
 			Bot.Delete(&tele.Message{ID: message, Chat: &tele.Chat{ID: context.Chat().ID}})
 		}
