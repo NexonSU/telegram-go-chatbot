@@ -560,7 +560,7 @@ func DownloadFile(filepath string, url string) (err error) {
 }
 
 func ReplyAndRemove(message string, context tele.Context) error {
-	message += "\n\nСообщение будет удалено через 10 секунд."
+	message += "\n\nЭто сообщение самоуничтожится через 30 секунд."
 	sentMessage, err := Bot.Send(context.Chat(), message, &tele.SendOptions{ReplyTo: context.Message(), AllowWithoutReply: true})
 	if err != nil {
 		return err
