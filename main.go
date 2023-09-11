@@ -57,7 +57,7 @@ func main() {
 		{tele.Command{Text: "blessing", Description: "устроиться в роскомнадзор"}, commands.Blessing, chats},
 		{tele.Command{Text: "bonk", Description: "бонкнуть кого-нибудь"}, commands.Bonk, chats},
 		{tele.Command{Text: "cur", Description: "посмотреть курс валют"}, commands.Cur, chats},
-		{tele.Command{Text: "getmyhentai", Description: "узнать свою хентай мангу и жанры"}, commands.GetMyHentai, chats},
+		//{tele.Command{Text: "getmyhentai", Description: "узнать свою хентай мангу и жанры"}, commands.GetMyHentai, chats},
 		{tele.Command{Text: "del", Description: "удалить гет"}, commands.Del, chats},
 		{tele.Command{Text: "distort", Description: "переебать медиа"}, commands.Distort, chats},
 		{tele.Command{Text: "invert", Description: "инвертировать медиа"}, commands.Invert, chats},
