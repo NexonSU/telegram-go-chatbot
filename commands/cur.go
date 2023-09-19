@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"github.com/dustin/go-humanize"
 	cmc "github.com/miguelmota/go-coinmarketcap/pro/v1"
 	tele "gopkg.in/telebot.v3"
 )
@@ -123,9 +122,5 @@ func Cur(context tele.Context) error {
 			resultName = JokeFiat.name
 		}
 	}
-	resultAmount_s := strings.Replace(humanize.CommafWithDigits(resultAmount, 2), ",", " ", -1)
-	if resultAmount > 1000 {
-		resultAmount_s = strings.Replace(humanize.CommafWithDigits(resultAmount, 0), ",", " ", -1)
-	}
-	return context.Send(fmt.Sprintf("%v %v = %v %v", conversion.Amount, conversion.Name, resultAmount_s, resultName), &tele.SendOptions{ReplyTo: context.Message().ReplyTo, AllowWithoutReply: true})
+	return context.Send(fmt.Sprintf("%.2f %v = %.2f %v", conversion.Amount, conversion.Name, resultAmount, resultName), &tele.SendOptions{ReplyTo: context.Message().ReplyTo, AllowWithoutReply: true})
 }
