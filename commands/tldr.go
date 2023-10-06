@@ -42,6 +42,17 @@ func TLDR(context tele.Context) error {
 	}
 
 	if link == "" {
+		for _, entity := range message.CaptionEntities {
+			if entity.Type == tele.EntityURL || entity.Type == tele.EntityTextLink {
+				link = entity.URL
+				if link == "" {
+					link = message.EntityText(entity)
+				}
+			}
+		}
+	}
+
+	if link == "" {
 		return utils.ReplyAndRemove("Бот заберёт статью по ссылке и сделает её краткое описание.\nПример использования:\n<code>/tldr ссылка</code>.\nИли отправь в ответ на какое-либо сообщение с ссылкой.", context)
 	}
 
