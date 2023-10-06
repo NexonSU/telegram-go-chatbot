@@ -19,8 +19,8 @@ func TLDR(context tele.Context) error {
 	if utils.Config.YandexSummarizerToken == "" {
 		return fmt.Errorf("не задан Yandex Summarizer токен")
 	}
-	if context.Message().ReplyTo == nil && len(context.Args()) < 1 {
-		return utils.ReplyAndRemove("Пример использования:\n<code>/tldr ссылка</code>", context)
+	if context.Message().ReplyTo == nil && len(context.Args()) == 0 {
+		return utils.ReplyAndRemove("Бот заберёт статью по ссылке и сделает её краткое описание.\nПример использования:\n<code>/tldr ссылка</code>.\nИли отправь в ответ на какое-либо сообщение с ссылкой.", context)
 	}
 
 	link := ""
@@ -42,7 +42,7 @@ func TLDR(context tele.Context) error {
 	}
 
 	if link == "" {
-		return fmt.Errorf("ссылка не найдена")
+		return utils.ReplyAndRemove("Бот заберёт статью по ссылке и сделает её краткое описание.\nПример использования:\n<code>/tldr ссылка</code>.\nИли отправь в ответ на какое-либо сообщение с ссылкой.", context)
 	}
 
 	client := &http.Client{}
