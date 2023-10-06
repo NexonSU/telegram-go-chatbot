@@ -7,26 +7,27 @@ import (
 )
 
 type Configuration struct {
-	Token             string   `json:"token"`
-	AppID             int      `json:"app_id"`
-	AppHash           string   `json:"app_hash"`
-	BotApiUrl         string   `json:"bot_api_url"`
-	AllowedUpdates    []string `json:"allowed_updates"`
-	Listen            string   `json:"listen"`
-	EndpointPublicURL string   `json:"endpoint_public_url"`
-	MaxConnections    int      `json:"max_connections"`
-	Chat              int64    `json:"chat"`
-	ReserveChat       int64    `json:"reserve_chat"`
-	CommentChat       int64    `json:"comment_chat"`
-	StreamChannel     int64    `json:"stream_channel"`
-	Channel           int64    `json:"channel"`
-	Admins            []int64  `json:"admins"`
-	Moders            []int64  `json:"moders"`
-	SysAdmin          int64    `json:"sysadmin"`
-	CurrencyKey       string   `json:"currency_key"`
-	OpenAIKey         string   `json:"openai_key"`
-	ReleasesUrl       string   `json:"releases_url"`
-	NHentaiCookie     string   `json:"nhentai_cookie"`
+	Token                 string   `json:"token"`
+	AppID                 int      `json:"app_id"`
+	AppHash               string   `json:"app_hash"`
+	BotApiUrl             string   `json:"bot_api_url"`
+	AllowedUpdates        []string `json:"allowed_updates"`
+	Listen                string   `json:"listen"`
+	EndpointPublicURL     string   `json:"endpoint_public_url"`
+	MaxConnections        int      `json:"max_connections"`
+	Chat                  int64    `json:"chat"`
+	ReserveChat           int64    `json:"reserve_chat"`
+	CommentChat           int64    `json:"comment_chat"`
+	StreamChannel         int64    `json:"stream_channel"`
+	Channel               int64    `json:"channel"`
+	Admins                []int64  `json:"admins"`
+	Moders                []int64  `json:"moders"`
+	SysAdmin              int64    `json:"sysadmin"`
+	CurrencyKey           string   `json:"currency_key"`
+	OpenAIKey             string   `json:"openai_key"`
+	ReleasesUrl           string   `json:"releases_url"`
+	NHentaiCookie         string   `json:"nhentai_cookie"`
+	YandexSummarizerToken string   `json:"yandex_summarizer_token"`
 }
 
 func ConfigInit(file string) Configuration {

@@ -66,6 +66,7 @@ func main() {
 		{tele.Command{Text: "duel", Description: "вызвать на дуэль кого-нибудь"}, duel.Request, chats},
 		{tele.Command{Text: "duelstats", Description: "посмотреть свою статистику дуэли"}, duel.Duelstats, chats},
 		{tele.Command{Text: "ping", Description: "понг"}, commands.Ping, chats},
+		{tele.Command{Text: "tldr", Description: "получить от яндекса пересказ по ссылке"}, commands.TLDR, chats},
 		{tele.Command{Text: "slap", Description: "дать леща кому-нибудь"}, commands.Slap, chats},
 		{tele.Command{Text: "suicide", Description: "устроиться в роскомнадзор"}, commands.Blessing, chats},
 		{tele.Command{Text: "topm", Description: "сохранить пост в личку"}, commands.SaveToPM, chats},
