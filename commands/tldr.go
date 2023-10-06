@@ -3,7 +3,6 @@ package commands
 import (
 	"bytes"
 	"fmt"
-	"html"
 	"io"
 	"net/http"
 	"regexp"
@@ -20,9 +19,35 @@ func TLDR(context tele.Context) error {
 	if utils.Config.YandexSummarizerToken == "" {
 		return fmt.Errorf("не задан Yandex Summarizer токен")
 	}
+	if len(context.Args()) == 0 {
+		return utils.ReplyAndRemove("Пример использования:\n<code>/tldr ссылка</code>", context)
+	}
+
+	link := ""
+	message := &tele.Message{}
+
+	if context.Message().ReplyTo == nil {
+		message = context.Message()
+	} else {
+		message = context.Message().ReplyTo
+	}
+
+	for _, entity := range message.Entities {
+		if entity.Type == tele.EntityURL || entity.Type == tele.EntityTextLink {
+			link = entity.URL
+			if link == "" {
+				link = message.EntityText(entity)
+			}
+		}
+	}
+
+	if link == "" {
+		return fmt.Errorf("ссылка не найдена")
+	}
+
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", "https://300.ya.ru/api/sharing-url",
-		bytes.NewBuffer([]byte(`{"article_url": "`+html.EscapeString(context.Data())+`"}`)))
+		bytes.NewBuffer([]byte(`{"article_url": "`+link+`"}`)))
 	if err != nil {
 		return err
 	}
