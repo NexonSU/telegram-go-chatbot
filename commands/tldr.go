@@ -19,7 +19,7 @@ func TLDR(context tele.Context) error {
 	if utils.Config.YandexSummarizerToken == "" {
 		return fmt.Errorf("не задан Yandex Summarizer токен")
 	}
-	if len(context.Args()) == 0 {
+	if context.Message().ReplyTo == nil && len(context.Args()) < 1 {
 		return utils.ReplyAndRemove("Пример использования:\n<code>/tldr ссылка</code>", context)
 	}
 
