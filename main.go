@@ -83,7 +83,7 @@ func main() {
 		{tele.Command{Text: "kick", Description: "кикнуть кого-нибудь"}, commands.Kick, moder},
 		{tele.Command{Text: "bite", Description: "укусить кого-нибудь"}, commands.Kill, moder},
 		{tele.Command{Text: "kill", Description: "пристрелить кого-нибудь"}, commands.Kill, moder},
-		//{tele.Command{Text: "listantispam", Description: "список антиспама"},  checkpoint.ListAntispam, moder},
+		//{tele.Command{Text: "listantispam", Description: "список антиспама"}, checkpoint.ListAntispam, moder},
 		{tele.Command{Text: "mute", Description: "заглушить кого-нибудь"}, commands.Mute, moder},
 		{tele.Command{Text: "pidordel", Description: "удалить игрока из \"Пидор Дня!\""}, pidor.Pidordel, moder},
 		{tele.Command{Text: "pidorlist", Description: "список всех игроков \"Пидор Дня!\""}, pidor.Pidorlist, moder},
