@@ -10,20 +10,13 @@ jobs:
   Deploy:
     runs-on: self-hosted
     steps:
-    - name: Create user
-      run: sudo useradd -m telegram-go-chatbot
-      continue-on-error: true
     - name: Checkout repo
       uses: actions/checkout@v3
     - name: Build and install bot
       run: |
         go build -o telegram-go-chatbot
-        sudo cp -fu telegram-go-chatbot /home/telegram-go-chatbot/
+        cp -fu telegram-go-chatbot /home/telegram-go-chatbot/
     - name: Copy bot files
-      run: sudo cp -rfu files /home/telegram-go-chatbot/
-    - name: Create systemd service
-      run: |
-        sudo cp -fu systemd.service /lib/systemd/system/telegram-go-chatbot.service
-        sudo systemctl daemon-reload
+      run: cp -rfu files /home/telegram-go-chatbot/
     - name: Restarting telegram-go-chatbot service
       run: sudo systemctl restart telegram-go-chatbot
