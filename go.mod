@@ -1,9 +1,10 @@
 module github.com/NexonSU/telegram-go-chatbot
 
-go 1.18
+go 1.19
 
 require (
 	github.com/Jeffail/tunny v0.1.4
+	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/arran4/golang-ical v0.1.0
 	github.com/fogleman/gg v1.3.0
 	github.com/gotd/contrib v0.19.0
@@ -23,7 +24,6 @@ require (
 )
 
 require (
-	github.com/PuerkitoBio/goquery v1.8.1 // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/aws/aws-sdk-go v1.45.23 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
