@@ -8,7 +8,7 @@ on:
       - '**.go'
 jobs:
   Deploy:
-    runs-on: nexon.su
+    runs-on: self-hosted
     steps:
     - name: Create user
       run: sudo useradd -m telegram-go-chatbot
