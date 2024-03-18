@@ -20,7 +20,7 @@ var Bot tele.Bot
 var GotdClient *telegram.Client
 var GotdContext tdctx.Context
 
-// BotInit initializes Telegram Bot
+// BotInit initializes Telegram Bots
 // Moved from auto init to manual init to make the code in utils package testable
 func BotInit() {
 	if Config.Token == "" {
