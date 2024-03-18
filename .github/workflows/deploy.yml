@@ -15,8 +15,8 @@ jobs:
     - name: Build and install bot
       run: |
         go build -o telegram-go-chatbot
-        cp -fu telegram-go-chatbot /home/telegram-go-chatbot/
+        sudo cp -fu telegram-go-chatbot /home/telegram/bot/
     - name: Copy bot files
-      run: cp -rfu files /home/telegram-go-chatbot/
+      run: sudo cp -rfu files /home/telegram/bot/
     - name: Restarting telegram-go-chatbot service
       run: sudo systemctl restart telegram-go-chatbot
