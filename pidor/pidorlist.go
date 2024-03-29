@@ -12,6 +12,7 @@ func Pidorlist(context tele.Context) error {
 	var pidorlist string
 	var pidor utils.PidorList
 	var i = 0
+	var err error
 	result, _ := utils.DB.Model(&utils.PidorList{}).Rows()
 	for result.Next() {
 		err := utils.DB.ScanRows(result, &pidor)
@@ -27,6 +28,10 @@ func Pidorlist(context tele.Context) error {
 			}
 			pidorlist = ""
 		}
+	}
+	_, err = utils.Bot.Send(context.Sender(), pidorlist)
+	if err != nil {
+		return err
 	}
 	return utils.ReplyAndRemove("Список отправлен в личку.\nЕсли список не пришел, то убедитесь, что бот запущен и не заблокирован в личке.", context)
 }
