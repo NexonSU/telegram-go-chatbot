@@ -2,9 +2,11 @@ package commands
 
 import (
 	"bytes"
+	"crypto/md5"
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"regexp"
 	"unicode/utf8"
 
@@ -72,7 +74,26 @@ func TLDR(context tele.Context) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("status code error: %d %s", resp.StatusCode, resp.Status)
+		link, err = webProxy(link)
+		if err != nil {
+			return fmt.Errorf("webProxy error: %s", err.Error())
+		}
+		req, err = http.NewRequest("POST", "https://300.ya.ru/api/sharing-url",
+			bytes.NewBuffer([]byte(`{"article_url": "`+link+`"}`)))
+		if err != nil {
+			return err
+		}
+		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Authorization", "OAuth "+utils.Config.YandexSummarizerToken)
+
+		resp, err = client.Do(req)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != 200 {
+			return fmt.Errorf("webProxy-link status code error: %d %s", resp.StatusCode, resp.Status)
+		}
 	}
 
 	body, err := io.ReadAll(resp.Body)
@@ -90,7 +111,7 @@ func TLDR(context tele.Context) error {
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		return fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
+		return fmt.Errorf("300 status code error: %d %s", res.StatusCode, res.Status)
 	}
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
@@ -110,4 +131,25 @@ func TLDR(context tele.Context) error {
 	//\n          \n
 
 	return context.Reply(text)
+}
+
+func webProxy(url string) (link string, error error) {
+	linkName := fmt.Sprintf("%x", md5.Sum([]byte(url)))
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	err = os.WriteFile(fmt.Sprintf("/home/nginx/zavtrabot.nexon.su/%x.html", linkName), body, 0644)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("https://zavtrabot.nexon.su/%x.html", linkName), nil
 }
