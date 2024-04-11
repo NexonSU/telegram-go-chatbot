@@ -121,7 +121,8 @@ func TLDR(context tele.Context) error {
 
 	text := doc.Find(".summary .summary-content .summary-text").Text()
 
-	text = regexp.MustCompile(`\n\s+\n|\n\n`).ReplaceAllString(text, "\n")
+	text = regexp.MustCompile(`\n`).ReplaceAllString(text, "")
+	text = regexp.MustCompile(`•`).ReplaceAllString(text, "\n•")
 	text = regexp.MustCompile(`[ ]+`).ReplaceAllString(text, ` `)
 
 	if utf8.RuneCountInString(text) > 4000 {
