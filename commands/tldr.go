@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"strings"
 	"unicode/utf8"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
@@ -129,7 +130,9 @@ func TLDR(context tele.Context) error {
 		text = string([]rune(text)[:4000])
 	}
 
-	//\n          \n
+	if strings.Contains(link, "zavtrabot.nexon.su") {
+		os.Remove(strings.Replace(link, "https://", "/home/nginx/", -1))
+	}
 
 	return context.Reply(text)
 }
