@@ -250,5 +250,5 @@ func Khaleesi(context tele.Context) error {
 			text = strings.ReplaceAll(text, dict[i][0], dict[i][1])
 		}
 	}
-	return context.Send(text, &tele.SendOptions{ReplyTo: context.Message().ReplyTo})
+	return context.Reply(text)
 }
