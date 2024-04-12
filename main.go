@@ -33,6 +33,7 @@ func main() {
 		{tele.Command{Text: "russianroulette", Description: "вызвать на дуэль кого-нибудь"}, duel.Request, chats},
 		{tele.Command{Text: "savetopm", Description: "сохранить пост в личку"}, commands.SaveToPM, chats},
 		{tele.Command{Text: "sed", Description: "заменить текст типо как в sed"}, commands.Sed, chats},
+		{tele.Command{Text: "khaleesi", Description: "заменить текст типо как кхалиси мем"}, commands.Khaleesi, chats},
 		{tele.Command{Text: "set", Description: "сохранить гет"}, commands.Set, chats},
 		{tele.Command{Text: "shrug", Description: "¯\\_(ツ)_/¯"}, commands.Shrug, chats},
 		{tele.Command{Text: "stats", Description: "статистика чата"}, commands.Stats, chats},
