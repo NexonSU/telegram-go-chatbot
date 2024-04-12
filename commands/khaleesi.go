@@ -243,10 +243,10 @@ func Khaleesi(context tele.Context) error {
 		{"ъ", "ь"},
 	}
 
-	text := context.Message().ReplyTo.Text
+	text := strings.ToLower(context.Message().ReplyTo.Text)
 
 	for i := range dict {
-		if strings.Contains(context.Message().ReplyTo.Text, dict[i][0]) {
+		if strings.Contains(strings.ToLower(context.Message().ReplyTo.Text), dict[i][0]) {
 			text = strings.ReplaceAll(text, dict[i][0], dict[i][1])
 		}
 	}
