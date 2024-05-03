@@ -19,6 +19,7 @@ import (
 
 // Send Yandex 300 response on link
 func TLDR(context tele.Context) error {
+	var err error
 	if utils.Config.YandexSummarizerToken == "" {
 		return fmt.Errorf("не задан Yandex Summarizer токен")
 	}
@@ -56,7 +57,11 @@ func TLDR(context tele.Context) error {
 	}
 
 	if link == "" {
-		return utils.ReplyAndRemove("Бот заберёт статью по ссылке и сделает её краткое описание.\nПример использования:\n<code>/tldr ссылка</code>.\nИли отправь в ответ на какое-либо сообщение с ссылкой.", context)
+		link, err = createPage(message.Text)
+		if err != nil {
+			return err
+		}
+		//return utils.ReplyAndRemove("Бот заберёт статью по ссылке и сделает её краткое описание.\nПример использования:\n<code>/tldr ссылка</code>.\nИли отправь в ответ на какое-либо сообщение с ссылкой.", context)
 	}
 
 	client := &http.Client{}
@@ -151,6 +156,17 @@ func webProxy(url string) (link string, error error) {
 	}
 
 	err = os.WriteFile(fmt.Sprintf("/home/nginx/zavtrabot.nexon.su/%x.html", linkName), body, 0644)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("https://zavtrabot.nexon.su/%x.html", linkName), nil
+}
+
+func createPage(text string) (link string, error error) {
+	linkName := fmt.Sprintf("%x", md5.Sum([]byte(text)))
+
+	err := os.WriteFile(fmt.Sprintf("/home/nginx/zavtrabot.nexon.su/%x.html", linkName), []byte(text), 0644)
 	if err != nil {
 		return "", err
 	}
