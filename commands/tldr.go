@@ -166,7 +166,7 @@ func webProxy(url string) (link string, error error) {
 func createPage(text string) (link string, error error) {
 	linkName := fmt.Sprintf("%x", md5.Sum([]byte(text)))
 
-	text = "<!doctype html><html><head><title>TLDR</title></head><body>" + text + "</body></html>"
+	text = "<!doctype html><html><head><title>TLDR</title></head><body><p>" + text + "</p></body></html>"
 
 	err := os.WriteFile(fmt.Sprintf("/home/nginx/zavtrabot.nexon.su/%x.html", linkName), []byte(text), 0644)
 	if err != nil {
