@@ -24,7 +24,7 @@ func TLDR(context tele.Context) error {
 		return fmt.Errorf("не задан Yandex Summarizer токен")
 	}
 	if context.Message().ReplyTo == nil && len(context.Args()) == 0 {
-		return utils.ReplyAndRemove("Бот заберёт статью по ссылке (или сами текст больше 200 символов) и сделает её краткое описание.\nПример использования:\n<code>/tldr ссылка</code>.\nИли отправь в ответ на какое-либо сообщение с ссылкой.", context)
+		return utils.ReplyAndRemove("Бот заберёт статью по ссылке (или сам текст больше 200 символов) и сделает её краткое описание.\nПример использования:\n<code>/tldr ссылка</code>.\nИли отправь в ответ на какое-либо сообщение с ссылкой.", context)
 	}
 
 	link := ""
@@ -58,7 +58,7 @@ func TLDR(context tele.Context) error {
 
 	if link == "" {
 		if len(message.Text) < 200 && len(message.Caption) < 200 {
-			return utils.ReplyAndRemove("Бот заберёт статью по ссылке (или сами текст больше 200 символов) и сделает её краткое описание.\nПример использования:\n<code>/tldr ссылка</code>.\nИли отправь в ответ на какое-либо сообщение с ссылкой.", context)
+			return utils.ReplyAndRemove("Бот заберёт статью по ссылке (или сам текст больше 200 символов) и сделает её краткое описание.\nПример использования:\n<code>/tldr ссылка</code>.\nИли отправь в ответ на какое-либо сообщение с ссылкой.", context)
 		}
 		if message.Text != "" {
 			link, err = createPage(message.Text)
