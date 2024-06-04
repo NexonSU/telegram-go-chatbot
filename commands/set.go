@@ -39,7 +39,10 @@ func Set(context tele.Context) error {
 		get.Name = strings.ToLower(inputGet)
 		get.Title = inputGet
 		get.Type = "Text"
-		get.Data = context.Message().Text
+		for i := range context.Message().Entities {
+			context.Message().Entities[i].Offset = context.Message().Entities[i].Offset - len(strings.Join(context.Args()[:2], " ")) - 1
+		}
+		get.Data = strings.Join(context.Args()[1:], " ")
 		get.Entities, _ = json.Marshal(context.Message().Entities)
 	} else {
 		get.Name = strings.ToLower(inputGet)
