@@ -53,7 +53,7 @@ func Get(context tele.Context) error {
 		case get.Type == "Text":
 			var entities tele.Entities
 			json.Unmarshal(get.Entities, &entities)
-			return context.Reply(get.Data, entities)
+			return context.Reply(get.Data, entities, &tele.SendOptions{DisableWebPagePreview: true})
 		default:
 			return utils.ReplyAndRemove(fmt.Sprintf("Ошибка при определении типа гета, я не знаю тип <code>%v</code>.", get.Type), context)
 		}
