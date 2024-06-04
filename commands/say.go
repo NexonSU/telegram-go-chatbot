@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"strings"
+
 	"github.com/NexonSU/telegram-go-chatbot/utils"
 	tele "gopkg.in/telebot.v3"
 )
@@ -11,5 +13,8 @@ func Say(context tele.Context) error {
 		return utils.ReplyAndRemove("Укажите сообщение.", context)
 	}
 	context.Delete()
-	return context.Send(utils.GetHtmlText(*context.Message()))
+	for i := range context.Message().Entities {
+		context.Message().Entities[i].Offset = context.Message().Entities[i].Offset - len(strings.Split(context.Message().Text, " ")[0]) - 1
+	}
+	return context.Send(context.Message().Payload, context.Message().Entities)
 }
