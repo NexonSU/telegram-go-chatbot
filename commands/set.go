@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -38,11 +39,13 @@ func Set(context tele.Context) error {
 		get.Name = strings.ToLower(inputGet)
 		get.Title = inputGet
 		get.Type = "Text"
-		get.Data = utils.GetHtmlText(*context.Message())
+		get.Data = context.Message().Text
+		get.Entities, _ = json.Marshal(context.Message().Entities)
 	} else {
 		get.Name = strings.ToLower(inputGet)
 		get.Title = inputGet
-		get.Caption = utils.GetHtmlText(*context.Message().ReplyTo)
+		get.Caption = context.Message().ReplyTo.Text
+		get.Entities, _ = json.Marshal(context.Message().ReplyTo.CaptionEntities)
 		switch {
 		case context.Message().ReplyTo.Animation != nil:
 			get.Type = "Animation"
@@ -64,7 +67,8 @@ func Set(context tele.Context) error {
 			get.Data = context.Message().ReplyTo.Document.FileID
 		case context.Message().ReplyTo.Text != "":
 			get.Type = "Text"
-			get.Data = utils.GetHtmlText(*context.Message().ReplyTo)
+			get.Data = context.Message().ReplyTo.Text
+			get.Entities, _ = json.Marshal(context.Message().ReplyTo.Entities)
 		default:
 			return utils.ReplyAndRemove("Не удалось распознать файл в сообщении, возможно, он не поддерживается.", context)
 		}

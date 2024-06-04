@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"strconv"
@@ -50,7 +51,9 @@ func Get(context tele.Context) error {
 				Caption: get.Caption,
 			})
 		case get.Type == "Text":
-			return context.Reply(get.Data)
+			var entities tele.Entities
+			json.Unmarshal(get.Entities, &entities)
+			return context.Reply(get.Data, entities)
 		default:
 			return utils.ReplyAndRemove(fmt.Sprintf("Ошибка при определении типа гета, я не знаю тип <code>%v</code>.", get.Type), context)
 		}
