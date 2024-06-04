@@ -13,7 +13,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"unicode/utf16"
 
 	cntx "context"
 
@@ -284,74 +283,6 @@ func GetBless() string {
 	var bless Bless
 	DB.Model(Bless{}).Order("RANDOM()").First(&bless)
 	return bless.Text
-}
-
-func GetHtmlText(message tele.Message) string {
-	type entity struct {
-		s string
-		i int
-	}
-
-	entities := message.Entities
-	textString := message.Text
-
-	if len(message.Text) == 0 {
-		entities = message.CaptionEntities
-		textString = message.Caption
-	}
-
-	textString = strings.ReplaceAll(textString, "<", "˂")
-	textString = strings.ReplaceAll(textString, ">", "˃")
-	text := utf16.Encode([]rune(textString))
-
-	ents := make([]entity, 0, len(entities)*2)
-
-	for _, ent := range entities {
-		var a, b string
-
-		switch ent.Type {
-		case tele.EntityBold, tele.EntityItalic,
-			tele.EntityUnderline, tele.EntityStrikethrough:
-			a = fmt.Sprintf("<%c>", ent.Type[0])
-			b = a[:1] + "/" + a[1:]
-		case tele.EntityCode, tele.EntityCodeBlock:
-			a = fmt.Sprintf("<%s>", ent.Type)
-			b = a[:1] + "/" + a[1:]
-		case tele.EntityTextLink:
-			a = fmt.Sprintf("<a href='%s'>", ent.URL)
-			b = "</a>"
-		case tele.EntityTMention:
-			a = fmt.Sprintf("<a href='tg://user?id=%d'>", ent.User.ID)
-			b = "</a>"
-		default:
-			continue
-		}
-
-		ents = append(ents, entity{a, ent.Offset})
-		ents = append(ents, entity{b, ent.Offset + ent.Length})
-	}
-
-	// reverse entities
-	for i, j := 0, len(ents)-1; i < j; i, j = i+1, j-1 {
-		ents[i], ents[j] = ents[j], ents[i]
-	}
-
-	for _, ent := range ents {
-		r := utf16.Encode([]rune(ent.s))
-		text = append(text[:ent.i], append(r, text[ent.i:]...)...)
-	}
-
-	textString = string(utf16.Decode(text))
-
-	if len(message.Entities) != 0 && message.Entities[0].Type == tele.EntityCommand {
-		if textString[1:4] == "set" {
-			textString = strings.Join(strings.Split(textString, " ")[2:], " ")
-		} else {
-			textString = textString[message.Entities[0].Length+1:]
-		}
-	}
-
-	return textString
 }
 
 func FFmpegConvert(context tele.Context, filePath string, targetType string) error {
