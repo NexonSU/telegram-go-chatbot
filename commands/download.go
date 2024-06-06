@@ -16,6 +16,8 @@ import (
 func Download(context tele.Context) error {
 	var filePath string
 
+	context.Delete()
+
 	if context.Message().ReplyTo == nil && len(context.Args()) < 1 {
 		return utils.ReplyAndRemove("Пример использования: <code>/download {ссылка на ютуб/твиттер}</code>\nИли отправь в ответ на какое-либо сообщение с ссылкой <code>/download</code>", context)
 	}

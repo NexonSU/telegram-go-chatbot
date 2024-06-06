@@ -77,6 +77,7 @@ func main() {
 		{tele.Command{Text: "delbet", Description: "удалить ставку"}, bets.DelBet, chats},
 		{tele.Command{Text: "convert", Description: "конвертировать файл, доппараметры: mp3,ogg,gif,audio,voice,animation"}, commands.Convert, chats},
 		{tele.Command{Text: "download", Description: "скачать файл"}, commands.Download, chats},
+		{tele.Command{Text: "wget", Description: "скачать файл"}, commands.Download, chats},
 	}
 
 	commandAdminList := []commandList{
