@@ -106,7 +106,7 @@ func Cur(context tele.Context) error {
 		}
 	}
 	if symbol == "9911" || convert == "9911" {
-		return fmt.Errorf("Невозможно конвертировать тестовую валюту")
+		return fmt.Errorf("невозможно конвертировать тестовую валюту")
 	}
 	client := cmc.NewClient(&cmc.Config{ProAPIKey: utils.Config.CurrencyKey})
 	conversion, err := client.Tools.PriceConversion(&cmc.ConvertOptions{Amount: amount, ID: symbol, ConvertID: convert})
