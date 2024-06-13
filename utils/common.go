@@ -403,7 +403,7 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 		if err != nil {
 			return err
 		}
-		KwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"an": "", "filter_complex": fmt.Sprintf("[0]trim=start_frame=1:end_frame=%d,setpts=PTS-STARTPTS,reverse[r];[0][r]concat,loop=1:2", framesInt-1)}})
+		KwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"an": "", "filter_complex": fmt.Sprintf("[0]trim=start_frame=0:end_frame=%d,setpts=PTS-STARTPTS,reverse[r];[0][r]concat,loop=1:2", framesInt)}})
 		extension = "mp4"
 		targetType = "animation"
 	default:
