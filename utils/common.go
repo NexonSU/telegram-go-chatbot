@@ -399,11 +399,7 @@ func FFmpegConvert(context tele.Context, filePath string, targetType string) err
 		extension = "ogg"
 		targetType = "voice"
 	case "animation_loop", "loop":
-		framesInt, err := strconv.Atoi(inputVideoFormat.NbFrames)
-		if err != nil {
-			return err
-		}
-		KwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"an": "", "filter_complex": fmt.Sprintf("[0]trim=start_frame=0:end_frame=%d,setpts=PTS-STARTPTS,reverse[r];[0][r]concat,loop=1:2", framesInt)}})
+		KwArgs = ffmpeg.MergeKwArgs([]ffmpeg.KwArgs{videoKwArgs, {"an": "", "filter_complex": "[0]reverse[r];[0][r]concat,loop=1:2,setpts=PTS-STARTPTS"}})
 		extension = "mp4"
 		targetType = "animation"
 	default:
