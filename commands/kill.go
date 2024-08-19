@@ -82,6 +82,12 @@ func Kill(context tele.Context) error {
 			prependText = "очень "
 		}
 	}
+	if strings.Contains(command, "kilo") {
+		duration = duration * 1024
+	}
+	if strings.Contains(command, "mega") {
+		duration = duration * 1048576
+	}
 	if victimText != "" {
 		duration = 1
 	}
