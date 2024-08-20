@@ -100,7 +100,7 @@ func Kill(context tele.Context) error {
 	if command == "/bless" {
 		text = prt.Sprintf("🤫 %v %vпопросил %v помолчать %d минут.", utils.UserFullName(context.Sender()), prependText, utils.UserFullName(&target), duration)
 	}
-	if command == "/bite" {
+	if strings.Contains(command, "bite") {
 		text = prt.Sprintf("😼 %v %vсделал кусь %v.\n%v отправился на респавн на %d мин.", utils.UserFullName(context.Sender()), prependText, utils.UserFullName(&target), utils.UserFullName(&target), duration)
 	}
 	if victimText != "" {
