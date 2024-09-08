@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/Jeffail/tunny v0.1.4
+	github.com/NexonSU/goutubedl v0.0.0-20240908193854-b7b8d57e8b0c
 	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/arran4/golang-ical v0.1.0
 	github.com/fogleman/gg v1.3.0
@@ -14,7 +15,6 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/tidwall/gjson v1.17.0
 	github.com/u2takey/ffmpeg-go v0.5.0
-	github.com/wader/goutubedl v0.0.0-20231003215439-3f0889f7e84f
 	github.com/yudgnahk/go-cloudflare-scraper v0.0.1
 	golang.org/x/text v0.13.0
 	gopkg.in/telebot.v3 v3.1.3

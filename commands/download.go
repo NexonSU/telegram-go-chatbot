@@ -4,11 +4,12 @@ import (
 	cntx "context"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"time"
 
+	"github.com/NexonSU/goutubedl"
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"github.com/wader/goutubedl"
 	tele "gopkg.in/telebot.v3"
 )
 
@@ -67,7 +68,7 @@ func Download(context tele.Context) error {
 
 	goutubedl.Path = "yt-dlp"
 
-	result, err := goutubedl.New(cntx.Background(), link, goutubedl.Options{})
+	result, err := goutubedl.New(cntx.Background(), link, goutubedl.Options{DebugLog: log.Default(), Impersonate: "chrome"})
 	if err != nil {
 		return err
 	}
