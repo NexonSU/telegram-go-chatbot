@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/Jeffail/tunny v0.1.4
-	github.com/NexonSU/goutubedl v0.0.0-20240908193854-b7b8d57e8b0c
+	github.com/NexonSU/goutubedl v0.0.0-20240909080527-113f9a40cfbf
 	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/arran4/golang-ical v0.1.0
 	github.com/fogleman/gg v1.3.0

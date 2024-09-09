@@ -59,8 +59,8 @@ github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
 github.com/Jeffail/tunny v0.1.4 h1:chtpdz+nUtaYQeCKlNBg6GycFF/kGVHOr6A3cmzTJXs=
 github.com/Jeffail/tunny v0.1.4/go.mod h1:P8xAx4XQl0xsuhjX1DtfaMDCSuavzdb2rwbd0lk+fvo=
-github.com/NexonSU/goutubedl v0.0.0-20240908193854-b7b8d57e8b0c h1:RdQfQppoWDxKqNW8veoodOUDg94B2GtcrCEFPaSlXu0=
-github.com/NexonSU/goutubedl v0.0.0-20240908193854-b7b8d57e8b0c/go.mod h1:i8ccyvDLBWaxCV9xlIfHIzB1Tq+1hsxGPUv+6ydaY/M=
+github.com/NexonSU/goutubedl v0.0.0-20240909080527-113f9a40cfbf h1:7uMN4M/BXAKqxucBOVbAcJnbgOCTAM095egNFiBqg4Q=
+github.com/NexonSU/goutubedl v0.0.0-20240909080527-113f9a40cfbf/go.mod h1:i8ccyvDLBWaxCV9xlIfHIzB1Tq+1hsxGPUv+6ydaY/M=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/PuerkitoBio/goquery v1.8.1 h1:uQxhNlArOIdbrH1tr0UXwdVFgDcZDrZVdcpygAcwmWM=
 github.com/PuerkitoBio/goquery v1.8.1/go.mod h1:Q8ICL1kNUJ2sXGoAhPGUdYDJvgQgHzJsnnd3H7Ho5jQ=
