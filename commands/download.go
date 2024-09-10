@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/NexonSU/goutubedl"
 	"github.com/NexonSU/telegram-go-chatbot/utils"
+	"github.com/wader/goutubedl"
 	tele "gopkg.in/telebot.v3"
 )
 
