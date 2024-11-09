@@ -127,7 +127,7 @@ func Distort(context tele.Context) error {
 			return err
 		}
 
-		if framesInt > 1000 {
+		if framesInt > 1000 && !utils.IsAdminOrModer(context.Sender().ID) {
 			return utils.ReplyAndRemove("Видео слишком длинное. Максимум 1000 фреймов.", context)
 		}
 	}
