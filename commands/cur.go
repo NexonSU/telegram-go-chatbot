@@ -12,10 +12,10 @@ import (
 
 var CryptoMap []*cmc.MapListing
 var FiatMap []*cmc.FiatMapListing
-var JokeMap = []JokeMapStruct{}
+var CustomMap = []CustomMapStruct{}
 var _ = GenerateMaps()
 
-type JokeMapStruct struct {
+type CustomMapStruct struct {
 	symbol string
 	name   string
 	amount float64
@@ -35,10 +35,10 @@ func GenerateMaps() error {
 	if err != nil {
 		return err
 	}
-	JokeMap = append(JokeMap, JokeMapStruct{symbol: "COC", name: "Cup Of Coffee", amount: 300.0})
-	JokeMap = append(JokeMap, JokeMapStruct{symbol: "DSHK", name: "Doshirak", amount: 80.0})
-	JokeMap = append(JokeMap, JokeMapStruct{symbol: "DOSH", name: "Doshirak", amount: 80.0})
-	JokeMap = append(JokeMap, JokeMapStruct{symbol: "TBW", name: "Boeing Wing", amount: 178000000.0})
+	CustomMap = append(CustomMap, CustomMapStruct{symbol: "COC", name: "Cup Of Coffee", amount: 300.0})
+	CustomMap = append(CustomMap, CustomMapStruct{symbol: "DSHK", name: "Doshirak", amount: 80.0})
+	CustomMap = append(CustomMap, CustomMapStruct{symbol: "DOSH", name: "Doshirak", amount: 80.0})
+	CustomMap = append(CustomMap, CustomMapStruct{symbol: "TBW", name: "Boeing Wing", amount: 178000000.0})
 	return nil
 }
 
@@ -47,8 +47,11 @@ func GetSymbolId(symbol string) (string, error) {
 	if symbol == "BYR" {
 		symbol = "BYN"
 	}
-	for _, JokeFiat := range JokeMap {
-		if symbol == JokeFiat.symbol {
+	if symbol == "TL" {
+		symbol = "TRY"
+	}
+	for _, CustomFiat := range CustomMap {
+		if symbol == CustomFiat.symbol {
 			symbol = "RUB"
 		}
 	}
@@ -100,9 +103,9 @@ func Cur(context tele.Context) error {
 	if err != nil {
 		return err
 	}
-	for _, JokeFiat := range JokeMap {
-		if strings.ToUpper(context.Args()[1]) == JokeFiat.symbol {
-			amount = amount * JokeFiat.amount
+	for _, CustomFiat := range CustomMap {
+		if strings.ToUpper(context.Args()[1]) == CustomFiat.symbol {
+			amount = amount * CustomFiat.amount
 		}
 	}
 	if symbol == "9911" || convert == "9911" {
@@ -115,14 +118,14 @@ func Cur(context tele.Context) error {
 	}
 	resultAmount := conversion.Quote[convert].Price
 	resultName := GetIdName(convert)
-	for _, JokeFiat := range JokeMap {
-		if strings.ToUpper(context.Args()[1]) == JokeFiat.symbol {
-			conversion.Amount = amount / JokeFiat.amount
-			conversion.Name = JokeFiat.name
+	for _, CustomFiat := range CustomMap {
+		if strings.ToUpper(context.Args()[1]) == CustomFiat.symbol {
+			conversion.Amount = amount / CustomFiat.amount
+			conversion.Name = CustomFiat.name
 		}
-		if strings.ToUpper(context.Args()[2]) == JokeFiat.symbol {
-			resultAmount = resultAmount / JokeFiat.amount
-			resultName = JokeFiat.name
+		if strings.ToUpper(context.Args()[2]) == CustomFiat.symbol {
+			resultAmount = resultAmount / CustomFiat.amount
+			resultName = CustomFiat.name
 		}
 	}
 	return context.Send(fmt.Sprintf("%.2f %v = %.2f %v", conversion.Amount, conversion.Name, resultAmount, resultName), &tele.SendOptions{ReplyTo: context.Message().ReplyTo, AllowWithoutReply: true})
