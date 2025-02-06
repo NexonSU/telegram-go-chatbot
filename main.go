@@ -21,7 +21,7 @@ type commandList struct {
 func main() {
 	utils.BotInit()
 
-	//middlewares
+	//middle wares
 	admin := utils.Whitelist(append(utils.Config.Admins, utils.Config.SysAdmin)...)
 	moder := utils.Whitelist(append(append(utils.Config.Admins, utils.Config.Moders...), utils.Config.SysAdmin)...)
 	chats := utils.Whitelist(append(append(utils.Config.Admins, utils.Config.Moders...), utils.Config.SysAdmin, utils.Config.Chat, utils.Config.ReserveChat)...)
