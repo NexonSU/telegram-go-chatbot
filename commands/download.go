@@ -66,7 +66,7 @@ func Download(context tele.Context) error {
 		}
 	}
 
-	goutubedl.Path = "yt-dlp"
+	goutubedl.Path = "/home/telegram/.local/bin/yt-dlp"
 
 	result, err := goutubedl.New(cntx.Background(), link, goutubedl.Options{DebugLog: log.Default(), Impersonate: "chrome"})
 	if err != nil {
