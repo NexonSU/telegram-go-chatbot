@@ -3,13 +3,11 @@ package commands
 import (
 	cntx "context"
 	"fmt"
-	"io"
-	"log"
 	"os"
 	"time"
 
 	"github.com/NexonSU/telegram-go-chatbot/utils"
-	"github.com/wader/goutubedl"
+	"github.com/lrstanley/go-ytdlp"
 	tele "gopkg.in/telebot.v3"
 )
 
@@ -66,31 +64,13 @@ func Download(context tele.Context) error {
 		}
 	}
 
-	goutubedl.Path = "/home/telegram/.local/bin/yt-dlp"
+	ytdlp.MustInstall(cntx.TODO(), nil)
 
-	result, err := goutubedl.New(cntx.Background(), link, goutubedl.Options{DebugLog: log.Default(), Impersonate: "chrome"})
-	if err != nil {
-		return err
-	}
+	filePath = fmt.Sprintf("%v/%v.mp4", os.TempDir(), context.Message().ID)
 
-	if result.Info.Duration > 3600 {
-		return utils.ReplyAndRemove("Максимальная длина видео 60 минут.", context)
-	}
+	dl := ytdlp.New().FormatSort("res,ext:mp4:m4a").RecodeVideo("mp4").Output(filePath)
 
-	ytdlpResult, err := result.Download(cntx.Background(), "bestvideo*+bestaudio/best")
-	if err != nil {
-		return err
-	}
-	defer ytdlpResult.Close()
-
-	filePath = fmt.Sprintf("%v/%v.%v", os.TempDir(), result.Info.ID, result.Info.Ext)
-
-	f, err := os.Create(filePath)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	_, err = io.Copy(f, ytdlpResult)
+	_, err := dl.Run(cntx.TODO(), link)
 	if err != nil {
 		return err
 	}
