@@ -13,7 +13,7 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-// Convert given file
+// Convert given  file
 func Download(context tele.Context) error {
 	var filePath string
 
