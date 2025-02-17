@@ -14,7 +14,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/tidwall/gjson v1.17.0
 	github.com/u2takey/ffmpeg-go v0.5.0
-	github.com/wader/goutubedl v0.0.0-20240910081116-fed2a6ab45a3
+	github.com/wader/goutubedl v0.0.0-20250213161834-1675a2e919fd
 	github.com/yudgnahk/go-cloudflare-scraper v0.0.1
 	golang.org/x/text v0.13.0
 	gopkg.in/telebot.v3 v3.1.3
