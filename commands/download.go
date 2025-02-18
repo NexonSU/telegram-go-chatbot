@@ -13,7 +13,7 @@ import (
 
 // Convert given  file
 func Download(context tele.Context) error {
-	var filePath string
+	filePath := fmt.Sprintf("%v/%v.mp4", os.TempDir(), context.Message().ID)
 
 	context.Delete()
 
@@ -23,15 +23,6 @@ func Download(context tele.Context) error {
 
 	link := ""
 	message := &tele.Message{}
-	arg := "video"
-
-	if context.Message().ReplyTo == nil && len(context.Args()) == 2 {
-		arg = context.Args()[1]
-	}
-
-	if context.Message().ReplyTo != nil && len(context.Args()) == 1 {
-		arg = context.Args()[0]
-	}
 
 	if context.Message().ReplyTo == nil {
 		message = context.Message()
@@ -39,11 +30,11 @@ func Download(context tele.Context) error {
 		message = context.Message().ReplyTo
 	}
 
-	var done = make(chan bool, 1)
+	var downloadNotify = make(chan bool, 1)
 	go func() {
 		for {
 			select {
-			case <-done:
+			case <-downloadNotify:
 				return
 			default:
 				context.Notify(tele.RecordingVideo)
@@ -52,7 +43,7 @@ func Download(context tele.Context) error {
 		}
 	}()
 	defer func() {
-		done <- true
+		downloadNotify <- true
 	}()
 
 	for _, entity := range message.Entities {
@@ -66,22 +57,25 @@ func Download(context tele.Context) error {
 
 	ytdlp.MustInstall(cntx.TODO(), nil)
 
-	filePath = fmt.Sprintf("%v/%v.mp4", os.TempDir(), context.Message().ID)
+	ytdlpDownload := ytdlp.New().Downloader("aria2c").Downloader("dash,m3u8:native").Impersonate("Chrome-124").Format("bestvideo[height<=?720]+bestaudio/best").RecodeVideo("mp4").Output(filePath).MaxFileSize("512M").PrintJSON().WriteThumbnail()
 
-	dl := ytdlp.New().FormatSort("res,ext:mp4:m4a").RecodeVideo("mp4").Output(filePath)
-
-	_, err := dl.Run(cntx.TODO(), link)
+	ytdlpResult, err := ytdlpDownload.Run(cntx.TODO(), link)
 	if err != nil {
 		return err
 	}
 
-	done <- true
+	ytdlpInfo, err := ytdlpResult.GetExtractedInfo()
+	if err != nil {
+		return err
+	}
 
-	var done2 = make(chan bool, 1)
+	downloadNotify <- true
+
+	var uploadNotify = make(chan bool, 1)
 	go func() {
 		for {
 			select {
-			case <-done2:
+			case <-uploadNotify:
 				return
 			default:
 				context.Notify(tele.UploadingVideo)
@@ -90,8 +84,15 @@ func Download(context tele.Context) error {
 		}
 	}()
 	defer func() {
-		done2 <- true
+		uploadNotify <- true
+		os.Remove(filePath)
 	}()
 
-	return utils.FFmpegConvert(context, filePath, arg)
+	return context.Send(&tele.Video{
+		FileName:  *ytdlpInfo[0].Title + ".mp4",
+		Streaming: true,
+		File: tele.File{
+			FileLocal: filePath,
+		},
+	})
 }
