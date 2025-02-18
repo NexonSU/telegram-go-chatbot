@@ -57,7 +57,7 @@ func Download(context tele.Context) error {
 
 	ytdlp.MustInstall(cntx.TODO(), nil)
 
-	ytdlpDownload := ytdlp.New().Downloader("aria2c").Downloader("dash,m3u8:native").Impersonate("Chrome-124").Format("bestvideo[height<=?720]+bestaudio/best").RecodeVideo("mp4").Output(filePath).MaxFileSize("512M").PrintJSON().WriteThumbnail()
+	ytdlpDownload := ytdlp.New().Downloader("aria2c").Downloader("dash,m3u8:native").Impersonate("Chrome-124").Format("bestvideo[height<=?720]+bestaudio/best").RecodeVideo("mp4").Output(filePath).MaxFileSize("512M").PrintJSON().EmbedThumbnail().EmbedMetadata()
 
 	ytdlpResult, err := ytdlpDownload.Run(cntx.TODO(), link)
 	if err != nil {
